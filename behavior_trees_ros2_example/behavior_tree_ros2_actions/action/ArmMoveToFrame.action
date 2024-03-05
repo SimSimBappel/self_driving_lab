@@ -1,0 +1,8 @@
+#goal definition
+string frame
+---
+#result definition
+bool done
+---
+#feedback
+int32 cycle

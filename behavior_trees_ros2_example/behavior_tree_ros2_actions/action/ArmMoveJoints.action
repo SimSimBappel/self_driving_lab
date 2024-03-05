@@ -1,0 +1,8 @@
+#goal definition
+float64[] joints
+---
+#result definition
+bool done
+---
+#feedback
+int32 cycle

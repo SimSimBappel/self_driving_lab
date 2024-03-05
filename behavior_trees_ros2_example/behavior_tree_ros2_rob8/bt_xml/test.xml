@@ -1,0 +1,27 @@
+ <root BTCPP_format="4">
+     <BehaviorTree ID="GraspObject">
+        <Sequence>
+            <PrintValue message="start"/>
+            <GripperAction name="gripper_open" open="true"/>
+            <GripperJointAction name="gripper_joint" joint_1="-0.328318531" joint_2="0.328318531"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.1,0.0,1.529,0.0"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <GripperAction name="gripper_close" open="false"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <ArmMovePoseAction name="arm" pose="-0.1,-0.6,0.4,0.0,0.0,-1.529"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.1,0.0,1.529,0.0"/>
+            <GripperAction name="gripper_open" open="true"/>
+            <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
+            <SleepAction name="sleepA" msec="200"/>
+            <ArmMovePoseAction name="arm" pose="0.1,-0.6,0.4,0.0,0.0,-1.529"/>
+            <GripperAction name="gripper_close" open="false"/>
+            <PrintValue message="sleep completed"/>
+        </Sequence>
+     </BehaviorTree>
+ </root>
