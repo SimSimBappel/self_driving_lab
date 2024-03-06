@@ -21,6 +21,10 @@ cd ~
 mkdir -p sdl_ws/src
 cd sdl_ws/src
 git clone https://github.com/SimSimBappel/self_driving_lab
+cd self_driving_lab/gazebo_sim
+git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin.git
+cd ..
+cd ..
 cd ..
 colcon build
 source install/setup.bash
