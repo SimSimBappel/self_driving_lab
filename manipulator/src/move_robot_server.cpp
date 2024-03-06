@@ -18,9 +18,12 @@ static const double MAX_VELOCITY_SCALE = 0.8;
 static const double MAX_ACCELERATION_SCALE = 0.8;
 static const unsigned int PLANNING_ATTEMPTS = 5;
 static const double GOAL_TOLERANCE = 1e-3;
-static const std::string PLANNING_GROUP = "arm_group";
+static const std::string PLANNING_GROUP = "panda_1";
 
-static const std::string PLANNING_GRIPPER_GROUP = "gripper";
+static const std::string PLANNING_GRIPPER_GROUP = "panda_1_gripper";
+// static const std::string PLANNING_GROUP = "arm_group";
+
+// static const std::string PLANNING_GRIPPER_GROUP = "gripper";
 
 // using std::placeholders::_1;
 using namespace std::placeholders;
@@ -122,7 +125,7 @@ bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
 bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
 {
     RCLCPP_INFO(this->get_logger(), "move function called");
-    
+    move_group_->setPoseReferenceFrame("panda1_link0");
     geometry_msgs::msg::Pose pose_goal; // = move_group_->getCurrentPose().pose;
     // pose_goal.position.x = 0.1;;
     // pose_goal.position.y = -0.4;

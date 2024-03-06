@@ -1,21 +1,135 @@
- <root BTCPP_format="4">
-     <BehaviorTree>
-        <Sequence>
-            <PrintValue message="start"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.2,0.281,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.1,0.281,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <GripperAction name="gripper_close" open="false"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.2,0.281,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.2,0.381,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.1,0.381,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-            <ArmMovePoseAction name="arm" pose="0.623,-0.1,0.281,-3.142,0.0,0.0"/>
-            <SleepAction name="sleepA" msec="200"/>
-        </Sequence>
-     </BehaviorTree>
- </root>
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="GraspObject">
+    <Sequence>
+      <GripperAction open="open"
+                     action_name="__default__placeholder__"/>
+      <ArmMovePoseAction pose="{goal}"
+                         action_name="__default__placeholder__"/>
+      <GripperAction open="close"
+                     action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+    <BehaviorTree ID="Grasp">
+    <Sequence>
+    <Script code="in_name:= '0.623,-0.2,0.281,-3.142,0.0,0.0' "/>
+      <GripperAction open="open"
+                     action_name="__default__placeholder__"/>
+      <ArmMovePoseAction pose="{in_name}"
+                         action_name="__default__placeholder__"/>
+      <GripperAction open="close"
+                     action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+
+
+
+  <BehaviorTree ID="MySub">
+    <Sequence>
+      <ScriptCondition code="sub_in_value==42 && sub_in_name=='john'" />
+      <Script code="sub_out_result:=69; sub_out_state:='ACTIVE'" />
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="MainTree">
+    <Sequence>
+      <Script code="in_name:= 'john' "/>
+      <SubTree ID="MySub" sub_in_name="{in_name}"
+                          sub_out_state="{out_state}"/>
+      <ScriptCondition code=" out_result==69 && out_state=='ACTIVE' " />
+      <Script code="in_name:= '0.623,-0.2,0.281,-3.142,0.0,0.0' "/>
+      <PrintValue message="start"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="{in_name}"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="0.623,-0.1,0.281,-3.142,0.0,0.0"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <GripperAction name="gripper_close"
+                     open="false"
+                     action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="0.623,-0.2,0.281,-3.142,0.0,0.0"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="0.623,-0.2,0.381,-3.142,0.0,0.0"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="0.623,-0.1,0.381,-3.142,0.0,0.0"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseAction name="arm"
+                         pose="0.623,-0.1,0.281,-3.142,0.0,0.0"
+                         action_name="__default__placeholder__"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+      
+    <SubTree ID="MySub">
+      <input_port name="sub_in_value" default="42"/>
+      <input_port name="sub_in_name"/>
+      <output_port name="sub_out_result" default="{out_result}"/>
+      <output_port name="sub_out_state"/>
+    </SubTree>
+
+    <SubTree ID="GraspObject">
+      <input_port name="goal" default="0.0,-0.1,0.281,-3.142,0.0,0.0"/>
+    </SubTree>
+
+
+    <Action ID="ArmMovePoseAction">
+      <input_port name="pose"
+                  type="std::string"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <SubTree ID="GraspObject"
+             editable="true">
+      <input_port name="goal"/>
+    </SubTree>
+    <Action ID="GripperAction">
+      <input_port name="open"
+                  type="unsigned int"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="PrintValue">
+      <input_port name="message"
+                  type="std::string"/>
+    </Action>
+    <Action ID="SleepAction">
+      <input_port name="msec"
+                  type="unsigned int"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+  </TreeNodesModel>
+
+</root>

@@ -1,11 +1,23 @@
 #include "behaviortree_ros2/bt_action_node.hpp"
+#include "behaviortree_cpp/bt_factory.h"
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/executors.hpp"
+
 #include "gripper_behaviors.cpp"
 #include "arm_behaviors.cpp"
 #include "behaviortree_ros2/plugins.hpp"
 #include "yaml-cpp/yaml.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
+#include "iostream"
+
+#include "behaviortree_cpp/loggers/bt_file_logger_v2.h"
+
+#include "behaviortree_cpp/bt_factory.h"
+#include "behaviortree_cpp/loggers/groot2_publisher.h"
+#include "behaviortree_cpp/loggers/bt_sqlite_logger.h"
+#include "behaviortree_cpp/xml_parsing.h"
+#include "behaviortree_cpp/json_export.h"
 
 #ifndef USE_SLEEP_PLUGIN
 #include "sleep_action.hpp"
@@ -52,7 +64,7 @@ const std::string default_bt_xml_file =
   // Simple tree, used to execute once each action.
 //   static const char* xml_text = R"(
 //  <root BTCPP_format="4">
-//      <BehaviorTree>
+//      <BehaviorTree>#include "behaviortree_cpp/bt_factory.h"
 //         <Sequence>
 //             <PrintValue message="start"/>
 //             <GripperAction name="gripper_open" open="true"/>
@@ -116,14 +128,35 @@ int main(int argc, char **argv)
 
   nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
   std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
-  auto tree = factory.createTreeFromFile(tree_xml_file_);
+
+  std::string xml_models = BT::writeTreeNodesModelXML(factory);
+  std::cout << "----------- XML file  ----------\n"
+            << xml_models
+            << "--------------------------------\n";
+
+  factory.registerBehaviorTreeFromFile(tree_xml_file_);
+  auto tree = factory.createTree("MainTree");
+
+  // std::cout << BT::writeTreeToXML(tree);
+  std::cout << "----------- XML file  ----------\n"
+            << BT::WriteTreeToXML(tree, false, false)
+            << "--------------------------------\n";
+
+  BT::Groot2Publisher publisher(tree);
+
   // auto tree = factory.createTreeFromText(xml_text);
-  // tree.tickWhileRunning();
+  tree.tickWhileRunning();
   // tree.tickOnce();
-  for(int i=0; i<5; i++){
-    tree.tickWhileRunning();
-    // tree.tickOnce();
-  }
+  // for(int i=0; i<5; i++){
+  //   tree.tickWhileRunning();
+  //   // tree.tickOnce();
+  // }
+
+    // let's visualize some information about the current state of the blackboards.
+  std::cout << "\n------ First BB ------" << std::endl;
+  tree.subtrees[0]->blackboard->debugMessage();
+  std::cout << "\n------ Second BB------" << std::endl;
+  tree.subtrees[1]->blackboard->debugMessage();
 
   return 0;
 }
