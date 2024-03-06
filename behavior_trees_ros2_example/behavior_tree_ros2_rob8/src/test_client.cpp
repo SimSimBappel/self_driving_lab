@@ -106,7 +106,14 @@ int main(int argc, char **argv)
   params_arm_mode_pose.server_timeout = std::chrono::milliseconds(2000);
   params_arm_mode_pose.wait_for_server_timeout = std::chrono::milliseconds(1000);
   params_arm_mode_pose.default_port_value = "arm_move_pose_service";
-  factory.registerNodeType<ArmMovePoseAction>("ArmMovePoseAction",params_arm_mode_pose);
+  factory.registerNodeType<ArmMoveJointsAction>("ArmMoveJointsAction",params_arm_mode_pose);
+
+  RosNodeParams params_arm_mode_joints;
+  params_arm_mode_joints.nh = nh;
+  params_arm_mode_joints.server_timeout = std::chrono::milliseconds(2000);
+  params_arm_mode_joints.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_arm_mode_joints.default_port_value = "arm_move_joints_service";
+  factory.registerNodeType<ArmMovePoseAction>("ArmMovePoseAction",params_arm_mode_joints);
 
   RosNodeParams params_gripper_joint;
   params_gripper_joint.nh = nh;

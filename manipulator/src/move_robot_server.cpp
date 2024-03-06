@@ -63,6 +63,13 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_pose_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pose_handle_accepted, this, _1));
     
+    this->action_server_arm_move_joints_ = rclcpp_action::create_server<ArmMoveJoints>(
+      this,
+      "arm_move_joints_service",
+      std::bind(&MoveRobotServer::arm_move_joints_handle_goal, this, _1, _2),
+      std::bind(&MoveRobotServer::arm_move_joints_handle_cancel, this, _1),
+      std::bind(&MoveRobotServer::arm_move_joints_handle_accepted, this, _1));
+    
     this->action_server_sleep_ = rclcpp_action::create_server<Sleep>(
       this,
       "sleep_service",
@@ -545,6 +552,112 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       // }
   }
 
+
+rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const ArmMoveJoints::Goal> goal)
+  {
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse MoveRobotServer::arm_move_joints_handle_cancel(
+    const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void MoveRobotServer::arm_move_joints_handle_accepted(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&MoveRobotServer::arm_move_joints_execute, this, _1), goal_handle}.detach();
+  
+  }
+
+  void MoveRobotServer::arm_move_joints_execute(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle){
+      auto result = std::make_shared<ArmMoveJoints::Result>();
+      std_msgs::msg::Float64MultiArray joints;
+      const auto goal = goal_handle->get_goal();
+      auto pose = goal->joints;
+      // RCLCPP_INFO(this->get_logger(), pose.str_c());
+    //   std::vector<std::string> v;
+ 
+    //   std::stringstream ss(pose);
+    //   std::vector<double> pos;
+    // while (ss.good()) {
+    //     std::string substr;
+    //     getline(ss, substr, ',');
+    //     v.push_back(substr);
+    // }
+    // for(int i = 0; i < v.size(); i++)
+    // {
+    //   pos.push_back(stod(v[i]));
+    // }
+    //   geometry_msgs::msg::PoseStamped pose_goal; // = move_group_->getCurrentPose().pose;
+   
+    //   pose_goal.pose.position.x = pos[0];
+    //   pose_goal.pose.position.y = pos[1];
+    //   pose_goal.pose.position.z = pos[2];
+
+    //   tf2::Quaternion q_new;
+    //   q_new.setRPY(pos[3], pos[4], pos[5]);
+    
+
+    //   q_new.normalize();
+      
+    //   pose_goal.pose.orientation.x = q_new.x();
+    //   pose_goal.pose.orientation.y = q_new.y();
+    //   pose_goal.pose.orientation.z = q_new.z();
+    //   pose_goal.pose.orientation.w = q_new.w();
+      
+      if(true)
+      {
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          result->done = false;
+          goal_handle->canceled(result);
+          RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      }
+      // if(open == true)
+      // {
+      //   joints.data = {-0.628318531, 0.628318531};
+      //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+          
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+      // if(open == false)
+      // {
+        
+      //   joints.data = {0.0, 0.0};
+      //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+  }
 
 //////////  SLEEP ACTION //////////////
 

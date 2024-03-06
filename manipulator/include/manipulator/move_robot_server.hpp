@@ -52,6 +52,14 @@ public:
     using ArmMovePose = behavior_tree_ros2_actions::action::ArmMovePose;
     using GoalHandleArmMovePose = rclcpp_action::ServerGoalHandle<ArmMovePose>;
 
+    using ArmMoveJoints = behavior_tree_ros2_actions::action::ArmMoveJoints;
+    using GoalHandleArmMoveJoints = rclcpp_action::ServerGoalHandle<ArmMoveJoints>;
+
+    rclcpp_action::GoalResponse arm_move_joints_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMoveJoints::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_joints_handle_cancel(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
+    void arm_move_joints_handle_accepted(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
+    void arm_move_joints_execute(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
+
     using GoalHandleHome = rclcpp_action::ServerGoalHandle<Home>;
 
     rclcpp_action::GoalResponse home_arm_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const Home::Goal> goal);
@@ -87,6 +95,9 @@ private:
     rclcpp_action::Server<Gripper>::SharedPtr action_server_gripper_;
     rclcpp_action::Server<GripperJoint>::SharedPtr action_server_gripper_joint_;
     rclcpp_action::Server<ArmMovePose>::SharedPtr action_server_arm_move_pose_;
+
+    rclcpp_action::Server<ArmMoveJoints>::SharedPtr action_server_arm_move_joints_;
+
     rclcpp_action::Server<Home>::SharedPtr action_server_home_arm_;
 
     rclcpp_action::Server<Sleep>::SharedPtr action_server_sleep_;

@@ -9,6 +9,43 @@
 
 using namespace BT;
 
+class ArmMoveJointsAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJoints>
+{
+public:
+  ArmMoveJointsAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJoints>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    return providedBasicPorts({InputPort<std::vector<double>>("joints")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto frame = getInput<std::vector<double>>("joints");
+    goal.joints = frame.value();
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
 class ArmMoveToFrameAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveToFrame>
 {
 public:
