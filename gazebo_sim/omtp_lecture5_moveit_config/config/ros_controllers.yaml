@@ -1,0 +1,62 @@
+panda_arm_controller:
+  type: effort_controllers/JointTrajectoryController
+  joints:
+    - franka_arm_joint1
+    - franka_arm_joint2
+    - franka_arm_joint3
+    - franka_arm_joint4
+    - franka_arm_joint5
+    - franka_arm_joint6
+    - franka_arm_joint7
+  gains:
+    franka_arm_joint1:
+      p: 18000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint2:
+      p: 25000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint3:
+      p: 18000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint4:
+      p: 18000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint5:
+      p: 12000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint6:
+      p: 7000
+      d: 100
+      i: 1
+      i_clamp: 1
+    franka_arm_joint7:
+      p: 2000
+      d: 100
+      i: 1
+      i_clamp: 1
+panda_hand_controller:
+  type: effort_controllers/JointTrajectoryController
+  joints:
+    - franka_arm_finger_joint1
+    - franka_arm_finger_joint2
+  gains:
+    franka_arm_finger_joint1:
+      p: 150
+      d: 1
+      i: 1
+      i_clamp: 1
+    franka_arm_finger_joint2:
+      p: 150
+      d: 1
+      i: 1
+      i_clamp: 1

@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<robot name="franka_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="franka_arm" params="name:=arm *origin parent">
+
+	<!-- ==================================================== -->
+	<!-- Panda robots -->
+	<!-- ==================================================== -->
+	<!-- Franka parameters -->
+	<xacro:arg name="use_cylinder_collision_model" default="false"/>
+	<xacro:arg name="use_gazebo_sim"               default="true"/>
+
+	<!-- Load panda arm and hand -->
+	<xacro:include filename="$(find franka_description)/robots/panda_arm.xacro" />
+	<xacro:include filename="$(find franka_description)/robots/hand.xacro"/>
+
+	<!-- Load gazebo control -->
+	<xacro:if value="$(arg use_gazebo_sim)">
+		<xacro:include filename="$(find franka_description)/robots/panda.gazebo.xacro"/>
+		<xacro:include filename="$(find franka_description)/robots/panda.control.xacro"/>
+	</xacro:if>
+	
+	<!-- Panda 1 -->
+	<xacro:panda_arm xyz="-0.55 1.5 0.95" rpy="0 0 0"        connected_to="${parent}"     arm_id="${name}" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+	<xacro:hand ns="${name}"              rpy="0 0 ${-pi/4}" connected_to="${name}_link8"                  safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+
+  	<!--     arm     -->
+	<xacro:arm_gazebo  arm_id="${name}"/>
+	<xacro:arm_control arm_id="${name}"/>
+
+	<!--     hand    -->
+	<xacro:hand_gazebo  arm_id="${name}"/>
+	<xacro:hand_control arm_id="${name}"/>
+
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+	</gazebo>
+
+  </xacro:macro>
+</robot>

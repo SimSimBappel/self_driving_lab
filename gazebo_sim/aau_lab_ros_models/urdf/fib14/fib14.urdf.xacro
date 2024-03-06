@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<robot name="fib14_urdf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="fib14_urdf" params="fib14_parent">
+
+    <!-- Links -->
+    <link name="fib14">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/fib14/fib14.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/fib14/fib14.dae"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="1.0" ixy="0" ixz="0"
+                 iyy="1.0" iyz="0"
+                 izz="1.0" />
+        <mass value="100" />
+      </inertial>
+    </link>
+
+    <joint name="fib14_to_world_interface" type="fixed">
+      <parent link="${fib14_parent}" />
+      <child link="fib14" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <gazebo reference="fib14">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  <gazebo>
+      <static>true</static>
+    </gazebo>
+
+  </xacro:macro>
+</robot>

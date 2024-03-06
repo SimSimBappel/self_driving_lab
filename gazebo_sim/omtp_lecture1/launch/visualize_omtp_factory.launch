@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- gui: if set to true, then the joint state publisher GUI will open and the robot joints can be manually controlled -->
+  <arg name="gui" default="true" />
+
+  <!-- Load  omtp factory to the parameter server under 'robot_description' -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find omtp_lecture1)/urdf/omtp_factory.xacro'" />
+
+  <!-- Publish robot states -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <!-- Publish joint states -->
+  <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+  <!-- Launch rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find omtp_lecture1)/rviz/omtp.rviz" required="true" />
+
+</launch>

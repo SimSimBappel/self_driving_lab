@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<robot name="conveyor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="conveyor" params="name:=conveyor parent *origin">
+	<!-- ==================================================== -->
+	<!-- Conveyor module -->
+	<!-- ==================================================== -->
+	<material name="gray">
+		<color rgba="0.5 0.5 0.5 1.0"/>
+	</material>
+
+	<joint name="conveyor_belt_joint" type="fixed">
+      	<xacro:insert_block name="origin" />
+		<parent link="${parent}"/>
+		<child link="conveyor_belt_link"/>
+		<axis xyz="0 1 0"/>
+		<limit lower="0.0" upper="1" effort="1000" velocity="1000"/>
+	</joint>
+
+	<link name="conveyor_belt_link">
+		<inertial>
+			<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+			<mass value="100"/>
+			<inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+		</inertial>
+		<collision>
+			<origin xyz="0.0 0.0 0.0005" rpy="0.0 0.0 0.0"/>
+			<geometry>
+				<box size="0.75 1.2 0.001"/>
+			</geometry>
+		</collision>
+		<visual>
+			<origin xyz="0.0 0.0 0.0005" rpy="0.0 0.0 0.0"/>
+			<geometry>
+				<box size="0.75 1.2 0.001"/>
+			</geometry>
+			<material name="gray"/>
+		</visual>
+	</link>
+  </xacro:macro>
+</robot>

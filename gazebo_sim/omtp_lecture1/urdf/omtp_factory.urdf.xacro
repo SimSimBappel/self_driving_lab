@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<robot name="omtp_factory"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ==================================================== -->
+  <!-- INITIAL SETUP OF WORLD LINK AND WORLD_INTERFACE LINK -->
+  <!-- ==================================================== -->
+  <!-- world -->
+  <link name="world" />
+
+  <!-- world_interface. Makes it convenient to move the whole environment according to the world origin -->
+  <link name="world_interface"/>
+
+  <!-- world<->world_interface joint -->
+  <joint name="world_interface_to_world" type="fixed">
+    <parent link="world" />
+    <child link="world_interface" />
+  </joint>
+
+
+  <!-- ==================================================== -->
+  <!-- Fib14 building -->
+  <!-- ==================================================== -->
+  <xacro:include filename="$(find aau_lab_ros_models)/urdf/fib14/fib14.urdf.xacro"/>
+  <xacro:fib14_urdf fib14_parent="world_interface"/>
+
+
+  <!-- ==================================================== -->
+  <!-- Panda robot -->
+  <!-- ==================================================== -->
+  <!-- Franka parameters -->
+  <xacro:arg name="arm_id_1" default="panda1"/>
+  <xacro:arg name="use_cylinder_collision_model" default="true"/>
+  <xacro:arg name="use_gazebo_sim" default="true"/>
+  <xacro:arg name="parent" default="robot1_pedestal_link"/>
+
+  <!-- Load panda arm and hand -->
+  <xacro:include filename="$(find franka_description)/robots/panda_arm.xacro" />
+  <xacro:include filename="$(find franka_description)/robots/hand.xacro"/>
+
+  <!-- Load gazebo control -->
+  <xacro:if value="$(arg use_gazebo_sim)">
+    <xacro:include filename="$(find franka_description)/robots/panda.gazebo.xacro"/>
+    <xacro:include filename="$(find franka_description)/robots/panda.control.xacro"/>
+  </xacro:if>
+
+  <!-- Panda 1 -->
+  <xacro:panda_arm xyz="0.05 0 0.95" rpy="0 0 0" connected_to="$(arg parent)" arm_id="$(arg arm_id_1)" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+  <xacro:hand ns="$(arg arm_id_1)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_1)_link8" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+
+  <xacro:arm_gazebo arm_id="$(arg arm_id_1)"/>
+  <xacro:arm_control arm_id="$(arg arm_id_1)"/>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+  </gazebo>
+
+
+  <!-- ==================================================== -->
+  <!-- Robot 1 pedestal -->
+  <!-- ==================================================== -->
+  <xacro:include filename="$(find external_ros_models)/urdf/robot_pedestal/robot_pedestal.urdf.xacro"/>
+  <xacro:robot_pedestal_urdf pedestal_prefix="robot1_" pedestal_parent="world_interface" pedestal_height="0.95">
+    <origin xyz="0.5 1.8 0.0" rpy="0 0 0"/>
+  </xacro:robot_pedestal_urdf>
+
+
+  <!-- ==================================================== -->
+  <!-- Bins -->
+  <!-- ==================================================== -->
+  <xacro:include filename="$(find external_ros_models)/urdf/bin/bin.urdf.xacro"/>
+  <xacro:bin_urdf prefix="bin_1"/>
+  <xacro:bin_urdf prefix="bin_2"/>
+  <xacro:bin_urdf prefix="bin_3"/>
+  <xacro:bin_urdf prefix="bin_4"/>
+  <xacro:bin_urdf prefix="bin_5"/>
+
+  <!-- Bin 1 -->
+  <joint name="bin_1_joint" type="fixed">
+    <parent link="world_interface" />
+    <child link="bin_1_base_link" />
+    <origin xyz="-0.3 1.2 0.0" rpy="0 0 0" />
+  </joint>
+
+  <!-- Bin 2 -->
+  <joint name="bin_2_joint" type="fixed">
+    <parent link="world_interface" />
+    <child link="bin_2_base_link" />
+    <origin xyz="-0.3 0.4 0.0" rpy="0 0 0" />
+  </joint>
+
+  <!-- Bin 3 -->
+  <joint name="bin_3_joint" type="fixed">
+    <parent link="world_interface" />
+    <child link="bin_3_base_link" />
+    <origin xyz="-0.3 -0.4 0.0" rpy="0 0 0" />
+  </joint>
+
+  <!-- Bin 4 -->
+  <joint name="bin_4_joint" type="fixed">
+    <parent link="world_interface" />
+    <child link="bin_4_base_link" />
+    <origin xyz="-0.3 -1.2 0.0" rpy="0 0 0" />
+  </joint>
+
+  <!-- Bin 5 -->
+  <joint name="bin_5_joint" type="fixed">
+    <parent link="world_interface" />
+    <child link="bin_5_base_link" />
+    <origin xyz="-0.3 -2.0 0.0" rpy="0 0 0" />
+  </joint>
+
+
+</robot>

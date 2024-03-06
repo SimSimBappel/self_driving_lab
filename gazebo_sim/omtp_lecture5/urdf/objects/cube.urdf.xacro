@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<robot name="simple_cube" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="color" default="Gazebo/Blue" />
+  <link name="simple_cube">
+    <contact>
+      <lateral_friction value="0.8"/>
+      <rolling_friction value="0.001"/>g
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+       <mass value="0.1"/>
+       <inertia ixx="0.00004166667" ixy="0" ixz="0" iyy="0.00004166667" iyz="0" izz="0.00004166667"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0 0.0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05" />
+      </geometry>
+      <!--<material>
+            <ambient>0 1 0 1</ambient> 
+      </material>-->
+    </visual>
+    <collision>
+      <origin xyz="0.0 0 0.0"/>
+      <geometry>
+        <box size="0.05 0.05 0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="simple_cube">
+    <!--<material>"$(arg color)"</material>-->
+    <material>Gazebo/Blue</material>
+  </gazebo>
+</robot>

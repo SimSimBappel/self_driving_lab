@@ -1,0 +1,31 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: omtp_lecture1
+    relative_path: urdf/omtp_custom.urdf.xacro
+  srdf:
+    relative_path: config/omtp_factory.srdf
+  package_settings:
+    author_name: lasse
+    author_email: due6230@gmail.com
+    generated_timestamp: 1707380206
+  control_xacro:
+    command:
+      - position
+      - velocity
+      - effort
+    state:
+      - position
+      - velocity
+      - effort
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+      - velocity
+      - effort
+    state:
+      - position
+      - velocity
+      - effort

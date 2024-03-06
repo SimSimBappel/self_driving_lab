@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<robot name="festo_module_urdf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="festo_module_urdf" params="module_prefix festo_module_parent *origin">
+
+    <!-- Links -->
+    <link name="${module_prefix}festo_module">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/festo_robot_module/festo_robot_module.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/festo_robot_module/festo_robot_module.dae"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <inertia ixx="1.0" ixy="0" ixz="0"
+                 iyy="1.0" iyz="0"
+                 izz="1.0" />
+        <mass value="100" />
+      </inertial>
+    </link>
+
+    <joint name="${module_prefix}festo_module_to_world_interface" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${festo_module_parent}" />
+      <child link="${module_prefix}festo_module" />
+      <!-- <origin xyz="0 0 0" rpy="0 0 0" /> -->
+    </joint>
+  </xacro:macro>
+</robot>

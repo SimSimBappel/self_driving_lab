@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<robot name="pool_cue_urdf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="pool_cue_urdf" params="pool_cue_prefix pool_cue_parent *origin">
+
+    <!-- Links -->
+    <link name="${pool_cue_prefix}pool_cue">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/pool_cue/pool_cue.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="file://$(find aau_lab_ros_models)/meshes/pool_cue/pool_cue.dae"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <inertia ixx="1.0" ixy="0" ixz="0"
+                 iyy="1.0" iyz="0"
+                 izz="1.0" />
+        <mass value="100" />
+      </inertial>
+    </link>
+
+    <joint name="${pool_cue_prefix}pool_cue_to_world_interface" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${pool_cue_parent}" />
+      <child link="${pool_cue_prefix}pool_cue" />
+      <!-- <origin xyz="0 0 0" rpy="0 0 ${radians(90)}" /> -->
+    </joint>
+  </xacro:macro>
+</robot>

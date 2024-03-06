@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- constants -->
+	<arg name="pi"                           default="3.14159265" />
+
+	<!-- gazebo arguments -->
+	<arg name="paused" 				         default="true"/>
+	<arg name="gazebo_gui" 					 default="true"/>
+	<arg name="gazebo_debug"				 default="false"/>
+	<arg name="gazebo_recording"    		 default="false"/>
+
+
+	<arg name="use_camera"                   default="true" />
+	<arg name="use_conveyor"                 default="true" />
+	<arg name="use_arm"                      default="true" />
+
+	<arg name="rviz"                         default="true"/>
+	<arg name="motion_planner"               default="true"/>
+	<arg name="model"                        default="$(find omtp_lecture5)/urdf/omtp_factory.urdf.xacro"/>
+
+	<!-- camera pose -->
+	<arg name="camera_pose_trans_x"          default="0.0"/>
+	<arg name="camera_pose_trans_y"          default="0.0"/>
+	<arg name="camera_pose_trans_z"          default="1.5"/>
+
+	<arg name="camera_pose_rot_x"            default="0.0"/>
+	<!--<arg name="camera_pose_rot_y"            default="$(eval arg('pi')/4.0)"/>-->
+	<arg name="camera_pose_rot_y"            default="0.0"/>
+	<arg name="camera_pose_rot_z"            default="0.0"/> <!--$(eval arg('pi'))-->
+
+	<arg name="initial_joint_positions" default=" -J franka_arm_joint1 0.0 -J franka_arm_joint2 0 -J franka_arm_joint3 0 -J franka_arm_joint4 -1.5708 -J franka_arm_joint5 0 -J franka_arm_joint6 1.6174 -J franka_arm_joint7 0" doc="Initial joint configuration of the robot"/>
+
+	<!-- moveit arguments -->
+	<!-- Choose controller manager: fake, simple, or ros_control -->
+
+	<arg name="moveit_controller_manager" default="ros_control" />
+	<arg name="fake_execution_type"       default="interpolate" />
+	<arg name="debug"                     default="false" />
+	<arg name="pipeline" 				  default="ompl"/>
+
+	<!-- ==================================================== -->
+	<!-- Startup simulated world in Gazebo -->
+	<!-- ==================================================== -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="paused"       value="$(arg paused)"/>
+		<arg name="gui" value="$(arg gazebo_gui)"/>
+		<arg name="debug" value="$(arg gazebo_debug)"/>
+		<!--<arg name="use_sim_time" value="true"/>-->
+		<arg name="recording" value="$(arg gazebo_recording)"/>
+	</include>
+
+	<!-- ==================================================== -->
+	<!-- Load universal robot description format (URDF) -->
+	<!-- ==================================================== -->
+	<param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model) 
+		use_nominal_extrinsics:=true 
+		add_plug:=true 
+		'camera_pose_trans:=$(arg camera_pose_trans_x) $(arg camera_pose_trans_y) $(arg camera_pose_trans_z)'
+		'camera_pose_rot:=$(arg camera_pose_rot_x) $(arg camera_pose_rot_y) $(arg camera_pose_rot_z)' 
+		use_conveyor:=$(arg use_conveyor)
+		use_camera:=$(arg use_camera)
+		use_arm:=$(arg use_arm)
+	"/>
+
+	<!-- push robot_description to to gazebo at the origin -->
+	<node name="spawn_gazebo_world" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model omtp_factory $(arg initial_joint_positions)"/>
+
+	<!-- Load the controller parameters onto the parameter server -->
+	<rosparam file="$(find omtp_lecture5)/config/gazebo_controllers.yaml" />
+	
+	<!-- Load joint controller configurations from YAML file to parameter server -->
+	<rosparam file="$(find omtp_lecture5)/config/ros_controllers.yaml" command="load"/>
+
+	<!-- Load the controllers -->
+	<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="panda_arm_controller panda_hand_controller"/>
+
+	<!-- ==================================================== -->
+	<!-- MoveIt!                                              -->
+	<!-- ==================================================== -->
+	<!-- Run the main MoveIt executable without trajectory execution (we do not have controllers configured by default) -->
+	<include file="$(find omtp_lecture5_moveit_config)/launch/move_group.launch">
+		<arg name="allow_trajectory_execution" value="true"/>
+		<arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
+		<arg name="fake_execution_type" value="$(arg fake_execution_type)"/>
+		<arg name="info" value="true"/>
+		<arg name="debug" value="$(arg debug)"/>
+		<arg name="pipeline" value="$(arg pipeline)"/>
+	</include>
+
+	<!-- ==================================================== -->
+	<!-- joint_state_publisher                                -->
+	<!-- ==================================================== -->
+	<node name="gazebo_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="joint_state_controller" />
+
+	<!-- ==================================================== -->
+	<!-- robot_state_publisher                                -->
+	<!-- ==================================================== -->
+	<!-- Given the published joint states, publish tf for the robot links -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />
+
+	<!-- ==================================================== -->
+	<!-- rviz				                                  -->
+	<!-- ==================================================== -->	
+	<!-- for visualization purposes -->
+	<node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(find omtp_lecture5)/rviz/rviz.rviz"/>
+
+	<!-- ==================================================== -->
+	<!-- spawn objects -->
+	<!-- ==================================================== -->
+	<!--<node name="spawn_banana"      pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/YcbBanana/model.urdf.xacro     -model banana      -x 0.0 -y  1.00 -z 1.05" respawn="false" output="screen" />-->
+	<!--<node name="spawm_chips_can"   pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/YcbChipsCan/model.urdf.xacro   -model chips_can   -x 0.0 -y  1.25 -z 1.05" respawn="false" output="screen" />-->
+	<!--<node name="spawn_cracker_box" pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/YcbCrackerBox/model.urdf.xacro -model cracker_box -x 0.0 -y  1.70 -z 1.05" respawn="false" output="screen" />-->
+	<!--<node name="spawn_foam_brick"  pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/YcbFoamBrick/model.urdf.xacro  -model foam_brick  -x 0.0 -y  1.90 -z 1.05" respawn="false" output="screen" />-->
+	<node name="cube_1"            pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/cube.urdf.xacro                        -model cube_1        -x 0.0 -y  1.20 -z 1.05" respawn="false" output="screen" />
+	<node name="cube_2"            pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/cube.urdf.xacro                        -model cube_2        -x 0.0 -y  1.00 -z 1.05" respawn="false" output="screen" />
+	<node name="cube_3"            pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/cube.urdf.xacro                        -model cube_3        -x 0.0 -y  1.60 -z 1.05" respawn="false" output="screen" />
+
+	<node name="sphere_1"          pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/sphere.urdf.xacro                      -model sphere_1      -x 0.0 -y  1.30 -z 1.05" respawn="false" output="screen" />
+	<node name="sphere_2"          pkg="gazebo_ros" type="spawn_model" args="-urdf -file $(find omtp_lecture5)/urdf/objects/sphere.urdf.xacro                      -model sphere_2      -x 0.0 -y  1.30 -z 1.05" respawn="false" output="screen" />
+
+    <node pkg="tf" type="static_transform_publisher" name="palm_frame"           args="0 0 0.069126 0 0 0 /franka_arm_hand /franka_palm 100"/>
+	<node pkg="tf" type="static_transform_publisher" name="franka_fingers_frame" args="0 0 0.034563 0 0 0 /franka_palm /franka_fingers_tip 100"/>
+
+</launch>

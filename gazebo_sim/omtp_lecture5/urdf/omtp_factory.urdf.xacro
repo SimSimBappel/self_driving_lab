@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<robot name="omtp_test" xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:property name="M_PI"              value="3.1415926535897931"/>
+	<xacro:arg      name="camera_pose_trans" default="0 1.2 2.0"/>
+	<xacro:arg      name="camera_pose_rot"   default="0.0 ${M_PI/2.0} 0.0"/>
+
+	<xacro:arg      name="arm_pose_trans"    default="-0.75 1.5 0.0"/>
+	<xacro:arg      name="arm_pose_rot"      default="0 0 0"/>
+
+	<xacro:arg      name="use_conveyor"      default="true"/>
+	<xacro:arg      name="use_camera"        default="true"/>
+	<xacro:arg      name="use_arm"           default="true"/>
+
+	<!-- ==================================================== -->
+	<!-- INITIAL SETUP OF WORLD LINK AND WORLD_INTERFACE LINK -->
+	<!-- ==================================================== -->
+	<!-- world -->
+	<link name="world" />
+
+	<!-- world_interface. Makes it convenient to move the whole environment according to the world origin -->
+	<link name="world_interface"/>
+
+	<!-- world<->world_interface joint -->
+	<joint name="world_interface_to_world" type="fixed">
+		<parent link="world" />
+		<child link="world_interface" />
+	</joint>
+
+	<!-- ==================================================== -->
+	<!-- Fib14 building -->
+	<!-- ==================================================== -->
+	<xacro:include filename="$(find aau_lab_ros_models)/urdf/fib14/fib14.urdf.xacro"/>
+	<xacro:fib14_urdf fib14_parent="world_interface"/>
+
+	<!-- ==================================================== -->
+	<!-- Robot 1 pedestal -->
+	<!-- ==================================================== -->
+	<xacro:include filename="$(find external_ros_models)/urdf/robot_pedestal/robot_pedestal.urdf.xacro"/>
+	<xacro:robot_pedestal_urdf pedestal_prefix="robot1_" pedestal_parent="world_interface" pedestal_height="0.95">
+		<origin xyz="-0.6 1.5 0.0" rpy="0 0 0"/>
+	</xacro:robot_pedestal_urdf>
+
+	<!-- ==================================================== -->
+	<!-- Festo modules -->
+	<!-- ==================================================== -->
+	<!-- Festo straight module -->
+	<xacro:include filename="$(find aau_lab_ros_models)/urdf/festo_straight_module/festo_straight_module.urdf.xacro"/>
+	<xacro:festo_module_urdf module_prefix="module1_" festo_module_parent="world_interface">
+		<origin xyz="0.0 1.5 0.0" rpy="0 0 0.0"/>
+	</xacro:festo_module_urdf>
+
+	<!-- ==================================================== -->
+	<!-- CAMERA -->
+	<!-- ==================================================== -->
+	<xacro:if value="$(arg use_camera)">
+		<xacro:include filename="$(find omtp_lecture5)/urdf/camera/_d435.urdf.xacro" />
+		<xacro:sensor_d435 name="camera" topics_ns="camera" parent="world_interface" publish_pointcloud="true">
+			<origin xyz="$(arg camera_pose_trans)" rpy="$(arg camera_pose_rot)" />
+		</xacro:sensor_d435>  
+	</xacro:if>
+
+	<!-- ==================================================== -->
+	<!-- CONVEYOR BELT -->
+	<!-- ==================================================== -->
+	<xacro:if value="$(arg use_conveyor)">
+		<xacro:include filename="$(find omtp_lecture5)/urdf/conveyor.urdf.xacro"/>
+		<xacro:conveyor name="conveyor"  parent="world_interface">
+			<origin xyz="0.0 1.5 1.0" rpy="0 0 0" />
+		</xacro:conveyor>  
+	</xacro:if>
+
+	<!-- ==================================================== -->
+	<!-- ARM -->
+	<!-- ==================================================== -->
+	<xacro:if value="$(arg use_arm)">
+		<xacro:include filename="$(find omtp_lecture5)/urdf/arm.urdf.xacro"/>
+		<xacro:franka_arm name="franka_arm" parent="world_interface">
+			<origin xyz="$(arg arm_pose_trans)" rpy="$(arg arm_pose_rot)" />
+		</xacro:franka_arm>  
+	</xacro:if>
+
+</robot>
