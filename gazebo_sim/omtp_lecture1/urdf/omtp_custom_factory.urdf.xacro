@@ -35,13 +35,13 @@
   <xacro:arg name="parent" default="robot1_pedestal_link"/>
 
   <!-- Load panda arm and hand -->
-  <xacro:include filename="$(find franka_description)/robots/panda_arm.xacro" />
-  <xacro:include filename="$(find franka_description)/robots/hand.xacro"/>
+  <xacro:include filename="$(find franka_description_sim)/robots/panda_arm.xacro" />
+  <xacro:include filename="$(find franka_description_sim)/robots/hand.xacro"/>
 
   <!-- Load gazebo control -->
   
-  <xacro:include filename="$(find franka_description)/robots/panda.gazebo.xacro"/>
-  <xacro:include filename="$(find franka_description)/robots/panda.control.xacro"/>
+  <xacro:include filename="$(find franka_description_sim)/robots/panda.gazebo.xacro"/>
+  <xacro:include filename="$(find franka_description_sim)/robots/panda.control.xacro"/>
   
 
   <!-- Panda 1 -->

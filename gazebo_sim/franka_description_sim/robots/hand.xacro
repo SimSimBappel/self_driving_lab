@@ -14,7 +14,7 @@
     <link name="${ns}_hand">
       <visual>
         <geometry>
-          <mesh filename="file://$(find franka_description)/meshes/visual/hand.dae"/>
+          <mesh filename="file://$(find franka_description_sim)/meshes/visual/hand.dae"/>
         </geometry>
       </visual>
       <xacro:if value="${use_cylinder_collision_model}">
@@ -58,7 +58,7 @@
       <xacro:unless value="${use_cylinder_collision_model}">
         <collision>
           <geometry>
-            <mesh filename="file://$(find franka_description)/meshes/collision/hand.stl"/>
+            <mesh filename="file://$(find franka_description_sim)/meshes/collision/hand.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -73,13 +73,13 @@
     <link name="${ns}_leftfinger">
       <visual>
         <geometry>
-          <mesh filename="file://$(find franka_description)/meshes/visual/finger.dae"/>
+          <mesh filename="file://$(find franka_description_sim)/meshes/visual/finger.dae"/>
         </geometry>
       </visual>
       <xacro:unless value="${use_cylinder_collision_model}">
         <collision>
           <geometry>
-            <mesh filename="file://$(find franka_description)/meshes/collision/finger.stl"/>
+            <mesh filename="file://$(find franka_description_sim)/meshes/collision/finger.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
@@ -95,14 +95,14 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
         <geometry>
-          <mesh filename="file://$(find franka_description)/meshes/visual/finger.dae"/>
+          <mesh filename="file://$(find franka_description_sim)/meshes/visual/finger.dae"/>
         </geometry>
       </visual>
       <xacro:unless value="${use_cylinder_collision_model}">
         <collision>
           <origin xyz="0 0 0" rpy="0 0 ${pi}"/>
           <geometry>
-            <mesh filename="file://$(find franka_description)/meshes/collision/finger.stl"/>
+            <mesh filename="file://$(find franka_description_sim)/meshes/collision/finger.stl"/>
           </geometry>
         </collision>
       </xacro:unless>
