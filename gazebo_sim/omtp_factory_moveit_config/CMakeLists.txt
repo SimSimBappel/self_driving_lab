@@ -17,15 +17,15 @@ find_package(behaviortree_ros2 REQUIRED)
 add_executable(move_demo src/move_demo.cpp)
 ament_target_dependencies(move_demo rclcpp std_msgs moveit_ros_planning_interface)
 
-add_executable(move_robot_server src/move_robot_server.cpp)
-ament_target_dependencies(move_robot_server behaviortree_ros2 rclcpp std_msgs moveit_ros_planning_interface tf2 geometry_msgs behavior_tree_ros2_actions) 
+# add_executable(move_robot_server src/move_robot_server.cpp)
+# ament_target_dependencies(move_robot_server behaviortree_ros2 rclcpp std_msgs moveit_ros_planning_interface tf2 geometry_msgs behavior_tree_ros2_actions) 
 
 include_directories(include)
 
 install(TARGETS
   move_demo
   # simple_move_pub
-  move_robot_server
+  # move_robot_server
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
