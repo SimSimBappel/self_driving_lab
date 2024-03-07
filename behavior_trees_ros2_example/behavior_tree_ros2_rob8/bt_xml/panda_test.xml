@@ -2,7 +2,7 @@
 <root BTCPP_format="4">
   <BehaviorTree ID="Grasp">
     <Sequence>
-      <Script code="in_name:= &apos;0.623,-0.2,0.281,-3.142,0.0,0.0&apos; "/>
+      <Script code="in_name:= &apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos; "/>
       <GripperAction open="open"
                      action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{in_name}"
@@ -14,12 +14,20 @@
 
   <BehaviorTree ID="GraspObject">
     <Sequence>
+      <Script code="goal:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <GripperAction open="open"
                      action_name="__default__placeholder__"/>
+      <ArmPoseOffsetCalculation offset="&apos;0.0;0.0;-0.1;0.0;0.0;0.0&apos;"
+                                pose="{goal}"
+                                pose_w_offset="{goal_w_offset}"/>
+      <ArmMovePoseAction pose="{goal_w_offset}"
+                         action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{goal}"
                          action_name="__default__placeholder__"/>
       <GripperAction open="close"
                      action_name="__default__placeholder__"/>
+      <ArmMovePoseAction pose="{goal_w_offset}"
+                         action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -32,19 +40,13 @@
                sub_out_result="{out_result}"
                sub_out_state="{out_state}"/>
       <ScriptCondition code=" out_result==69 &amp;&amp; out_state==&apos;ACTIVE&apos; "/>
-      <Script code="in_name:= &apos;0.623,-0.2,0.281,-3.142,0.0,0.0&apos; "/>
+      <Script code="in_pose:= &apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <PrintValue message="start"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
       <ArmMovePoseAction name="arm"
-                         pose="{in_name}"
-                         action_name="__default__placeholder__"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
-      <ArmMovePoseAction name="arm"
-                         pose="0.623,-0.1,0.281,-3.142,0.0,0.0"
+                         pose="{in_pose}"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
@@ -62,27 +64,26 @@
       <GripperAction name="gripper_close"
                      open="false"
                      action_name="__default__placeholder__"/>
-      <Script code="object_pose:=&apos;0.623,-0.2,0.281,-3.142,0.0,0.0&apos;"/>
+      <Script code="object_pose:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <ArmMovePoseAction name="arm"
                          pose="{object_pose}"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
+      <Script code="object_pose:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
+      <SubTree ID="GraspObject"/>
+      <SleepAction name="sleepA"
+                   msec="200"
+                   action_name="__default__placeholder__"/>
       <ArmMovePoseAction name="arm"
-                         pose="0.623,-0.2,0.381,-3.142,0.0,0.0"
+                         pose="&apos;0.623;-0.1;0.381;-3.142;0.0;0.0&apos;"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
       <ArmMovePoseAction name="arm"
-                         pose="0.623,-0.1,0.381,-3.142,0.0,0.0"
-                         action_name="__default__placeholder__"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
-      <ArmMovePoseAction name="arm"
-                         pose="0.623,-0.1,0.281,-3.142,0.0,0.0"
+                         pose="&apos;0.623;-0.1;0.281;-3.142;0.0;0.0&apos;"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
