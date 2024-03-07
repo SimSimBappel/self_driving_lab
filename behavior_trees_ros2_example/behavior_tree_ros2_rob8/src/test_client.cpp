@@ -127,6 +127,8 @@ int main(int argc, char **argv)
   params.wait_for_server_timeout = std::chrono::milliseconds(1000);
   params.default_port_value = "sleep_service";
 
+  factory.registerNodeType<ArmPoseOffsetCalculation>("ArmPoseOffsetCalculation");
+
 #ifdef USE_SLEEP_PLUGIN
   RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
 #else
@@ -149,7 +151,7 @@ int main(int argc, char **argv)
             << BT::WriteTreeToXML(tree, false, false)
             << "--------------------------------\n";
 
-  BT::Groot2Publisher publisher(tree);
+  BT::Groot2Publisher publisher(tree,5555);
 
   // auto tree = factory.createTreeFromText(xml_text);
   tree.tickWhileRunning();

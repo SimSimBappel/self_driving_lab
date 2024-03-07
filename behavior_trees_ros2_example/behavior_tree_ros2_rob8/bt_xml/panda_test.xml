@@ -49,18 +49,22 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <Script code="home:=&apos;0.0;0.0;0.0;0.0;0.0;0.0;0.0&apos;"/>
+      <Script code="home:=&apos;0.0;0.5;0.0;0.0;0.0;0.0;0.0&apos;"/>
       <ArmMoveJointsAction name="arm_joint_pose"
                            joints="{home}"
                            action_name="__default__placeholder__"/>
-      <Script code="home:=&apos;0.5;0.0;0.0;0.0;0.0;0.0;0.0&apos;"/>
+      <Script code="offset:=&apos;0.5;0.0;0.0;0.0;0.0;0.0;0.0&apos;"/>
+      <ArmPoseOffsetCalculation offset="{offset}"
+                                pose="{home}"
+                                pose_w_offset="{home}"/>
       <ArmMoveJointsAction joints="{home}"
                            action_name="__default__placeholder__"/>
       <GripperAction name="gripper_close"
                      open="false"
                      action_name="__default__placeholder__"/>
+      <Script code="object_pose:=&apos;0.623,-0.2,0.281,-3.142,0.0,0.0&apos;"/>
       <ArmMovePoseAction name="arm"
-                         pose="0.623,-0.2,0.281,-3.142,0.0,0.0"
+                         pose="{object_pose}"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
@@ -108,6 +112,14 @@
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ArmPoseOffsetCalculation">
+      <input_port name="offset"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <input_port name="pose"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <output_port name="pose_w_offset"
+                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
     </Action>
     <Action ID="GripperAction">
       <input_port name="open"

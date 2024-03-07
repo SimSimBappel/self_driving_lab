@@ -9,6 +9,37 @@
 
 using namespace BT;
 
+class ArmPoseOffsetCalculation : public BT::SyncActionNode
+{
+public:
+  ArmPoseOffsetCalculation(const std::string& name, const BT::NodeConfig& config) :
+    BT::SyncActionNode(name, config)
+  {}
+
+  // This Action simply write a value in the port "text"
+  BT::NodeStatus tick() override
+  { 
+    auto offset = getInput<std::vector<double>>("offset");
+    auto pose = getInput<std::vector<double>>("pose");
+    std::vector<double> pose_ = pose.value();
+    std::vector<double> offset_ = offset.value();
+    for(int i = 0; i<pose_.size();i++)
+    {
+      pose_[i] = pose_[i]-offset_[i];
+    }
+
+    setOutput("pose_w_offset", pose_);
+    
+    return BT::NodeStatus::SUCCESS;
+  }
+
+  // A node having ports MUST implement this STATIC method
+  static BT::PortsList providedPorts()
+  {
+    return {BT::OutputPort<std::vector<double>>("pose_w_offset"),InputPort<std::vector<double>>("pose"),InputPort<std::vector<double>>("offset")};
+  }
+};
+
 class ArmMoveJointsAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJoints>
 {
 public:
