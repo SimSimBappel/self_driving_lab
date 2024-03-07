@@ -21,6 +21,8 @@ static const double GOAL_TOLERANCE = 1e-3;
 static const std::string PLANNING_GROUP = "panda_1";
 
 static const std::string PLANNING_GRIPPER_GROUP = "panda_1_gripper";
+static const std::vector<std::string> gripper_joint_names = {"gripper_joint1", "gripper_joint2"};
+static const std::vector<std::string> arm_joint_names = {"panda1_joint1", "panda1_joint2", "panda1_joint3", "panda1_joint4", "panda1_joint5", "panda1_joint6", "panda1_joint7"};
 // static const std::string PLANNING_GROUP = "arm_group";
 
 // static const std::string PLANNING_GRIPPER_GROUP = "gripper";
@@ -106,14 +108,38 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
 }
 
+bool MoveRobotServer::ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg){
+  std::vector<double> joints;
+  for(int i = 0; i<msg.data.size();i++)
+  {
+    joints.push_back(msg.data[i]);
+  }
+  // for(int i = 0; i < v.size(); i++)
+  //   {
+  //     pos.push_back(stod(v[i]));
+  //   }
+  move_group_->setJointValueTarget(arm_joint_names,joints);
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+  bool success = static_cast<bool>(move_group_->plan(my_plan));
+              RCLCPP_INFO(this->get_logger(), " (MoveJ movement) %s", success ? "" : "FAILED");
+              if(success == true){
+                  //move_group.move();
+                  move_gripper_group_->execute(my_plan);
+                  return true;
+              }
+              else{
+                return false;
+              }
+}
+
 bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
 {
   // std::vector<double> joints = {-0.628318531, 0.628318531};
-  std::vector<std::string> joint_names = {"gripper_joint1", "gripper_joint2"};
+  // std::vector<std::string> joint_names = {"gripper_joint1", "gripper_joint2"};
   std::vector<double> joints = {msg.data[0], msg.data[1]};
   
-  joint_names = {"gripper_joint1", "gripper_joint2"};
-  move_gripper_group_->setJointValueTarget(joint_names,joints);
+  // joint_names = {"gripper_joint1", "gripper_joint2"};
+  move_gripper_group_->setJointValueTarget(gripper_joint_names,joints);
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
   bool success = static_cast<bool>(move_gripper_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
@@ -578,41 +604,15 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
 
   void MoveRobotServer::arm_move_joints_execute(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle){
       auto result = std::make_shared<ArmMoveJoints::Result>();
-      std_msgs::msg::Float64MultiArray joints;
+      std_msgs::msg::Float64MultiArray joints_;
       const auto goal = goal_handle->get_goal();
-      auto pose = goal->joints;
-      // RCLCPP_INFO(this->get_logger(), pose.str_c());
-    //   std::vector<std::string> v;
- 
-    //   std::stringstream ss(pose);
-    //   std::vector<double> pos;
-    // while (ss.good()) {
-    //     std::string substr;
-    //     getline(ss, substr, ',');
-    //     v.push_back(substr);
-    // }
-    // for(int i = 0; i < v.size(); i++)
-    // {
-    //   pos.push_back(stod(v[i]));
-    // }
-    //   geometry_msgs::msg::PoseStamped pose_goal; // = move_group_->getCurrentPose().pose;
-   
-    //   pose_goal.pose.position.x = pos[0];
-    //   pose_goal.pose.position.y = pos[1];
-    //   pose_goal.pose.position.z = pos[2];
-
-    //   tf2::Quaternion q_new;
-    //   q_new.setRPY(pos[3], pos[4], pos[5]);
-    
-
-    //   q_new.normalize();
+      auto joint_pose = goal->joints;
+      for(int i = 0; i<joint_pose.size();i++)
+      {
+        joints_.data.push_back(joint_pose[i]);
+       }
       
-    //   pose_goal.pose.orientation.x = q_new.x();
-    //   pose_goal.pose.orientation.y = q_new.y();
-    //   pose_goal.pose.orientation.z = q_new.z();
-    //   pose_goal.pose.orientation.w = q_new.w();
-      
-      if(true)
+      if(MoveRobotServer::ArmMoveJ(joints_))
       {
           result->done = true;
           goal_handle->succeed(result);
@@ -623,40 +623,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
           goal_handle->canceled(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
-      // if(open == true)
-      // {
-      //   joints.data = {-0.628318531, 0.628318531};
-      //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
-      //   if(MoveRobotServer::MoveGripper(joints)){
-          
-      //     result->done = true;
-      //     goal_handle->succeed(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      //   }
-      //   else{
-      //     result->done = false;
-      //     goal_handle->canceled(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
-      //   }
-
-      // }
-      // if(open == false)
-      // {
-        
-      //   joints.data = {0.0, 0.0};
-      //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
-      //   if(MoveRobotServer::MoveGripper(joints)){
-      //     result->done = true;
-      //     goal_handle->succeed(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      //   }
-      //   else{
-      //     result->done = false;
-      //     goal_handle->canceled(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
-      //   }
-
-      // }
   }
 
 //////////  SLEEP ACTION //////////////

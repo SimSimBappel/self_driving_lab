@@ -56,6 +56,9 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
+      <ArmMoveJointsAction name="arm_joint_pose"
+                     joints="0.0;0.0;0.0;0.0;0.0;0.0;0.0"
+                     action_name="__default__placeholder__"/>
       <GripperAction name="gripper_close"
                      open="false"
                      action_name="__default__placeholder__"/>
@@ -88,6 +91,11 @@
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="ArmMoveJointsAction">
+            <input_port name="joints" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
+        </Action>
+
       
     <SubTree ID="MySub">
       <input_port name="sub_in_value" default="42"/>

@@ -114,7 +114,9 @@ private:
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscription_gripper_;
 
     bool MoveGripper(const std_msgs::msg::Float64MultiArray & msg);
+    bool ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg);
     bool Move(const geometry_msgs::msg::PoseStamped & msg);
+
     // void service_example_callback(const std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Request> request,
     //      std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Response>      response);
 };
