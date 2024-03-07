@@ -28,6 +28,7 @@ set(THIS_PACKAGE_DEPS
 
 set(action_files
     "action/Sleep.action"
+    "action/FindArucoTag.action"
     "action/Home.action"
     "action/Gripper.action"
     "action/GripperJoint.action"
