@@ -501,18 +501,18 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       std_msgs::msg::Float64MultiArray joints;
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
-      std::vector<std::string> v;
+    //   std::vector<std::string> v;
  
-      std::stringstream ss(pose);
+    //   std::stringstream ss(pose);
       std::vector<double> pos;
-    while (ss.good()) {
-        std::string substr;
-        getline(ss, substr, ',');
-        v.push_back(substr);
-    }
-    for(int i = 0; i < v.size(); i++)
+    // while (ss.good()) {
+    //     std::string substr;
+    //     getline(ss, substr, ',');
+    //     v.push_back(substr);
+    // }
+    for(int i = 0; i < pose.size(); i++)
     {
-      pos.push_back(stod(v[i]));
+      pos.push_back(pose[i]);
     }
       geometry_msgs::msg::PoseStamped pose_goal; // = move_group_->getCurrentPose().pose;
    

@@ -1,5 +1,6 @@
 #goal definition
-string pose
+#string pose
+float64[] pose
 ---
 #result definition
 bool done
