@@ -4,7 +4,7 @@ AAU Robotics 8 semester project
 ## Dependencies
 install libfranka from [here](https://frankaemika.github.io/docs/installation_linux.html)
 ```
-sudo apt install ros-humble-behaviortree-cpp
+sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2*
 cd ~
 mkdir -p ros2_ws/src
 cd ros2_ws/src

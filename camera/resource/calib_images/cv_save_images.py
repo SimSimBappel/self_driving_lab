@@ -6,7 +6,7 @@ save_dir = "checkerboard"
 os.makedirs(save_dir, exist_ok=True)
 
 # Initialize the video capture object
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(6)
 
 # Check if the webcam is opened successfully
 if not cap.isOpened():

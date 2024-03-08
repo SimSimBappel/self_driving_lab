@@ -22,10 +22,6 @@ class ArucoMarkerDetector(Node):
         self.logger = self.get_logger()
         self.logger.info('Initializing aruco_marker_detector')
         self.publisher = self.create_publisher(TransformStamped, 'marker_pose', 10)
-        self.bridge = CvBridge()
-        self.subscription = None
-        self.cap = None
-        # self.subscribe_to_image_topic()
         
         self.action_server = ActionServer(
             self,
@@ -34,15 +30,8 @@ class ArucoMarkerDetector(Node):
             execute_callback=self.execute_callback,
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback
-            )
-        self.subscription = self.create_subscription(
-                Image,
-                '/camera/color/image_raw',
-                self.image_callback,
-                1
-            )
-        self.get_logger().info("Subscribed to image topic")
-        
+        )
+        self.bridge = CvBridge()
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
         self.camera_matrix, self.distortion_coeffs = self.calib_cam()  # Calibrate the camera
 
@@ -74,13 +63,8 @@ class ArucoMarkerDetector(Node):
     def goal_callback(self, goal_request):
         """Accept or reject a client request to begin an action."""
         # This server allows multiple goals in parallel
-        # self.get_logger().info('Received goal request')
-        if goal_request.id > -1 and goal_request.id < 251:
-            self.get_logger().info('Received goal request ID:' + str(goal_request.id))
-            return GoalResponse.ACCEPT
-        else:
-            self.get_logger().info('Goal request ID:' + str(goal_request.id) + "is not in range!")
-            return GoalResponse.REJECT
+        self.get_logger().info('Received goal request ' + str(goal_request.id))
+        return GoalResponse.ACCEPT
 
     def cancel_callback(self, goal_handle):
         """Accept or reject a client request to cancel an action."""
@@ -88,17 +72,17 @@ class ArucoMarkerDetector(Node):
         return CancelResponse.ACCEPT
 
     def execute_callback(self, goal_handle):
-        # self.subscribe_to_image_topic()
         self.logger.info("Looking for ID:" + str(goal_handle.request.id))
         result = None
+        cap = cv2.VideoCapture(6)
         while rclpy.ok() and result is None: #not goal_handle.is_cancelled():
             self.logger.info("rclpyok")
             # Process the images until the action is completed
-            frame = self.cap
+            ret, frame = cap.read()
             if frame is None:
                 self.logger.info("spinning")
                 rclpy.spin_once(self, timeout_sec=0.1)
-            else: 
+            else:
                 self.logger.info("not spinning :)")
                 cv2.imshow("Image from RealSense", frame)
                 cv2.waitKey(1)
@@ -126,61 +110,29 @@ class ArucoMarkerDetector(Node):
                         marker_pose_msg.transform.rotation.z = q[2]
                         marker_pose_msg.transform.rotation.w = q[3]
                         self.publisher.publish(marker_pose_msg)
-                        # goal_handle.succeed()
+                        goal_handle.succeed()
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
-                self.cap = None
                 frame = None
-                gray = None
-        # self.unsubscribe_from_image_topic()
+                        #self.unsubscribe_from_image_topic()
+        cap.release()
         cv2.destroyAllWindows()
-        self.logger.info("fug")
-        goal_handle.succeed()
+        # self.logger.info(result)
         return result
-
-                        
-        
-        
                 
-    def image_callback(self, msg):
-        # Convert ROS Image message to OpenCV format
-        self.logger.info("got image!")
-        self.cap = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        # Example: Display the received image
-        # cv2.imshow("Image from RealSense", self.cap)
-        # cv2.waitKey(1)  # Adjust as needed
+        
+        
 
-    # def image_callback(self, msg):
-    #     self.image_data = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-
-    def subscribe_to_image_topic(self):
-        if self.subscription is None:
-            self.subscription = self.create_subscription(
-                Image,
-                '/camera/color/image_raw',
-                self.image_callback,
-                1
-            )
-            self.get_logger().info("Subscribed to image topic")
-
-    # def unsubscribe_from_image_topic(self):
-    #     if self.subscription is not None:
-    #         self.subscription.destroy()
-    #         self.subscription = None
-    #         self.get_logger().info("Unsubscribed from image topic")
-
+  
 
 
 
 def main(args=None):
     rclpy.init(args=args)
     aruco_marker_detector = ArucoMarkerDetector()
-    executor = MultiThreadedExecutor()
-    try:
-        rclpy.spin(aruco_marker_detector, executor=executor)
-    except Exception as e: 
-        print(e)
+    # executor = MultiThreadedExecutor()
+    rclpy.spin(aruco_marker_detector) #, executor=executor)
     aruco_marker_detector.destroy_node()
     rclpy.shutdown()
 
