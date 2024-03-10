@@ -3,11 +3,62 @@
 #include "behaviortree_ros2/plugins.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
 
+#include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose.hpp"
+
+#include "tf2/LinearMath/Quaternion.h"
+// #include <tf2/LinearMath/Quaternion.h>
+
+
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 using namespace BT;
+
+class ArmArrayToPoseAction : public BT::SyncActionNode
+{
+public:
+  ArmArrayToPoseAction(const std::string& name, const BT::NodeConfig& config) :
+    BT::SyncActionNode(name, config)
+  {}
+
+  // This Action simply write a value in the port "text"
+  BT::NodeStatus tick() override
+  { 
+    auto array = getInput<std::vector<double>>("array");
+    std::vector<double> array_ = array.value();
+    geometry_msgs::msg::PoseStamped pose_goal;
+    pose_goal.pose.position.x = array_[0];
+    pose_goal.pose.position.y = array_[1];
+    pose_goal.pose.position.z = array_[2];
+
+    tf2::Quaternion q_new;
+    q_new.setRPY(array_[3], array_[4], array_[5]);
+  
+
+    q_new.normalize();
+    
+    pose_goal.pose.orientation.x = q_new.x();
+    pose_goal.pose.orientation.y = q_new.y();
+    pose_goal.pose.orientation.z = q_new.z();
+    pose_goal.pose.orientation.w = q_new.w();
+    
+
+    setOutput("pose", pose_goal);
+    
+    return BT::NodeStatus::SUCCESS;
+  }
+
+  // A node having ports MUST implement this STATIC method
+  static BT::PortsList providedPorts()
+  {
+    return {BT::OutputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<std::vector<double>>("array")};
+  }
+};
+
 
 class ArmPoseOffsetCalculation : public BT::SyncActionNode
 {
@@ -37,6 +88,51 @@ public:
   static BT::PortsList providedPorts()
   {
     return {BT::OutputPort<std::vector<double>>("pose_w_offset"),InputPort<std::vector<double>>("pose"),InputPort<std::vector<double>>("offset")};
+  }
+};
+
+class ArmPoseMsgOffsetCalculation : public BT::SyncActionNode
+{
+public:
+  ArmPoseMsgOffsetCalculation(const std::string& name, const BT::NodeConfig& config) :
+    BT::SyncActionNode(name, config)
+  {}
+
+  // This Action simply write a value in the port "text"
+  BT::NodeStatus tick() override
+  { 
+    auto offset = getInput<std::vector<double>>("offset");
+    auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
+    geometry_msgs::msg::PoseStamped pose_goal = pose.value();
+    std::vector<double> offset_ = offset.value();
+    
+    pose_goal.pose.position.x -= offset_[0];
+    pose_goal.pose.position.y -= offset_[1];
+    pose_goal.pose.position.z -= offset_[2];
+
+    tf2::Quaternion q_rot,q_new,quat_from_msg;
+    tf2::fromMsg(pose_goal.pose.orientation, quat_from_msg);
+    q_rot.setRPY(offset_[3], offset_[4], offset_[5]);
+  
+
+    q_rot.normalize();
+
+    q_new = q_rot * quat_from_msg;
+    q_new.normalize();
+
+
+
+    tf2::convert(pose_goal.pose.orientation, q_new);
+    
+    setOutput("pose_w_offset", pose_goal);
+    
+    return BT::NodeStatus::SUCCESS;
+  }
+
+  // A node having ports MUST implement this STATIC method
+  static BT::PortsList providedPorts()
+  {
+    return {BT::OutputPort<geometry_msgs::msg::PoseStamped>("pose_w_offset"),InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<std::vector<double>>("offset")};
   }
 };
 
@@ -132,7 +228,53 @@ public:
   }
 
   bool setGoal(Goal& goal) override{
-    auto pose = getInput<std::vector<double>>("pose");
+    auto pos = getInput<std::vector<double>>("pose");
+    
+    
+    // goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    //  goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    goal.pose = pos.value();
+    
+    
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
+class ArmMovePoseMsgAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePoseMsg>
+{
+public:
+  ArmMovePoseMsgAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMovePoseMsg>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    // return providedBasicPorts({InputPort<std::string>("pose")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
     
     
     // goal.pose = pose.value();

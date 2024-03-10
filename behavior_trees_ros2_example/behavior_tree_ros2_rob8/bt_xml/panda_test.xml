@@ -14,10 +14,9 @@
 
   <BehaviorTree ID="GraspObject">
     <Sequence>
-      <Script code="goal:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <GripperAction open="open"
                      action_name="__default__placeholder__"/>
-      <ArmPoseOffsetCalculation offset="&apos;0.0;0.0;-0.1;0.0;0.0;0.0&apos;"
+      <ArmPoseOffsetCalculation offset="&apos;0.0;0.0;0.1;0.0;0.0;0.0&apos;"
                                 pose="{goal}"
                                 pose_w_offset="{goal_w_offset}"/>
       <ArmMovePoseAction pose="{goal_w_offset}"
@@ -71,20 +70,22 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <Script code="object_pose:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
-      <SubTree ID="GraspObject"/>
+      <Script code="object_pose:=&apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
+      <ArmArrayToPoseAction array="{object_pose}"
+                            pose="{object_pose_msg}"/>
+      <SubTree ID="grasp_pose_msg"
+               target_pose_msg="{object_pose_msg}"
+               approch_offset="0.0;0.0;0.1;0.0;0.0;0.0"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
+      <Script code="object_pose:=&apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
       <ArmMovePoseAction name="arm"
-                         pose="&apos;0.623;-0.1;0.381;-3.142;0.0;0.0&apos;"
+                         pose="{object_pose}"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <ArmMovePoseAction name="arm"
-                         pose="&apos;0.623;-0.1;0.281;-3.142;0.0;0.0&apos;"
-                         action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
@@ -98,8 +99,39 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="grasp_pose_msg">
+    <Sequence>
+      <Sleep msec="200"/>
+      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{approch_pose}"/>
+      <GripperJointAction joint_2="0.03"
+                          joint_1="0.03"
+                          action_name="__default__placeholder__"/>
+      <Sleep msec="2000"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePoseMsgAction pose="{target_pose_msg}"
+                            action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <GripperJointAction joint_2="0.01"
+                          joint_1="0.01"
+                          action_name="__default__placeholder__"/>
+      <Sleep msec="2000"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="ArmArrayToPoseAction">
+      <input_port name="array"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <output_port name="pose"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+    </Action>
     <Action ID="ArmMoveJointsAction">
       <input_port name="joints"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -114,6 +146,21 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <Action ID="ArmMovePoseMsgAction">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ArmPoseMsgOffsetCalculation">
+      <input_port name="offset"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="pose_w_offset"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+    </Action>
     <Action ID="ArmPoseOffsetCalculation">
       <input_port name="offset"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -125,6 +172,15 @@
     <Action ID="GripperAction">
       <input_port name="open"
                   type="unsigned int"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="GripperJointAction">
+      <input_port name="joint_2"
+                  type="double"/>
+      <input_port name="joint_1"
+                  type="double"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
@@ -148,6 +204,12 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <SubTree ID="grasp_pose_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="approch_offset"
+                  default="&apos;0.0;0.0;0.1;0.0;0.0;0.0&apos;"/>
+    </SubTree>
   </TreeNodesModel>
 
 </root>

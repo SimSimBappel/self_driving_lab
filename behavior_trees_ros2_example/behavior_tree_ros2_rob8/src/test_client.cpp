@@ -120,6 +120,16 @@ int main(int argc, char **argv)
 
   params_gripper_joint.default_port_value = "gripper_joint_service";
   factory.registerNodeType<GripperJointAction>("GripperJointAction",params_gripper_joint);
+  
+  factory.registerNodeType<ArmArrayToPoseAction>("ArmArrayToPoseAction");
+  factory.registerNodeType<ArmPoseMsgOffsetCalculation>("ArmPoseMsgOffsetCalculation");
+
+  RosNodeParams params_arm_move_pose_msg;
+  params_arm_move_pose_msg.nh = nh;
+  params_arm_move_pose_msg.default_port_value = "arm_move_pose_msg_service";
+  params_arm_move_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+  params_arm_move_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
 
   RosNodeParams params;
   params.nh = nh;
