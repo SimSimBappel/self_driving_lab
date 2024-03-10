@@ -25,6 +25,7 @@
 // arm actions
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
 #include "behavior_tree_ros2_actions/action/sleep.hpp"
@@ -52,6 +53,9 @@ public:
     using ArmMovePose = behavior_tree_ros2_actions::action::ArmMovePose;
     using GoalHandleArmMovePose = rclcpp_action::ServerGoalHandle<ArmMovePose>;
 
+    using ArmMovePoseMsg = behavior_tree_ros2_actions::action::ArmMovePoseMsg;
+    using GoalHandleArmMovePoseMsg = rclcpp_action::ServerGoalHandle<ArmMovePoseMsg>;
+
     using ArmMoveJoints = behavior_tree_ros2_actions::action::ArmMoveJoints;
     using GoalHandleArmMoveJoints = rclcpp_action::ServerGoalHandle<ArmMoveJoints>;
 
@@ -76,6 +80,11 @@ public:
     void arm_move_pose_handle_accepted(const std::shared_ptr<GoalHandleArmMovePose> goal_handle);
     void arm_move_pose_execute(const std::shared_ptr<GoalHandleArmMovePose> goal_handle);
 
+    rclcpp_action::GoalResponse arm_move_pose_msg_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMovePoseMsg::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_pose_msg_handle_cancel(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle);
+    void arm_move_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle);
+    void arm_move_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle);
+
     using Sleep = behavior_tree_ros2_actions::action::Sleep;
     using GoalHandleSleep = rclcpp_action::ServerGoalHandle<Sleep>;
 
@@ -95,6 +104,8 @@ private:
     rclcpp_action::Server<Gripper>::SharedPtr action_server_gripper_;
     rclcpp_action::Server<GripperJoint>::SharedPtr action_server_gripper_joint_;
     rclcpp_action::Server<ArmMovePose>::SharedPtr action_server_arm_move_pose_;
+
+    rclcpp_action::Server<ArmMovePoseMsg>::SharedPtr action_server_arm_move_pose_msg_;
 
     rclcpp_action::Server<ArmMoveJoints>::SharedPtr action_server_arm_move_joints_;
 
