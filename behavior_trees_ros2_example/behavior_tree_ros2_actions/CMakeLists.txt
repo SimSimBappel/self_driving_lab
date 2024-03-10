@@ -34,6 +34,7 @@ set(action_files
     "action/GripperJoint.action"
     "action/ArmMoveJoints.action"
     "action/ArmMovePose.action"
+    "action/ArmMovePoseMsg.action"
     "action/ArmMoveRelativePose.action"
     "action/ArmMoveToFrame.action"
     # "action/MoveGroupSequence.action"

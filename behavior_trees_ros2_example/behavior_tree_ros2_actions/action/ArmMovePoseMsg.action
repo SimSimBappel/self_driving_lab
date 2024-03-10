@@ -1,5 +1,5 @@
 #goal definition
-float64[] pose
+geometry_msgs/PoseStamped pose
 ---
 #result definition
 bool done

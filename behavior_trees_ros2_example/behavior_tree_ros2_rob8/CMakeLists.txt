@@ -9,6 +9,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(behavior_tree_ros2_actions REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -16,6 +18,8 @@ find_package(behavior_tree_ros2_actions REQUIRED)
 set(THIS_PACKAGE_DEPS 
     behaviortree_ros2
     std_msgs
+    geometry_msgs
+    tf2
     behavior_tree_ros2_actions )
 
 
