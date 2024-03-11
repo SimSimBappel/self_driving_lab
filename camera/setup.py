@@ -23,8 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'aruco_detection_action = camera.aruco_detection_action:main',
-            'aruco_transform_action = camera.arucoTransformAction:main'
+            'aruco_detection_action = camera.aruco_detection_action:main'
         ],
     },
 )
