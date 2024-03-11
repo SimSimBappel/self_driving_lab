@@ -4,10 +4,10 @@ ros2 action  send_goal /detect_marker_pose behavior_tree_ros2_actions/action/Fin
 ```
 
 # TODO
-- [ ] Camera calibration uses relative folder.
-- [ ] Implement timeout function for action FindArucoTag.
-- [ ] Implement realsense ros2 wrapper for image pipeline.
+- [x] Camera calibration uses relative folder.
+- [x] Implement timeout function for action FindArucoTag.
+- [x] Implement realsense ros2 wrapper for image pipeline.
 - [ ] make sure there is only one marker of same id.
-- [ ] Get camera info from file.
+- [x] Get camera info from file.
 - [x] Make the detection callable though action(s).
 - [x] 

@@ -1,60 +1,81 @@
-import rclpy
-from rclpy.action import ActionServer, CancelResponse, GoalResponse
-from rclpy.callback_groups import ReentrantCallbackGroup
-from rclpy.executors import MultiThreadedExecutor
-import tf2_ros
-import tf_transformations
-from rclpy.node import Node
-from geometry_msgs.msg import TransformStamped
-from cv_bridge import CvBridge
+import os
 import cv2
+import time
+import glob
+import rclpy
 import numpy as np
 from cv2 import aruco
-import glob
-from behavior_tree_ros2_actions.action import FindArucoTag  # Import your action type
+import tf_transformations
+from rclpy.node import Node
+from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from geometry_msgs.msg import TransformStamped
+from behavior_tree_ros2_actions.action import FindArucoTag
+from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
 
-
-class ArucoMarkerDetector(Node):
+class CameraSubscriber(Node):
     def __init__(self):
-        super().__init__('aruco_marker_detector')
-        self.logger = self.get_logger()
-        self.logger.info('Initializing aruco_marker_detector')
-        self.publisher = self.create_publisher(TransformStamped, 'marker_pose', 10)
-        self.bridge = CvBridge()
-        self.subscription = None
-        self.cap = None
-        # self.subscribe_to_image_topic()
-        
-        self.action_server = ActionServer(
-            self,
-            FindArucoTag,
-            'detect_marker_pose',
-            execute_callback=self.execute_callback,
-            goal_callback=self.goal_callback,
-            cancel_callback=self.cancel_callback
-            )
+        super().__init__('camera_subscriber')
         self.subscription = self.create_subscription(
-                Image,
-                '/camera/color/image_raw',
-                self.image_callback,
-                1
-            )
-        self.get_logger().info("Subscribed to image topic")
-        
-        self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-        self.camera_matrix, self.distortion_coeffs = self.calib_cam()  # Calibrate the camera
+            Image,
+            '/camera/color/image_raw',
+            self.callback,
+            10)
+        self.subscription 
+        self.bridge = CvBridge()
+        self.logger = self.get_logger()
+        self.streaming = False
+        self.img_raw = None
+        self.img_none = False
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        package_dir = os.path.dirname(script_dir)
+        self.calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
+        self.camera_matrix, self.distortion_coeffs = self.calib_cam(self.calibration_file_path)
 
-    def calib_cam(self):
+    def callback(self, data):
+        if not self.streaming:
+            return
+
+        try:
+            # Convert ROS Image message to OpenCV image
+            self.img_raw = self.bridge.imgmsg_to_cv2(data, "bgr8")
+        except Exception as e:
+            self.logger.warn(str(e))
+            return
+
+    def get_latest_image(self):
+        return self.img_raw
+
+    def start_streaming(self):
+        self.streaming = True
+
+    def stop_streaming(self):
+        self.streaming = False
+
+    def calib_cam(self, calibration_file_path): 
+        
+
+        if os.path.exists(calibration_file_path):
+            # Load calibration data from file
+            with np.load(calibration_file_path) as data:
+                mtx, dist = [data[i] for i in ('mtx', 'dist')]
+            self.logger.info("Camera calibration data loaded from file.")
+            return mtx, dist
+
+        # If calibration file doesn't exist, perform calibration
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        # checkerboard of size (7 x 6) is used
         objp = np.zeros((6*7,3), np.float32)
         objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
-        # iterating through all calibration images in the folder
-        images = glob.glob('/home/simon/self_driving_ws/src/self_driving_lab/camera/resource/calib_images/checkerboard/*.jpg')
+
+        package_dir = os.path.abspath(__file__)
+        for i in range(2): 
+            package_dir = os.path.dirname(os.path.dirname(package_dir))
+
+        image_path = os.path.join(package_dir, 'src', 'self_driving_lab', 'camera', 'resource', 'calib_images', 'checkerboard')
+        images = glob.glob(os.path.join(image_path, '*.jpg'))
 
         for fname in images:
             img = cv2.imread(fname)
@@ -64,17 +85,47 @@ class ArucoMarkerDetector(Node):
                 objpoints.append(objp)
                 corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
                 imgpoints.append(corners2)
-                #img = cv2.drawChessboardCorners(img, (7,6), corners2,ret)
+
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
+
         self.logger.debug("matrix: " + str(mtx))
         self.logger.debug("distortion: " + str(dist))
-        self.logger.info("camera calibrated")
+        self.logger.info("Camera calibrated")
+
+        # Save calibration data to file
+        np.savez(calibration_file_path, mtx=mtx, dist=dist)
+        self.logger.info("Camera calibration data saved to file.")
+
         return mtx, dist  # Return camera matrix and distortion coefficients
+
+
+class ArucoMarkerDetector(Node):
+    def __init__(self):
+        super().__init__('aruco_marker_detector')
+        self.logger = self.get_logger()
+        self.logger.info('Initializing aruco_marker_detector')
+        self.publisher = self.create_publisher(TransformStamped, 'marker_pose', 10)
+        self.camera_subscriber = CameraSubscriber()
+        
+        self.action_server = ActionServer(
+            self,
+            FindArucoTag,
+            'detect_marker_pose',
+            execute_callback=self.execute_callback,
+            goal_callback=self.goal_callback,
+            cancel_callback=self.cancel_callback
+            )
+        self.timeout = 15 # Secounds
+        self.found_object = False
+        self.result = None
+
+    def destroy(self):
+        self.camera_subscriber.destroy_node()
+        self.action_server.destroy()
+        super().destroy_node()
     
     def goal_callback(self, goal_request):
         """Accept or reject a client request to begin an action."""
-        # This server allows multiple goals in parallel
-        # self.get_logger().info('Received goal request')
         if goal_request.id > -1 and goal_request.id < 251:
             self.get_logger().info('Received goal request ID:' + str(goal_request.id))
             return GoalResponse.ACCEPT
@@ -86,31 +137,38 @@ class ArucoMarkerDetector(Node):
         """Accept or reject a client request to cancel an action."""
         self.get_logger().info('Received cancel request')
         return CancelResponse.ACCEPT
+    
+    def reset(self):
+        self.camera_subscriber.img_raw = None
 
     def execute_callback(self, goal_handle):
-        # self.subscribe_to_image_topic()
         self.logger.info("Looking for ID:" + str(goal_handle.request.id))
-        result = None
-        while rclpy.ok() and result is None: #not goal_handle.is_cancelled():
-            self.logger.info("rclpyok")
-            # Process the images until the action is completed
-            frame = self.cap
-            if frame is None:
-                self.logger.info("spinning")
-                rclpy.spin_once(self, timeout_sec=0.1)
-            else: 
-                self.logger.info("not spinning :)")
-                cv2.imshow("Image from RealSense", frame)
-                cv2.waitKey(1)
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        self.found_object = False
+        self.result = None
+        start_time = time.time()
+        self.camera_subscriber.start_streaming()
+        count = 0
 
+        while not goal_handle.is_cancel_requested and not self.found_object and time.time() - start_time < self.timeout: 
+            # Process the images until the action is completed
+            frame = self.camera_subscriber.get_latest_image()
+            if frame is None:
+                rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1)
+                count = count + 1
+                if count == 4:
+                    self.logger.warn("Image not retrieved!")
+            else:
+                if count >= 4:
+                    self.logger.info("Image found")
+                count = 0
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
                 parameters = aruco.DetectorParameters_create()
                 corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
-                if ids is not None and goal_handle.request.id in ids:
+                if ids is not None and goal_handle.request.id in ids: 
                     index = np.where(ids == goal_handle.request.id)[0][0]
-                    rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], 0.0435, self.camera_matrix, self.distortion_coeffs)
+                    rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], 0.0435, self.camera_subscriber.camera_matrix, self.camera_subscriber.distortion_coeffs)
                     if rvec is not None and tvec is not None:
                         # Construct and publish the marker pose
                         marker_pose_msg = TransformStamped()
@@ -126,62 +184,40 @@ class ArucoMarkerDetector(Node):
                         marker_pose_msg.transform.rotation.z = q[2]
                         marker_pose_msg.transform.rotation.w = q[3]
                         self.publisher.publish(marker_pose_msg)
-                        # goal_handle.succeed()
+                        self.found_object = True
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
-                self.cap = None
-                frame = None
-                gray = None
-        # self.unsubscribe_from_image_topic()
-        cv2.destroyAllWindows()
-        self.logger.info("fug")
-        goal_handle.succeed()
-        return result
-
-                        
+                        goal_handle.succeed()
+                        self.reset()
+                        self.camera_subscriber.stop_streaming()
+                        return result
+                self.reset()
+                time.sleep(0.05)
         
-        
-                
-    def image_callback(self, msg):
-        # Convert ROS Image message to OpenCV format
-        self.logger.info("got image!")
-        self.cap = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-        # Example: Display the received image
-        # cv2.imshow("Image from RealSense", self.cap)
-        # cv2.waitKey(1)  # Adjust as needed
-
-    # def image_callback(self, msg):
-    #     self.image_data = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
-
-    def subscribe_to_image_topic(self):
-        if self.subscription is None:
-            self.subscription = self.create_subscription(
-                Image,
-                '/camera/color/image_raw',
-                self.image_callback,
-                1
-            )
-            self.get_logger().info("Subscribed to image topic")
-
-    # def unsubscribe_from_image_topic(self):
-    #     if self.subscription is not None:
-    #         self.subscription.destroy()
-    #         self.subscription = None
-    #         self.get_logger().info("Unsubscribed from image topic")
-
-
+        self.camera_subscriber.stop_streaming()
+        if goal_handle.is_cancel_requested:
+            goal_handle.canceled()
+            self.get_logger().info('Goal canceled')
+            return FindArucoTag.Result()
+        elif not time.time() - start_time < self.timeout:
+            goal_handle.abort()
+            self.get_logger().warn('Timeout')
+            return FindArucoTag.Result()
+        else:
+            cv2.destroyAllWindows()
+            self.logger.error("wtf")
+            self.destroy()
 
 
 def main(args=None):
     rclpy.init(args=args)
     aruco_marker_detector = ArucoMarkerDetector()
-    executor = MultiThreadedExecutor()
     try:
-        rclpy.spin(aruco_marker_detector, executor=executor)
+        rclpy.spin(aruco_marker_detector)
     except Exception as e: 
         print(e)
-    aruco_marker_detector.destroy_node()
+    aruco_marker_detector.destroy()
     rclpy.shutdown()
 
 
