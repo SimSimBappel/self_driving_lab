@@ -3,7 +3,7 @@
 <package format="3">
   <name>pgsql_services</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>ROS2 Servcices for interfacing with a postgresql backend (through locally hosted Supabase server) </description>
   <maintainer email="khytti19@student.aau.dk">kmh</maintainer>
   <license>TODO: License declaration</license>
 

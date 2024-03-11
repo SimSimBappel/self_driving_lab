@@ -30,3 +30,6 @@ colcon build
 source install/setup.bash
 ```
 
+
+### pgsql_services and supabase_docker
+Check seperate readme files for incstructions. 

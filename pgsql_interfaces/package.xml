@@ -3,9 +3,9 @@
 <package format="3">
   <name>pgsql_interfaces</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="khytti19@student.aau.dk">kmh</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Interfaces for the pgsql_services package</description>
+  <maintainer email="khytti19@student.aau.dk">Kasper Maarschalk Hytting</maintainer>
+  <license>MIT</license>
 
   <depend>geometry_msgs</depend>
 
