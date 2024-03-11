@@ -152,7 +152,7 @@ class ArucoMarkerDetector(Node):
         while not goal_handle.is_cancel_requested and not self.found_object and time.time() - start_time < self.timeout: 
             # Process the images until the action is completed
             frame = self.camera_subscriber.get_latest_image()
-            if frame is None:
+            if self.camera_subscriber.img_raw is None:
                 rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1)
                 count = count + 1
                 if count == 4:
@@ -166,7 +166,9 @@ class ArucoMarkerDetector(Node):
                 parameters = aruco.DetectorParameters_create()
                 corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
-                if ids is not None and goal_handle.request.id in ids: 
+                # if ids is not None and goal_handle.request.id in ids:
+                # if ids is not None and ids.count(goal_handle.request.id) == 1: 
+                if ids is not None and np.sum(ids == goal_handle.request.id) == 1:
                     index = np.where(ids == goal_handle.request.id)[0][0]
                     rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], 0.0435, self.camera_subscriber.camera_matrix, self.camera_subscriber.distortion_coeffs)
                     if rvec is not None and tvec is not None:
@@ -192,6 +194,14 @@ class ArucoMarkerDetector(Node):
                         self.reset()
                         self.camera_subscriber.stop_streaming()
                         return result
+                elif ids is not None and goal_handle.request.id in ids and not np.sum(ids == goal_handle.request.id) == 1:
+                    print(ids)
+                    print(np.sum(ids == goal_handle.request.id))
+                    self.logger.warn("More than one of id:" + str(goal_handle.request.id) + "found!")
+                    goal_handle.abort()
+                    self.reset()
+                    return FindArucoTag.Result()
+
                 self.reset()
                 time.sleep(0.05)
         
