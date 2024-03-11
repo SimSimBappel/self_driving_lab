@@ -5,6 +5,9 @@ ALTER TABLE chemical_locations ADD UNIQUE (location_id);
 ALTER TABLE workstation_locations ADD CONSTRAINT workstation_location_unique UNIQUE (workstation_id, location_id);
 ALTER TABLE workstation_locations ADD UNIQUE (location_id);
 
+ALTER TABLE chemical ADD CONSTRAINT unique_name UNIQUE (name);
+
+
 
 -- ^ the below tables have these alterations added.
 

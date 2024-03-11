@@ -1,6 +1,6 @@
 # Supabase Docker
 
-# Start the services (in detached mode)
+## Start the services (in detached mode)
 ```
 # Start in detached mode
 docker compose up -d

@@ -2,7 +2,7 @@
 
 ## System dependencies
 ```
-sudo apt-get install -y libpqxx-dev
+sudo apt-get install -y libpqxx-dev libpqxx-6.4
 ```
 
 ## Testing services
