@@ -131,6 +131,22 @@ int main(int argc, char **argv)
   params_arm_move_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
   factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
 
+  RosNodeParams params_arm_move_pliz_ptp_pose_msg;
+  params_arm_move_pliz_ptp_pose_msg.nh = nh;
+  params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";
+  params_arm_move_pliz_ptp_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+  params_arm_move_pliz_ptp_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  factory.registerNodeType<ArmMovePlizPtpPoseMsgAction>("ArmMovePlizPtpPoseMsgAction",params_arm_move_pliz_ptp_pose_msg);
+
+
+  RosNodeParams params_arm_move_pliz_lin_pose_msg;
+  params_arm_move_pliz_lin_pose_msg.nh = nh;
+  params_arm_move_pliz_lin_pose_msg.default_port_value = "arm_move_pliz_lin_pose_msg_service";
+  params_arm_move_pliz_lin_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+  params_arm_move_pliz_lin_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  factory.registerNodeType<ArmMovePlizLinPoseMsgAction>("ArmMovePlizLinPoseMsgAction",params_arm_move_pliz_lin_pose_msg);
+
+
   RosNodeParams params;
   params.nh = nh;
   params.server_timeout = std::chrono::milliseconds(2000);

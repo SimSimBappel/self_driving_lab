@@ -71,6 +71,20 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_accepted, this, _1));
+    
+    this->action_server_arm_move_pliz_ptp_pose_msg_ = rclcpp_action::create_server<ArmMovePlizPtpPoseMsg>(
+      this,
+      "arm_move_pliz_ptp_pose_msg_service",
+      std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_goal, this, _1, _2),
+      std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_cancel, this, _1),
+      std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_accepted, this, _1));
+    
+    this->action_server_arm_move_pliz_lin_pose_msg_ = rclcpp_action::create_server<ArmMovePlizLinPoseMsg>(
+      this,
+      "arm_move_pliz_lin_pose_msg_service",
+      std::bind(&MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_goal, this, _1, _2),
+      std::bind(&MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_cancel, this, _1),
+      std::bind(&MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_accepted, this, _1));
 
     this->action_server_arm_move_joints_ = rclcpp_action::create_server<ArmMoveJoints>(
       this,
@@ -453,7 +467,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
         }
         else{
           result->done = false;
-          goal_handle->canceled(result);
+          goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
         }
 
@@ -470,7 +484,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
         }
         else{
           result->done = false;
-          goal_handle->canceled(result);
+          goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
         }
 
@@ -479,6 +493,174 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
 
 
 ////////// ARM ACTION SERVICES //////////////7
+
+
+rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const ArmMovePlizPtpPoseMsg::Goal> goal)
+  {
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_cancel(
+    const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_execute, this, _1), goal_handle}.detach();
+  
+  }
+
+  void MoveRobotServer::arm_move_pliz_ptp_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle){
+      auto result = std::make_shared<ArmMovePlizPtpPoseMsg::Result>();
+      
+      const auto goal = goal_handle->get_goal();
+      auto pose = goal->pose;
+
+      move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
+      move_group_->setPlannerId("PTP");
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      
+      if(MoveRobotServer::Move(pose))
+      {
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          result->done = false;
+          goal_handle->abort(result);
+          RCLCPP_INFO(this->get_logger(), "Goal abort");
+      }
+      // if(open == true)
+      // {
+      //   joints.data = {-0.628318531, 0.628318531};
+      //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+          
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+      // if(open == false)
+      // {
+        
+      //   joints.data = {0.0, 0.0};
+      //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+  }
+
+
+//////(/)
+
+rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const ArmMovePlizLinPoseMsg::Goal> goal)
+  {
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_cancel(
+    const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&MoveRobotServer::arm_move_pliz_lin_pose_msg_execute, this, _1), goal_handle}.detach();
+  
+  }
+
+  void MoveRobotServer::arm_move_pliz_lin_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle){
+      auto result = std::make_shared<ArmMovePlizLinPoseMsg::Result>();
+      
+      const auto goal = goal_handle->get_goal();
+      auto pose = goal->pose;
+      move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
+      move_group_->setPlannerId("LIN");
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      
+      if(MoveRobotServer::Move(pose))
+      {
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          result->done = false;
+          goal_handle->abort(result);
+          RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      }
+      // if(open == true)
+      // {
+      //   joints.data = {-0.628318531, 0.628318531};
+      //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+          
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+      // if(open == false)
+      // {
+        
+      //   joints.data = {0.0, 0.0};
+      //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
+      //   if(MoveRobotServer::MoveGripper(joints)){
+      //     result->done = true;
+      //     goal_handle->succeed(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      //   }
+      //   else{
+      //     result->done = false;
+      //     goal_handle->canceled(result);
+      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      //   }
+
+      // }
+  }
+
+
+/////
 
 rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
     const rclcpp_action::GoalUUID &,
@@ -508,6 +690,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
+      move_group_->setPlanningPipelineId("ompl");
+      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      // move_group_->setMaxVelocityScalingFactor(goal->speed);
+      move_group_->setMaxAccelerationScalingFactor(0.6);
+      move_group_->setMaxVelocityScalingFactor(0.6);
       
       if(MoveRobotServer::Move(pose))
       {
@@ -517,7 +704,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       }
       else{
           result->done = false;
-          goal_handle->canceled(result);
+          goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
       // if(open == true)
@@ -614,6 +801,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       pose_goal.pose.orientation.y = q_new.y();
       pose_goal.pose.orientation.z = q_new.z();
       pose_goal.pose.orientation.w = q_new.w();
+
+      move_group_->setPlanningPipelineId("ompl");
+      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      // move_group_->setMaxVelocityScalingFactor(goal->speed);
+      move_group_->setMaxAccelerationScalingFactor(0.6);
+      move_group_->setMaxVelocityScalingFactor(0.6);
       
       if(MoveRobotServer::Move(pose_goal))
       {
@@ -623,7 +816,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       }
       else{
           result->done = false;
-          goal_handle->canceled(result);
+          goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
       // if(open == true)
@@ -696,6 +889,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
         joints_.data.push_back(joint_pose[i]);
        }
       
+      move_group_->setPlanningPipelineId("ompl");
+      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      // move_group_->setMaxVelocityScalingFactor(goal->speed);
+      move_group_->setMaxAccelerationScalingFactor(0.6);
+      move_group_->setMaxVelocityScalingFactor(0.6);
+      
       if(MoveRobotServer::ArmMoveJ(joints_))
       {
           result->done = true;
@@ -704,7 +903,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
       }
       else{
           result->done = false;
-          goal_handle->canceled(result);
+          goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
   }
@@ -798,7 +997,7 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
 //     MoveRobotServer::Move(i);
 //     reponse->sum = 1;
 //     // move_group_->move();
-// }
+// }canceled
 
 int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
