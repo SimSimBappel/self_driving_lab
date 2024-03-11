@@ -1,0 +1,6 @@
+int32 id
+geometry_msgs/Pose location_base
+geometry_msgs/Pose location_hand
+---
+bool success
+string message

@@ -1,0 +1,5 @@
+int32 workstation_id
+int32 location_id
+---
+bool success
+string message

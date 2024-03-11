@@ -1,0 +1,8 @@
+int8 id
+int8 location_id                    #? Only if applicable
+string name
+geometry_msgs/Pose location_base
+geometry_msgs/Pose location_hand
+---
+bool success
+string message

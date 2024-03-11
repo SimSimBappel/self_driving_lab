@@ -1,0 +1,5 @@
+int32 chemical_id
+string name
+int32 location_id
+geometry_msgs/Pose location_base
+geometry_msgs/Pose location_hand
