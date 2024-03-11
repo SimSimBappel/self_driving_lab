@@ -1,5 +1,7 @@
 #goal definition
 float64[] pose # xyz, rpy
+float64 speed
+float64 accel
 ---
 #result definition
 bool done

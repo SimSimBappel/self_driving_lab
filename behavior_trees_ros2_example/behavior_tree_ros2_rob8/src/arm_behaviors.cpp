@@ -138,6 +138,8 @@ public:
   }
 };
 
+
+
 class ArmMoveJointsAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJoints>
 {
 public:
@@ -149,12 +151,16 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<std::vector<double>>("joints")});
+    return providedBasicPorts({InputPort<std::vector<double>>("joints"),InputPort<double>("speed"),InputPort<double>("accel")});
   }
 
   bool setGoal(Goal& goal) override{
     auto frame = getInput<std::vector<double>>("joints");
     goal.joints = frame.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     return true;
   }
 
@@ -226,7 +232,7 @@ public:
   static BT::PortsList providedPorts()
   {
     // return providedBasicPorts({InputPort<std::string>("pose")});
-    return providedBasicPorts({InputPort<std::vector<double>>("pose")});
+    return providedBasicPorts({InputPort<std::vector<double>>("pose"),InputPort<double>("speed"),InputPort<double>("accel")});
   }
 
   bool setGoal(Goal& goal) override{
@@ -237,6 +243,10 @@ public:
     //  auto pose = getInput<std::string>("pose");
     //  goal.pose = pose.value();
     //  auto pose = getInput<std::string>("pose");
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     goal.pose = pos.value();
     
     
@@ -272,7 +282,7 @@ public:
   static BT::PortsList providedPorts()
   {
     // return providedBasicPorts({InputPort<std::string>("pose")});
-    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel")});
   }
 
   bool setGoal(Goal& goal) override{
@@ -284,6 +294,10 @@ public:
     //  goal.pose = pose.value();
     //  auto pose = getInput<std::string>("pose");
     goal.pose = pose.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     
     
     return true;

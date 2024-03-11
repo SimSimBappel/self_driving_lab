@@ -22,6 +22,10 @@ def generate_launch_description():
 
     moveit_config = (MoveItConfigsBuilder("omtp_factory", package_name="omtp_factory_moveit_config")
                      .parameter("use_sim_time",True)
+                     .planning_pipelines(
+            pipelines=["ompl", "pilz_industrial_motion_planner","chomp"],
+            default_planning_pipeline="ompl",
+        )
                      .planning_scene_monitor(
             publish_robot_description=True, publish_robot_description_semantic=True)
                     # .sensors_3d(os.path.join(get_package_share_directory("omtp_factory_moveit_config"),'config','sensors_depthmap.yaml'))

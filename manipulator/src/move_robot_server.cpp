@@ -16,7 +16,7 @@
 static const double PLANNING_TIME_S = 5.0;
 static const double MAX_VELOCITY_SCALE = 0.8;
 static const double MAX_ACCELERATION_SCALE = 0.8;
-static const unsigned int PLANNING_ATTEMPTS = 5;
+static const unsigned int PLANNING_ATTEMPTS = 10;
 static const double GOAL_TOLERANCE = 1e-3;
 static const std::string PLANNING_GROUP = "panda_1";
 
@@ -369,8 +369,11 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     // {
     //   pos.push_back(stod(v[i]));
     // }
+
     
         joints.data = {goal->joint_1, goal->joint_2};
+        move_gripper_group_->setMaxAccelerationScalingFactor(goal->accel);
+        move_gripper_group_->setMaxVelocityScalingFactor(goal->speed);
         RCLCPP_INFO(this->get_logger(), "opening %d",goal->joint_1);
         if(MoveRobotServer::MoveGripper(joints)){
           
@@ -458,6 +461,8 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
       if(open == true)
       {
         joints.data = {-0.628318531, 0.628318531};
+        move_gripper_group_->setMaxAccelerationScalingFactor(goal->accel);
+        move_gripper_group_->setMaxVelocityScalingFactor(goal->speed);
         RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
         if(MoveRobotServer::MoveGripper(joints)){
           
@@ -691,10 +696,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
       move_group_->setPlanningPipelineId("ompl");
-      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
-      // move_group_->setMaxVelocityScalingFactor(goal->speed);
-      move_group_->setMaxAccelerationScalingFactor(0.6);
-      move_group_->setMaxVelocityScalingFactor(0.6);
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      // move_group_->setMaxAccelerationScalingFactor(0.6);
+      // move_group_->setMaxVelocityScalingFactor(0.6);
       
       if(MoveRobotServer::Move(pose))
       {
@@ -803,10 +808,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       pose_goal.pose.orientation.w = q_new.w();
 
       move_group_->setPlanningPipelineId("ompl");
-      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
-      // move_group_->setMaxVelocityScalingFactor(goal->speed);
-      move_group_->setMaxAccelerationScalingFactor(0.6);
-      move_group_->setMaxVelocityScalingFactor(0.6);
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      // move_group_->setMaxAccelerationScalingFactor(0.6);
+      // move_group_->setMaxVelocityScalingFactor(0.6);
       
       if(MoveRobotServer::Move(pose_goal))
       {
@@ -890,10 +895,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
        }
       
       move_group_->setPlanningPipelineId("ompl");
-      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
-      // move_group_->setMaxVelocityScalingFactor(goal->speed);
-      move_group_->setMaxAccelerationScalingFactor(0.6);
-      move_group_->setMaxVelocityScalingFactor(0.6);
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      // move_group_->setMaxAccelerationScalingFactor(0.6);
+      // move_group_->setMaxVelocityScalingFactor(0.6);
       
       if(MoveRobotServer::ArmMoveJ(joints_))
       {

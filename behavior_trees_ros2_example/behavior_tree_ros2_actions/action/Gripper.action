@@ -1,5 +1,7 @@
 #goal definition
 bool open
+float64 speed
+float64 accel
 ---
 #result definition
 bool done

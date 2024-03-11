@@ -21,12 +21,16 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<unsigned>("open")});
+    return providedBasicPorts({InputPort<unsigned>("open"),InputPort<double>("speed"),InputPort<double>("accel")});
   }
 
   bool setGoal(Goal& goal) override{
     auto open = getInput<bool>("open");
     goal.open = open.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     return true;
   }
 
@@ -60,7 +64,7 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<double>("joint_1"), InputPort<double>("joint_2")});
+    return providedBasicPorts({InputPort<double>("joint_1"), InputPort<double>("joint_2"),InputPort<double>("speed"),InputPort<double>("accel")});
   }
 
   bool setGoal(Goal& goal) override{
@@ -68,6 +72,10 @@ public:
     auto joint2 = getInput<double>("joint_2");
     goal.joint_1 = joint1.value();
     goal.joint_2 = joint2.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     
     return true;
   }
