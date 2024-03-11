@@ -26,6 +26,9 @@
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pliz_ptp_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
 #include "behavior_tree_ros2_actions/action/sleep.hpp"
@@ -55,6 +58,22 @@ public:
 
     using ArmMovePoseMsg = behavior_tree_ros2_actions::action::ArmMovePoseMsg;
     using GoalHandleArmMovePoseMsg = rclcpp_action::ServerGoalHandle<ArmMovePoseMsg>;
+
+    using ArmMovePlizPtpPoseMsg = behavior_tree_ros2_actions::action::ArmMovePlizPtpPoseMsg;
+    using GoalHandleArmMovePlizPtpPoseMsg = rclcpp_action::ServerGoalHandle<ArmMovePlizPtpPoseMsg>;
+
+    rclcpp_action::GoalResponse arm_move_pliz_ptp_pose_msg_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMovePlizPtpPoseMsg::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_pliz_ptp_pose_msg_handle_cancel(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle);
+    void arm_move_pliz_ptp_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle);
+    void arm_move_pliz_ptp_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle);
+
+    using ArmMovePlizLinPoseMsg = behavior_tree_ros2_actions::action::ArmMovePlizLinPoseMsg;
+    using GoalHandleArmMovePlizLinPoseMsg = rclcpp_action::ServerGoalHandle<ArmMovePlizLinPoseMsg>;
+
+    rclcpp_action::GoalResponse arm_move_pliz_lin_pose_msg_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMovePlizLinPoseMsg::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_pliz_lin_pose_msg_handle_cancel(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle);
+    void arm_move_pliz_lin_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle);
+    void arm_move_pliz_lin_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle);
 
     using ArmMoveJoints = behavior_tree_ros2_actions::action::ArmMoveJoints;
     using GoalHandleArmMoveJoints = rclcpp_action::ServerGoalHandle<ArmMoveJoints>;
@@ -106,6 +125,10 @@ private:
     rclcpp_action::Server<ArmMovePose>::SharedPtr action_server_arm_move_pose_;
 
     rclcpp_action::Server<ArmMovePoseMsg>::SharedPtr action_server_arm_move_pose_msg_;
+
+    rclcpp_action::Server<ArmMovePlizPtpPoseMsg>::SharedPtr action_server_arm_move_pliz_ptp_pose_msg_;
+
+    rclcpp_action::Server<ArmMovePlizLinPoseMsg>::SharedPtr action_server_arm_move_pliz_lin_pose_msg_;
 
     rclcpp_action::Server<ArmMoveJoints>::SharedPtr action_server_arm_move_joints_;
 

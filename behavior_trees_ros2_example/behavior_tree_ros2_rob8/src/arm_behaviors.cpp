@@ -4,6 +4,8 @@
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pliz_ptp_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
 
@@ -282,6 +284,104 @@ public:
     //  goal.pose = pose.value();
     //  auto pose = getInput<std::string>("pose");
     goal.pose = pose.value();
+    
+    
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
+class ArmMovePlizPtpPoseMsgAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizPtpPoseMsg>
+{
+public:
+  ArmMovePlizPtpPoseMsgAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizPtpPoseMsg>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    // return providedBasicPorts({InputPort<std::string>("pose")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    
+    // goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    //  goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    goal.pose = pose.value();
+    goal.speed = speed.value();
+    goal.accel = accel.value();
+    
+    
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
+class ArmMovePlizLinPoseMsgAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizLinPoseMsg>
+{
+public:
+  ArmMovePlizLinPoseMsgAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizLinPoseMsg>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    // return providedBasicPorts({InputPort<std::string>("pose")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    
+    // goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    //  goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    goal.pose = pose.value();
+    goal.speed = speed.value();
+    goal.accel = accel.value();
     
     
     return true;
