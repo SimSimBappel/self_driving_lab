@@ -1,0 +1,7 @@
+string name
+string formula
+int8 safety_level
+---
+bool success
+string message
+int8 id
