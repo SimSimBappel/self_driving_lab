@@ -6,7 +6,7 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include <memory>
 
-
+#include <Eigen/Geometry>
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 // #include "ar4_msgs/action/home.hpp"
@@ -117,7 +117,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_gripper_group_->setPlanningPipelineId("ompl");
 
     move_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GROUP);
-    //move_group_->setPoseReferenceFrame("base_link_inertia");
+    move_group_->setPoseReferenceFrame("panda1_link0");
     move_group_->setPlanningTime(PLANNING_TIME_S);
     move_group_->setNumPlanningAttempts(PLANNING_ATTEMPTS);
     move_group_->setGoalTolerance(GOAL_TOLERANCE);
@@ -616,18 +616,56 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       move_group_->setPlannerId("LIN");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
-      
-      if(MoveRobotServer::Move(pose))
-      {
-          result->done = true;
-          goal_handle->succeed(result);
-          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      }
-      else{
-          result->done = false;
-          goal_handle->abort(result);
-          RCLCPP_INFO(this->get_logger(), "Goal canceled");
-      }
+      moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.position.x, pose_goal.position.y,
+    //           pose_goal.position.z);
+    // bool success = (move_group_->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    // RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+    // move_group_->move();
+    pose.header.frame_id = "panda1_link0";
+    move_group_->setStartStateToCurrentState();
+    move_group_->setPoseReferenceFrame("world");
+
+    move_group_->setPoseTarget(pose);
+    bool success = static_cast<bool>(move_group_->plan(my_plan));
+              RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+              if(success == true){
+                  //move_group.move();
+                  // move_group_->setStartStateToCurrentState();
+                  if(move_group_->execute(my_plan).val == 1){
+                    result->done = true;
+                    goal_handle->succeed(result);
+                    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                  }
+                  else{
+                    move_group_->setStartStateToCurrentState();
+                    move_group_->setPoseTarget(pose.pose);
+                    bool success = static_cast<bool>(move_group_->plan(my_plan));
+                      RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+                    if(success == true){
+                      // move_group.move();
+                      move_group_->setStartStateToCurrentState();
+                      if(move_group_->execute(my_plan).val == 1){
+                        result->done = true;
+                        goal_handle->succeed(result);
+                        RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                      }
+                      else{
+                        result->done = false;
+                        goal_handle->abort(result);
+                        RCLCPP_INFO(this->get_logger(), "Goal canceled");
+                      }
+                      
+                    }
+
+                  }
+              }
+              else{
+                  result->done = false;
+                  goal_handle->abort(result);
+                  RCLCPP_INFO(this->get_logger(), "Goal canceled");
+                }
+
       // if(open == true)
       // {
       //   joints.data = {-0.628318531, 0.628318531};

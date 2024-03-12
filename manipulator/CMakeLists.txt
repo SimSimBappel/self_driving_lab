@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(behavior_tree_ros2_actions REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 find_package(moveit_ros_planning_interface REQUIRED)
 
@@ -27,7 +28,7 @@ target_include_directories(moveL PUBLIC
 target_compile_features(moveL PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
 add_executable(move_robot_server src/move_robot_server.cpp)
-ament_target_dependencies(move_robot_server behavior_tree_ros2_actions rclcpp behaviortree_ros2 std_msgs moveit_ros_planning_interface tf2 geometry_msgs) 
+ament_target_dependencies(move_robot_server Eigen3 behavior_tree_ros2_actions rclcpp behaviortree_ros2 std_msgs moveit_ros_planning_interface tf2 geometry_msgs) 
 
 include_directories(include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})

@@ -101,7 +101,7 @@
                             pose="{object_pose_msg}"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg}"
-               approch_offset="0.0;0.0;0.1;0.0;0.0;0.0"/>
+               approch_offset="0.0;0.0;0.01;0.0;0.0;0.0"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
@@ -145,8 +145,8 @@
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.2"
-                                   accel="0.2"
+                                   speed="0.1"
+                                   accel="0.1"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <GripperJointAction joint_2="0.01"
@@ -156,8 +156,8 @@
                           action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.2"
-                                   accel="0.2"
+                                   speed="0.1"
+                                   accel="0.1"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
