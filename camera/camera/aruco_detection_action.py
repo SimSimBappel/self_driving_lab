@@ -54,8 +54,7 @@ class CameraSubscriber(Node):
         self.streaming = False
 
     def calib_cam(self, calibration_file_path): 
-        
-
+        """Calibrate camera from file or images"""
         if os.path.exists(calibration_file_path):
             # Load calibration data from file
             with np.load(calibration_file_path) as data:
@@ -104,7 +103,6 @@ class ArucoMarkerDetector(Node):
         super().__init__('aruco_marker_detector')
         self.logger = self.get_logger()
         self.logger.info('Initializing aruco_marker_detector')
-        self.publisher = self.create_publisher(TransformStamped, 'marker_pose', 10)
         self.camera_subscriber = CameraSubscriber()
         
         self.action_server = ActionServer(
@@ -115,11 +113,13 @@ class ArucoMarkerDetector(Node):
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback
             )
-        self.timeout = 15 # Secounds
+        self.timeout = 10 # Secounds
         self.found_object = False
         self.result = None
+        self.aruco_size = 0.0435 # Meters
 
     def destroy(self):
+        """Shutdown all components of node"""
         self.camera_subscriber.destroy_node()
         self.action_server.destroy()
         super().destroy_node()
@@ -139,9 +139,11 @@ class ArucoMarkerDetector(Node):
         return CancelResponse.ACCEPT
     
     def reset(self):
+        """Delete image after using"""
         self.camera_subscriber.img_raw = None
 
     def execute_callback(self, goal_handle):
+        """Get image and return transform to aruco tag"""
         self.logger.info("Looking for ID:" + str(goal_handle.request.id))
         self.found_object = False
         self.result = None
@@ -166,13 +168,10 @@ class ArucoMarkerDetector(Node):
                 parameters = aruco.DetectorParameters_create()
                 corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
-                # if ids is not None and goal_handle.request.id in ids:
-                # if ids is not None and ids.count(goal_handle.request.id) == 1: 
                 if ids is not None and np.sum(ids == goal_handle.request.id) == 1:
                     index = np.where(ids == goal_handle.request.id)[0][0]
-                    rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], 0.0435, self.camera_subscriber.camera_matrix, self.camera_subscriber.distortion_coeffs)
+                    rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], self.aruco_size, self.camera_subscriber.camera_matrix, self.camera_subscriber.distortion_coeffs)
                     if rvec is not None and tvec is not None:
-                        # Construct and publish the marker pose
                         marker_pose_msg = TransformStamped()
                         marker_pose_msg.header.stamp = self.get_clock().now().to_msg()
                         marker_pose_msg.header.frame_id = "camera"
@@ -185,7 +184,6 @@ class ArucoMarkerDetector(Node):
                         marker_pose_msg.transform.rotation.y = q[1]
                         marker_pose_msg.transform.rotation.z = q[2]
                         marker_pose_msg.transform.rotation.w = q[3]
-                        self.publisher.publish(marker_pose_msg)
                         self.found_object = True
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
@@ -200,6 +198,7 @@ class ArucoMarkerDetector(Node):
                     self.logger.warn("More than one of id:" + str(goal_handle.request.id) + "found!")
                     goal_handle.abort()
                     self.reset()
+                    self.camera_subscriber.stop_streaming()
                     return FindArucoTag.Result()
 
                 self.reset()
