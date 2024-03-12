@@ -46,32 +46,32 @@ def generate_launch_description():
                     .sensors_3d(os.path.join(get_package_share_directory("omtp_factory_moveit_config"),'config','sensors_depthmap.yaml'))
                      .to_moveit_configs()
     )
-    planning_pipelines_config = {
-        "default_planning_pipeline": "ompl",
-        "planning_pipelines": ["ompl", "pilz_industrial_motion_planner"],
-        "pilz_industrial_motion_planner": {
-            "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner",
-            "request_adapters": "",
-            "start_state_max_bounds_error": 0.1,
-        },
-        "ompl": {
-            "planning_plugin": "ompl_interface/OMPLPlanner",
-            "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
-            "start_state_max_bounds_error": 0.1,
-        },
-    }
-    ompl_planning_yaml = load_yaml(
-        "omtp_factory_moveit_config", "config/ompl_planning.yaml"
-    )
-    pilz_planning_yaml = load_yaml(
-        "omtp_factory_moveit_config", "config/pilz_industrial_motion_planner_planning.yaml"
-    )
-    planning_pipelines_config["ompl"].update(ompl_planning_yaml)
-    planning_pipelines_config["pilz_industrial_motion_planner"].update(pilz_planning_yaml)
+    # planning_pipelines_config = {
+    #     "default_planning_pipeline": "ompl",
+    #     "planning_pipelines": ["ompl", "pilz_industrial_motion_planner"],
+    #     "pilz_industrial_motion_planner": {
+    #         "planning_plugin": "pilz_industrial_motion_planner/CommandPlanner",
+    #         "request_adapters": "",
+    #         "start_state_max_bounds_error": 0.1,
+    #     },
+    #     "ompl": {
+    #         "planning_plugin": "ompl_interface/OMPLPlanner",
+    #         "request_adapters": """default_planner_request_adapters/AddTimeOptimalParameterization default_planner_request_adapters/FixWorkspaceBounds default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision default_planner_request_adapters/FixStartStatePathConstraints""",
+    #         "start_state_max_bounds_error": 0.1,
+    #     },
+    # }
+    # ompl_planning_yaml = load_yaml(
+    #     "omtp_factory_moveit_config", "config/ompl_planning.yaml"
+    # )
+    # pilz_planning_yaml = load_yaml(
+    #     "omtp_factory_moveit_config", "config/pilz_industrial_motion_planner_planning.yaml"
+    # )
+    # planning_pipelines_config["ompl"].update(ompl_planning_yaml)
+    # planning_pipelines_config["pilz_industrial_motion_planner"].update(pilz_planning_yaml)
 
-    move_group_capabilities = {
-        "capabilities": "pilz_industrial_motion_planner/MoveGroupSequenceAction pilz_industrial_motion_planner/MoveGroupSequenceService"
-    }
+    # move_group_capabilities = {
+    #     "capabilities": "pilz_industrial_motion_planner/MoveGroupSequenceAction pilz_industrial_motion_planner/MoveGroupSequenceService"
+    # }
 
     move_group_demo = Node(
         name="move_robot_server",
@@ -84,10 +84,11 @@ def generate_launch_description():
             moveit_config.robot_description,
             moveit_config.robot_description_semantic,
             moveit_config.robot_description_kinematics,
-            # moveit_config.planning_pipelines,
+            moveit_config.planning_pipelines,
+            moveit_config.joint_limits,
             # moveit_config.to_dict(),
-            move_group_capabilities,
-            planning_pipelines_config,
+            # move_group_capabilities,
+            # planning_pipelines_config,
             {'use_sim_time': True}
         ],
     )
