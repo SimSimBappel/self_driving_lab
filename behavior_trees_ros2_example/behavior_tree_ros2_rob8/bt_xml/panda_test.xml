@@ -117,6 +117,7 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
+      <SubTree ID="bob_bob"/>
     </Sequence>
   </BehaviorTree>
 
@@ -189,18 +190,28 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
-   <Action ID="ArmMovePlizLinPoseMsgAction">
-            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-            <input_port name="speed" type="double"/>
-            <input_port name="accel" type="double"/>
-            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
-        </Action>
+    <Action ID="ArmMovePlizLinPoseMsgAction">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="ArmMovePlizPtpPoseMsgAction">
-            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-            <input_port name="speed" type="double"/>
-            <input_port name="accel" type="double"/>
-            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
-        </Action>
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="ArmMovePoseAction">
       <input_port name="pose"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>

@@ -26,8 +26,17 @@ set(THIS_PACKAGE_DEPS
     tf2
     behavior_tree_ros2_actions )
 
+add_executable(test_load 
+    src/sleep_action.cpp
+    src/gripper_behaviors.cpp
+    src/arm_behaviors.cpp
+    src/camera_behaviors.cpp
+    src/test_load_and_make_xml_files.cpp)
+    
+ ament_target_dependencies(test_load ${THIS_PACKAGE_DEPS})
 
-add_executable(test_client 
+
+  add_executable(test_client 
     src/sleep_action.cpp
     src/gripper_behaviors.cpp
     src/arm_behaviors.cpp
@@ -46,6 +55,7 @@ ament_target_dependencies(sleep2_plugin ${THIS_PACKAGE_DEPS})
 
 install(TARGETS
   test_client
+  test_load
   # sleep_client_dyn
   
   # sleep_server

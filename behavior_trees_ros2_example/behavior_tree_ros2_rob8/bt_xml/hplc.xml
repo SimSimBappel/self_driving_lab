@@ -1,5 +1,5 @@
  <root BTCPP_format="4">
-     <BehaviorTree>
+     <BehaviorTree ID="bob_bob">
         <Sequence>
             <PrintValue message="start"/>
             <GripperAction name="gripper_open" open="true"/>
@@ -20,7 +20,7 @@
  </root>
 
   <root BTCPP_format="4">
-     <BehaviorTree>
+     <BehaviorTree ID="bip_bip">
         <Sequence>
             <PrintValue message="start"/>
             <GripperAction name="gripper_open" open="true"/>
