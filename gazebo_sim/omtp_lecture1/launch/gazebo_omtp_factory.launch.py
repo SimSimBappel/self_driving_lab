@@ -26,7 +26,7 @@ def generate_launch_description():
     #                         'urdf/omtp.urdf.xacro')
     robot_description_path = os.path.join(
                             get_package_share_directory("omtp_lecture1"),
-                            'urdf/omtp_custom.urdf.xacro')
+                            'urdf/omtp_custom_factory.urdf.xacro')
     print(robot_description_path)
     robot_description_content = open(robot_description_path).read()
     

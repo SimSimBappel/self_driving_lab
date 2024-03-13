@@ -19,7 +19,7 @@ class CameraSubscriber(Node):
         super().__init__('camera_subscriber')
         self.subscription = self.create_subscription(
             Image,
-            '/color/image_raw', # /camera/color/image_raw
+            '/camera/color/image_raw', 
             self.callback,
             10)
         self.subscription 
@@ -183,12 +183,13 @@ class ArucoMarkerDetector(Node):
                         marker_pose_msg.pose.position.x = tvec[0][0][0]
                         marker_pose_msg.pose.position.y = tvec[0][0][1]
                         marker_pose_msg.pose.position.z = tvec[0][0][2]
-                        q = tf_transformations.quaternion_from_euler(rvec[0][0][0], rvec[0][0][1], rvec[0][0][2])
+                        q = tf_transformations.quaternion_from_euler(rvec[0][0][0]-np.pi, rvec[0][0][1], rvec[0][0][2])
                         marker_pose_msg.pose.orientation.x = q[0]
                         marker_pose_msg.pose.orientation.y = q[1]
                         marker_pose_msg.pose.orientation.z = q[2]
                         marker_pose_msg.pose.orientation.w = q[3]
                         self.found_object = True
+                        self.logger.info(str(marker_pose_msg))
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))

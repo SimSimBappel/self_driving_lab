@@ -7,19 +7,19 @@
     <xacro:include filename="$(find omtp_lecture1)/urdf/omtp_custom_factory.urdf.xacro" />
     <!-- <xacro:include filename="$(find ariac_sensors)/models/basic_logical_camera/model.sdf" /> -->
     <!-- Import control_xacro -->
-    <xacro:include filename="omtp_factory.ros2_control.xacro" />
+    <!-- <xacro:include filename="omtp_factory.ros2_control.xacro" />
     
     
-    <xacro:omtp_factory_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+    <xacro:omtp_factory_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/> -->
 
-    <!-- <xacro:include filename="omtp_factory.ros2_gazebo_control.xacro" />
-    <xacro:omtp_factory_ros2_gazebo_control name="GazeboSystem" initial_positions_file="$(arg initial_positions_file)"/> -->
+    <xacro:include filename="omtp_factory.ros2_gazebo_control.xacro" />
+    <xacro:omtp_factory_ros2_gazebo_control name="GazeboSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
     <xacro:property name="M_PI"              value="3.1415926535897931"/>
 	<xacro:arg      name="camera_pose_trans" default="0 1.2 2.0"/>
 	<xacro:arg      name="camera_pose_rot"   default="0.0 ${M_PI/2.0} 0.0"/>
     <xacro:include filename="$(find omtp_lecture5)/urdf/camera/_d435.urdf.xacro" />
-		<xacro:sensor_d435 name="camera" topics_ns="camera" parent="world_interface" publish_pointcloud="true">
+		<xacro:sensor_d435 name="camera" topics_ns="camera/" parent="world_interface" publish_pointcloud="true">
 			<origin xyz="$(arg camera_pose_trans)" rpy="$(arg camera_pose_rot)" />
 		</xacro:sensor_d435>  
 
