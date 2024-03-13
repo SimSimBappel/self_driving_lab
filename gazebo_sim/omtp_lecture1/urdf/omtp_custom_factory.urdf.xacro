@@ -29,7 +29,7 @@
   <xacro:panda_arm arm_id="$(arg arm_id_1)" connected_to="${robot1_pedestal_link}"  xyz="${0 -0.5 1}" safety_distance="0.03"/>
   <xacro:hand ns="$(arg arm_id_1)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_1)_link8" safety_distance="0.03"/> -->
   
-  <xacro:arg name="arm_id_1" default="panda1"/>
+  <xacro:arg name="arm_id_1" default="panda"/>
   <xacro:arg name="use_cylinder_collision_model" default="true"/>
   <xacro:arg name="use_gazebo_sim" default="true"/>
   <xacro:arg name="parent" default="robot1_pedestal_link"/>

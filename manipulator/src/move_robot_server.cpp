@@ -23,11 +23,11 @@ static const double GOAL_TOLERANCE = 1e-3;
 // static const std::string PLANNING_GRIPPER_GROUP = "hand";
 // static const std::vector<std::string> gripper_joint_names = {"panda_finger_joint1", "panda_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
 // static const std::vector<std::string> arm_joint_names = {"panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"};
-static const std::string PLANNING_GROUP = "panda_1";
-static const std::string base_link = "panda1_link0";
-static const std::string PLANNING_GRIPPER_GROUP = "panda_1_gripper";
-static const std::vector<std::string> gripper_joint_names = {"panda1_finger_joint1", "panda1_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
-static const std::vector<std::string> arm_joint_names = {"panda1_joint1", "panda1_joint2", "panda1_joint3", "panda1_joint4", "panda1_joint5", "panda1_joint6", "panda1_joint7"};
+static const std::string PLANNING_GROUP = "panda_arm";
+static const std::string base_link = "panda_link0";
+static const std::string PLANNING_GRIPPER_GROUP = "hand";
+static const std::vector<std::string> gripper_joint_names = {"panda_finger_joint1", "panda_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
+static const std::vector<std::string> arm_joint_names = {"panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"};
 // static const std::string PLANNING_GROUP = "arm_group";
 
 // static const std::string PLANNING_GRIPPER_GROUP = "gripper";

@@ -132,7 +132,7 @@ planner_configs:
   TrajOptDefault:
     type: geometric::TrajOpt
 
-panda_1:
+panda_arm:
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault
@@ -158,7 +158,7 @@ panda_1:
     - SPARSkConfigDefault
     - SPARStwokConfigDefault
     - TrajOptDefault
-panda_1_gripper:
+hand:
   planner_configs:
     - SBLkConfigDefault
     - ESTkConfigDefault

@@ -35,7 +35,7 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "panda1_link0", "base_link"],
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "panda_link0", "base_link"],
     )
 
     # static_tf_oak = Node(

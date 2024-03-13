@@ -9,84 +9,84 @@
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
-    <group name="panda_1">
-        <chain base_link="panda1_link0" tip_link="panda1_link8"/>
+    <group name="panda_arm">
+        <chain base_link="panda_link0" tip_link="panda_link8"/>
     </group>
-    <group name="panda_1_gripper">
-        <joint name="panda1_finger_joint1"/>
-        <joint name="panda1_finger_joint2"/>
-        <joint name="panda1_hand_joint"/>
+    <group name="hand">
+        <joint name="panda_finger_joint1"/>
+        <joint name="panda_finger_joint2"/>
+        <joint name="panda_hand_joint"/>
     </group>
 
-    <virtual_joint name="world_joint" type="fixed" parent_frame="world" child_link="panda1_link0"/>
+    <virtual_joint name="world_joint" type="fixed" parent_frame="world" child_link="panda_link0"/>
 
     
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="Home" group="panda_1">
-        <joint name="panda1_joint1" value="0"/>
-        <joint name="panda1_joint2" value="0"/>
-        <joint name="panda1_joint3" value="0"/>
-        <joint name="panda1_joint4" value="-1.5708"/>
-        <joint name="panda1_joint5" value="0"/>
-        <joint name="panda1_joint6" value="0"/>
-        <joint name="panda1_joint7" value="0"/>
+    <group_state name="Home" group="panda_arm">
+        <joint name="panda_joint1" value="0"/>
+        <joint name="panda_joint2" value="0"/>
+        <joint name="panda_joint3" value="0"/>
+        <joint name="panda_joint4" value="-1.5708"/>
+        <joint name="panda_joint5" value="0"/>
+        <joint name="panda_joint6" value="0"/>
+        <joint name="panda_joint7" value="0"/>
     </group_state>
-    <group_state name="home" group="panda_1_gripper">
-        <joint name="panda1_finger_joint1" value="0"/>
-        <joint name="panda1_finger_joint2" value="0"/>
+    <group_state name="home" group="hand">
+        <joint name="panda_finger_joint1" value="0"/>
+        <joint name="panda_finger_joint2" value="0"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="panda_ef" parent_link="panda1_link8" group="panda_1_gripper" parent_group="panda_1"/>
+    <end_effector name="panda_ef" parent_link="panda_link8" group="hand" parent_group="panda_arm"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
    
-    <disable_collisions link1="panda1_hand" link2="panda1_link4" reason="Never"/>
-    <disable_collisions link1="panda1_hand" link2="panda1_link5" reason="Default"/>
-    <disable_collisions link1="panda1_hand" link2="panda1_link6" reason="Never"/>
-    <disable_collisions link1="panda1_hand" link2="panda1_link7" reason="Default"/>
-    <disable_collisions link1="panda1_hand" link2="panda1_link8" reason="Adjacent"/>
+    <disable_collisions link1="panda_hand" link2="panda_link4" reason="Never"/>
+    <disable_collisions link1="panda_hand" link2="panda_link5" reason="Default"/>
+    <disable_collisions link1="panda_hand" link2="panda_link6" reason="Never"/>
+    <disable_collisions link1="panda_hand" link2="panda_link7" reason="Default"/>
+    <disable_collisions link1="panda_hand" link2="panda_link8" reason="Adjacent"/>
 
-    <disable_collisions link1="panda1_link0" link2="panda1_link1" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link0" link2="panda1_link2" reason="Never"/>
-    <disable_collisions link1="panda1_link0" link2="panda1_link3" reason="Never"/>
-    <disable_collisions link1="panda1_link0" link2="panda1_link4" reason="Never"/>
+    <disable_collisions link1="panda_link0" link2="panda_link1" reason="Adjacent"/>
+    <disable_collisions link1="panda_link0" link2="panda_link2" reason="Never"/>
+    <disable_collisions link1="panda_link0" link2="panda_link3" reason="Never"/>
+    <disable_collisions link1="panda_link0" link2="panda_link4" reason="Never"/>
 
-    <disable_collisions link1="panda1_link0" link2="robot1_pedestal_link" reason="Adjacent"/>
+    <disable_collisions link1="panda_link0" link2="robot1_pedestal_link" reason="Adjacent"/>
 
-    <disable_collisions link1="panda1_link1" link2="panda1_link2" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link1" link2="panda1_link3" reason="Default"/>
-    <disable_collisions link1="panda1_link1" link2="panda1_link4" reason="Never"/>
+    <disable_collisions link1="panda_link1" link2="panda_link2" reason="Adjacent"/>
+    <disable_collisions link1="panda_link1" link2="panda_link3" reason="Default"/>
+    <disable_collisions link1="panda_link1" link2="panda_link4" reason="Never"/>
 
-    <disable_collisions link1="panda1_link1" link2="robot1_pedestal_link" reason="Default"/>
+    <disable_collisions link1="panda_link1" link2="robot1_pedestal_link" reason="Default"/>
 
-    <disable_collisions link1="panda1_link2" link2="panda1_link3" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link2" link2="panda1_link4" reason="Never"/>
+    <disable_collisions link1="panda_link2" link2="panda_link3" reason="Adjacent"/>
+    <disable_collisions link1="panda_link2" link2="panda_link4" reason="Never"/>
   
-    <disable_collisions link1="panda1_link2" link2="robot1_pedestal_link" reason="Never"/>
+    <disable_collisions link1="panda_link2" link2="robot1_pedestal_link" reason="Never"/>
 
-    <disable_collisions link1="panda1_link3" link2="panda1_link4" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link3" link2="panda1_link6" reason="Never"/>
+    <disable_collisions link1="panda_link3" link2="panda_link4" reason="Adjacent"/>
+    <disable_collisions link1="panda_link3" link2="panda_link6" reason="Never"/>
  
-    <disable_collisions link1="panda1_link3" link2="robot1_pedestal_link" reason="Never"/>
+    <disable_collisions link1="panda_link3" link2="robot1_pedestal_link" reason="Never"/>
 
-    <disable_collisions link1="panda1_link4" link2="panda1_link5" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link4" link2="panda1_link6" reason="Never"/>
-    <disable_collisions link1="panda1_link4" link2="panda1_link7" reason="Never"/>
-    <disable_collisions link1="panda1_link4" link2="panda1_link8" reason="Never"/>
+    <disable_collisions link1="panda_link4" link2="panda_link5" reason="Adjacent"/>
+    <disable_collisions link1="panda_link4" link2="panda_link6" reason="Never"/>
+    <disable_collisions link1="panda_link4" link2="panda_link7" reason="Never"/>
+    <disable_collisions link1="panda_link4" link2="panda_link8" reason="Never"/>
 
-    <disable_collisions link1="panda1_link4" link2="robot1_pedestal_link" reason="Never"/>
+    <disable_collisions link1="panda_link4" link2="robot1_pedestal_link" reason="Never"/>
 
-    <disable_collisions link1="panda1_link5" link2="panda1_link6" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link5" link2="panda1_link7" reason="Default"/>
+    <disable_collisions link1="panda_link5" link2="panda_link6" reason="Adjacent"/>
+    <disable_collisions link1="panda_link5" link2="panda_link7" reason="Default"/>
 
   
-    <disable_collisions link1="panda1_link6" link2="panda1_link7" reason="Adjacent"/>
+    <disable_collisions link1="panda_link6" link2="panda_link7" reason="Adjacent"/>
   
-    <disable_collisions link1="panda1_link7" link2="panda1_link8" reason="Adjacent"/>
+    <disable_collisions link1="panda_link7" link2="panda_link8" reason="Adjacent"/>
     
    
-    <disable_collisions link1="panda1_link6" link2="panda1_link8" reason="Adjacent"/>
-    <disable_collisions link1="panda1_link3" link2="panda1_link5" reason="Adjacent"/>
-    <!-- <disable_collisions link1="panda1_link6" link2="panda1_link8" reason="Never"/> -->
+    <disable_collisions link1="panda_link6" link2="panda_link8" reason="Adjacent"/>
+    <disable_collisions link1="panda_link3" link2="panda_link5" reason="Adjacent"/>
+    <!-- <disable_collisions link1="panda_link6" link2="panda_link8" reason="Never"/> -->
     
     <disable_collisions link1="robot1_pedestal_link" link2="robot2_pedestal_link" reason="Adjacent"/>
 </robot>

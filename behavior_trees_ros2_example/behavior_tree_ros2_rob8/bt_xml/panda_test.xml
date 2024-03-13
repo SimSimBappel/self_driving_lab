@@ -57,17 +57,13 @@
       <ScriptCondition code=" out_result==69 &amp;&amp; out_state==&apos;ACTIVE&apos; "/>
       <Script code="in_pose:= &apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <PrintValue message="start"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
       <ArmMovePoseAction name="arm"
                          pose="{in_pose}"
                          speed="0.2"
                          accel="0.2"
                          action_name="__default__placeholder__"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
       <Script code="home:=&apos;0.0;0.5;0.0;0.0;0.0;0.0;0.0&apos;"/>
       <ArmMoveJointsAction name="arm_joint_pose"
                            joints="{home}"
