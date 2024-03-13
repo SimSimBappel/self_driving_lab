@@ -5,6 +5,7 @@
 #include "rclcpp/executors.hpp"
 
 #include "gripper_behaviors.cpp"
+#include "camera_behaviors.cpp"
 #include "arm_behaviors.cpp"
 #include "behaviortree_ros2/plugins.hpp"
 #include "yaml-cpp/yaml.h"
@@ -100,7 +101,14 @@ int main(int argc, char **argv)
   params_gripper.wait_for_server_timeout = std::chrono::milliseconds(1000);
   params_gripper.default_port_value = "gripper_service";
   factory.registerNodeType<GripperAction>("GripperAction",params_gripper);
-
+////////////////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_aruco;
+  params_aruco.nh = nh;
+  params_aruco.server_timeout = std::chrono::milliseconds(2000);
+  params_aruco.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_aruco.default_port_value = "detect_marker_pose";
+  factory.registerNodeType<FindArucoTagAction>("ArucoAction",params_aruco);
+////////////////////////////////////////////////////////////////////////////////////////
   RosNodeParams params_arm_mode_pose;
   params_arm_mode_pose.nh = nh;
   params_arm_mode_pose.server_timeout = std::chrono::milliseconds(2000);

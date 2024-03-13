@@ -101,7 +101,7 @@ def generate_launch_description():
 
             #tutorial_arg,
             #db_arg,
-            #rviz_node,
+            # rviz_node,
             #rviz_node_tutorial,
             #static_tf,
             #robot_state_publisher,

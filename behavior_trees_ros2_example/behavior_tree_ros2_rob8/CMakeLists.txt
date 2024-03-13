@@ -6,6 +6,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
+# find_package(camera REQUIRED)
+
 find_package(ament_cmake REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -29,6 +31,7 @@ add_executable(test_client
     src/sleep_action.cpp
     src/gripper_behaviors.cpp
     src/arm_behaviors.cpp
+    src/camera_behaviors.cpp
     src/test_client.cpp)
     
   ament_target_dependencies(test_client ${THIS_PACKAGE_DEPS})
