@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot name="aruco_cube" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="prefix" default="1_"/>
+
+  <!-- URDF -->
+  <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.urdf.xacro"/>
+  <xacro:bin_urdf prefix="$(arg prefix)"/>
+
+  <!-- Gazebo -->
+  <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.gazebo.xacro"/>
+  <xacro:aruco_cube_gazebo prefix="$(arg prefix)"/>
+
+</robot>
