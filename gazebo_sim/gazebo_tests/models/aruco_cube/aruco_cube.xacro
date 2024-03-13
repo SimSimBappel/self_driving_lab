@@ -4,10 +4,10 @@
 
   <!-- URDF -->
   <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.urdf.xacro"/>
-  <xacro:bin_urdf prefix="$(arg prefix)"/>
+  <xacro:aruco_cube_macro prefix="$(arg prefix)"/>
 
   <!-- Gazebo -->
-  <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.gazebo.xacro"/>
-  <xacro:aruco_cube_gazebo prefix="$(arg prefix)"/>
+  <!-- <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.gazebo.xacro"/>
+  <xacro:aruco_cube_gazebo prefix="$(arg prefix)"/> -->
 
 </robot>
