@@ -591,6 +591,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
+      
 
       move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
       move_group_->setPlannerId("PTP");
@@ -687,7 +688,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       //                   goal_handle->succeed(result);
       //                   RCLCPP_INFO(this->get_logger(), "Goal succeeded");
       // }
+ 
 
+
+  
       move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
       move_group_->setPlannerId("LIN");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
@@ -699,10 +703,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
     // RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
     // move_group_->move();
     // pose.header.frame_id = "panda1_link0";
+
     move_group_->setStartStateToCurrentState();
     // move_group_->setPoseReferenceFrame("");
     move_group_->setPoseReferenceFrame(base_link);
-
+    
     move_group_->setPoseTarget(pose);
     bool success = static_cast<bool>(move_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
