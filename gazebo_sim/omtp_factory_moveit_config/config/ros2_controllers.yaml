@@ -22,9 +22,9 @@ panda_1_controller:
       stopped_velocity_tolerance: 0.25
       goal_time: 0.6
     command_interfaces:
-      # - position
+      - position
       # - velocity
-      - effort
+      # - effort
     state_interfaces:
       - position
       - velocity
@@ -96,9 +96,9 @@ panda_1_gripper_controller:
       - panda1_finger_joint1
       - panda1_finger_joint2
     command_interfaces:
-      # - position
+      - position
       # - velocity
-      - effort
+      # - effort
     state_interfaces:
       - position
       - velocity

@@ -144,6 +144,10 @@
                             accel="0.6"
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
+      <ArmMovePlizPtpPoseMsgAction pose="{target_pose_msg}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
                                    speed="0.1"
                                    accel="0.1"

@@ -36,16 +36,16 @@ def generate_launch_description():
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "panda1_link0", "base_link"],
     )
 
-    static_tf_oak = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="static_transform_publisher",
-        output="log",
-        arguments=["0.0", "1.2", "2.0", "0.0", "0.0", "0.0", "world", "oak-d-base-frame"],
-    )
+    # static_tf_oak = Node(
+    #     package="tf2_ros",
+    #     executable="static_transform_publisher",
+    #     name="static_transform_publisher",
+    #     output="log",
+    #     arguments=["0.0", "1.2", "2.0", "0.0", "0.0", "0.0", "world", "oak-d-base-frame"],
+    # )
 
     run_move_group_node = Node(
         package="moveit_ros_move_group",
@@ -181,7 +181,7 @@ def generate_launch_description():
             ros2_control_node,
             run_move_group_node,
             static_tf,
-            static_tf_oak,
+            # static_tf_oak,
             # sensor_tf_broadcaster,
             # object_tf_broadcaster,
 

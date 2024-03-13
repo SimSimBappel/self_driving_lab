@@ -8,14 +8,14 @@
   <!-- INITIAL SETUP OF WORLD LINK AND WORLD_INTERFACE LINK -->
   <!-- ==================================================== -->
   <!-- world -->
-  <link name="world"/>
+  <!-- <link name="world"/> -->
   <!-- world_interface. Makes it convenient to move the whole environment according to the world origin -->
   <link name="world_interface"/>
   <!-- world<->world_interface joint -->
-  <joint name="world_interface_to_world" type="fixed">
+  <!-- <joint name="world_interface_to_world" type="fixed">
     <parent link="world"/>
     <child link="world_interface"/>
-  </joint>
+  </joint> -->
   <!-- <xacro:include filename="$(find aau_lab_ros_models)/urdf/fib14/fib14.urdf.xacro"/>
   <xacro:fib14_urdf fib14_parent="world_interface"/> -->
 
@@ -32,8 +32,8 @@
   <xacro:arg name="arm_id_1" default="panda1"/>
   <xacro:arg name="use_cylinder_collision_model" default="true"/>
   <xacro:arg name="use_gazebo_sim" default="true"/>
-  <xacro:arg name="parent" default="robot1_pedestal_link"/>
-
+  <!-- <xacro:arg name="parent" default="robot1_pedestal_link"/> -->
+  <xacro:arg name="parent" default="world_interface"/>
   <!-- Load panda arm and hand -->
   <xacro:include filename="$(find franka_description_sim)/robots/panda_arm.xacro" />
   <xacro:include filename="$(find franka_description_sim)/robots/hand.xacro"/>
@@ -45,19 +45,29 @@
   
 
   <!-- Panda 1 -->
-  <xacro:panda_arm xyz="0.05 0 0.95" rpy="0 0 0" connected_to="$(arg parent)" arm_id="$(arg arm_id_1)" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+
+  <xacro:panda_arm xyz="0.0 0 0.0" rpy="0 0 0" connected_to="$(arg parent)" arm_id="$(arg arm_id_1)" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
   <xacro:hand ns="$(arg arm_id_1)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_1)_link8" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
 
   <xacro:arm_gazebo arm_id="$(arg arm_id_1)"/>
   <xacro:arm_control arm_id="$(arg arm_id_1)"/>
 
 
-  <xacro:include filename="$(find external_ros_models)/urdf/robot_pedestal/robot_pedestal.urdf.xacro"/>
-  <xacro:robot_pedestal_urdf pedestal_prefix="robot1_" pedestal_parent="world_interface" pedestal_height="0.95">
-    <origin xyz="-0.6 1.5 0.0" rpy="0 0 0"/>
-  </xacro:robot_pedestal_urdf>
 
-  <xacro:include filename="$(find aau_lab_ros_models)/urdf/festo_straight_module/festo_straight_module.urdf.xacro"/>
+
+  <!-- <xacro:panda_arm xyz="0.05 0 0.95" rpy="0 0 0" connected_to="$(arg parent)" arm_id="$(arg arm_id_1)" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+  <xacro:hand ns="$(arg arm_id_1)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id_1)_link8" safety_distance="0.03" use_cylinder_collision_model="$(arg use_cylinder_collision_model)"/>
+
+  <xacro:arm_gazebo arm_id="$(arg arm_id_1)"/>
+  <xacro:arm_control arm_id="$(arg arm_id_1)"/> -->
+
+
+  <!-- <xacro:include filename="$(find external_ros_models)/urdf/robot_pedestal/robot_pedestal.urdf.xacro"/>
+  <xacro:robot_pedestal_urdf pedestal_prefix="robot1_" pedestal_parent="world_interface" pedestal_height="0.95">
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </xacro:robot_pedestal_urdf> -->
+
+  <!-- <xacro:include filename="$(find aau_lab_ros_models)/urdf/festo_straight_module/festo_straight_module.urdf.xacro"/>
 	<xacro:festo_module_urdf module_prefix="module1_" festo_module_parent="world_interface">
 		<origin xyz="0.0 1.5 0.0" rpy="0 0 0.0"/>
 	</xacro:festo_module_urdf>
@@ -70,7 +80,7 @@
 		<xacro:conveyor name="conveyor"  parent="world_interface">
 			<origin xyz="0.0 1.5 1.0" rpy="0 0 0" />
 		</xacro:conveyor>  
-	</xacro:if>
+	</xacro:if> -->
 
   
 
