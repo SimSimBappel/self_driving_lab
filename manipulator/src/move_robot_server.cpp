@@ -18,8 +18,13 @@ static const double MAX_VELOCITY_SCALE = 0.8;
 static const double MAX_ACCELERATION_SCALE = 0.8;
 static const unsigned int PLANNING_ATTEMPTS = 10;
 static const double GOAL_TOLERANCE = 1e-3;
+// static const std::string PLANNING_GROUP = "panda_arm";
+// static const std::string base_link = "panda_link0";
+// static const std::string PLANNING_GRIPPER_GROUP = "hand";
+// static const std::vector<std::string> gripper_joint_names = {"panda_finger_joint1", "panda_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
+// static const std::vector<std::string> arm_joint_names = {"panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"};
 static const std::string PLANNING_GROUP = "panda_1";
-
+static const std::string base_link = "panda1_link0";
 static const std::string PLANNING_GRIPPER_GROUP = "panda_1_gripper";
 static const std::vector<std::string> gripper_joint_names = {"panda1_finger_joint1", "panda1_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
 static const std::vector<std::string> arm_joint_names = {"panda1_joint1", "panda1_joint2", "panda1_joint3", "panda1_joint4", "panda1_joint5", "panda1_joint6", "panda1_joint7"};
@@ -117,7 +122,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_gripper_group_->setPlanningPipelineId("ompl");
 
     move_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GROUP);
-    move_group_->setPoseReferenceFrame("panda1_link0");
+    move_group_->setPoseReferenceFrame(base_link);
     move_group_->setPlanningTime(PLANNING_TIME_S);
     move_group_->setNumPlanningAttempts(PLANNING_ATTEMPTS);
     move_group_->setGoalTolerance(GOAL_TOLERANCE);
@@ -155,7 +160,7 @@ bool MoveRobotServer::ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg){
 
 bool MoveRobotServer::ArmMoveL(const geometry_msgs::msg::PoseStamped & msg){
   std::vector<geometry_msgs::msg::Pose> waypoints;
-  move_group_->setPoseReferenceFrame("panda1_link0");
+  move_group_->setPoseReferenceFrame(base_link);
 
 
   std::vector<geometry_msgs::msg::Pose> interpolated_poses;
@@ -237,7 +242,7 @@ bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
 bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
 {
     RCLCPP_INFO(this->get_logger(), "move function called");
-    move_group_->setPoseReferenceFrame("panda1_link0");
+    move_group_->setPoseReferenceFrame(base_link);
     geometry_msgs::msg::Pose pose_goal; // = move_group_->getCurrentPose().pose;
     // pose_goal.position.x = 0.1;;
     // pose_goal.position.y = -0.4;
@@ -627,7 +632,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
       //   if(MoveRobotServer::MoveGripper(joints)){
       //     result->done = true;
-      //     goal_handle->succeed(result);
+      //     goal_handle->succeed(result);ngPipelineId("pilz_industrial_motion_planner");
+      // move_group_->setPlannerId("LIN");
       //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
       //   }
       //   else{
@@ -670,71 +676,72 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
-      move_group_->setPlanningPipelineId("ompl");
-      RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.pose.position.x, pose.pose.position.y,
-              pose.pose.position.z);
-      // move_group_->setPlannerId("LIN");
+      // move_group_->setPlanningPipelineId("ompl");
+      // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.pose.position.x, pose.pose.position.y,
+      //         pose.pose.position.z);
+      // // move_group_->setPlannerId("LIN");
+      // move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      // move_group_->setMaxVelocityScalingFactor(goal->speed);
+      // if(MoveRobotServer::ArmMoveL(pose)){
+      //                   result->done = true;
+      //                   goal_handle->succeed(result);
+      //                   RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      // }
+
+      move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
+      move_group_->setPlannerId("LIN");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
-      if(MoveRobotServer::ArmMoveL(pose)){
+      moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.position.x, pose_goal.position.y,
+    //           pose_goal.position.z);
+    // bool success = (move_group_->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    // RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+    // move_group_->move();
+    // pose.header.frame_id = "panda1_link0";
+    move_group_->setStartStateToCurrentState();
+    // move_group_->setPoseReferenceFrame("");
+    move_group_->setPoseReferenceFrame(base_link);
+
+    move_group_->setPoseTarget(pose);
+    bool success = static_cast<bool>(move_group_->plan(my_plan));
+              RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+              if(success == true){
+                  //move_group.move();
+                  // move_group_->setStartStateToCurrentState();
+                  if(move_group_->execute(my_plan).val == 1){
+                    result->done = true;
+                    goal_handle->succeed(result);
+                    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                  }
+                  else{
+                    move_group_->setStartStateToCurrentState();
+                    move_group_->setPoseTarget(pose.pose);
+                    bool success = static_cast<bool>(move_group_->plan(my_plan));
+                      RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+                    if(success == true){
+                      // move_group.move();
+                      move_group_->setStartStateToCurrentState();
+                      if(move_group_->execute(my_plan).val == 1){
                         result->done = true;
                         goal_handle->succeed(result);
                         RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      }
-
-    //   move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
-    //   move_group_->setPlannerId("LIN");
-    //   move_group_->setMaxAccelerationScalingFactor(goal->accel);
-    //   move_group_->setMaxVelocityScalingFactor(goal->speed);
-    //   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-    // // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.position.x, pose_goal.position.y,
-    // //           pose_goal.position.z);
-    // // bool success = (move_group_->plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    // // RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
-    // // move_group_->move();
-    // pose.header.frame_id = "panda1_link0";
-    // move_group_->setStartStateToCurrentState();
-    // move_group_->setPoseReferenceFrame("world");
-
-    // move_group_->setPoseTarget(pose);
-    // bool success = static_cast<bool>(move_group_->plan(my_plan));
-    //           RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
-    //           if(success == true){
-    //               //move_group.move();
-    //               // move_group_->setStartStateToCurrentState();
-    //               if(move_group_->execute(my_plan).val == 1){
-    //                 result->done = true;
-    //                 goal_handle->succeed(result);
-    //                 RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-    //               }
-    //               else{
-    //                 move_group_->setStartStateToCurrentState();
-    //                 move_group_->setPoseTarget(pose.pose);
-    //                 bool success = static_cast<bool>(move_group_->plan(my_plan));
-    //                   RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
-    //                 if(success == true){
-    //                   // move_group.move();
-    //                   move_group_->setStartStateToCurrentState();
-    //                   if(move_group_->execute(my_plan).val == 1){
-    //                     result->done = true;
-    //                     goal_handle->succeed(result);
-    //                     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-    //                   }
-    //                   else{
-    //                     result->done = false;
-    //                     goal_handle->abort(result);
-    //                     RCLCPP_INFO(this->get_logger(), "Goal canceled");
-    //                   }
+                      }
+                      else{
+                        result->done = false;
+                        goal_handle->abort(result);
+                        RCLCPP_INFO(this->get_logger(), "Goal canceled");
+                      }
                       
-    //                 }
+                    }
 
-    //               }
-    //           }
-    //           else{
-    //               result->done = false;
-    //               goal_handle->abort(result);
-    //               RCLCPP_INFO(this->get_logger(), "Goal canceled");
-    //             }
+                  }
+              }
+              else{
+                  result->done = false;
+                  goal_handle->abort(result);
+                  RCLCPP_INFO(this->get_logger(), "Goal canceled");
+                }
 
     
   }
