@@ -42,7 +42,7 @@ public:
   
 
     q_new.normalize();
-    
+    pose_goal.header.frame_id = "panda1_link0";
     pose_goal.pose.orientation.x = q_new.x();
     pose_goal.pose.orientation.y = q_new.y();
     pose_goal.pose.orientation.z = q_new.z();

@@ -242,7 +242,7 @@ bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
 bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
 {
     RCLCPP_INFO(this->get_logger(), "move function called");
-    move_group_->setPoseReferenceFrame(base_link);
+    
     geometry_msgs::msg::Pose pose_goal; // = move_group_->getCurrentPose().pose;
     // pose_goal.position.x = 0.1;;
     // pose_goal.position.y = -0.4;
@@ -707,7 +707,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
     move_group_->setStartStateToCurrentState();
     // move_group_->setPoseReferenceFrame("");
     move_group_->setPoseReferenceFrame(base_link);
-    
+    pose.header.frame_id = "";
     move_group_->setPoseTarget(pose);
     bool success = static_cast<bool>(move_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
@@ -787,6 +787,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       move_group_->setMaxVelocityScalingFactor(goal->speed);
       // move_group_->setMaxAccelerationScalingFactor(0.6);
       // move_group_->setMaxVelocityScalingFactor(0.6);
+      if(goal->pose.header.frame_id != ""){
+        move_group_->setPoseReferenceFrame(goal->pose.header.frame_id);
+      }
+      else{
+        move_group_->setPoseReferenceFrame(base_link);
+      }
       
       if(MoveRobotServer::Move(pose))
       {
