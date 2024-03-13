@@ -30,6 +30,14 @@ colcon build
 source install/setup.bash
 ```
 
+# todo?
+## Running (in seprate terminals)
+```
+ros2 launch omtp_factory_moveit_config demo.launch.py
+
+ros2 launch manipulator move_robot_server.launch.py
+```
+
 
 ### pgsql_services and supabase_docker
 Check seperate readme files for instructions. 
