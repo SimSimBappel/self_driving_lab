@@ -26,7 +26,8 @@ git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin.
 cd ..
 cd ..
 cd ..
-colcon build
+colcon build --packages-ignore camera
+colcon build --packages-select camera --symlink-install
 source install/setup.bash
 ```
 
