@@ -19,7 +19,7 @@ class CameraSubscriber(Node):
         super().__init__('camera_subscriber')
         self.subscription = self.create_subscription(
             Image,
-            '/camera/color/image_raw',
+            '/color/image_raw', # /camera/color/image_raw
             self.callback,
             10)
         self.subscription 
@@ -31,6 +31,7 @@ class CameraSubscriber(Node):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         package_dir = os.path.dirname(script_dir)
         self.calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
+        print(self.calibration_file_path)
         self.camera_matrix, self.distortion_coeffs = self.calib_cam(self.calibration_file_path)
 
     def callback(self, data):
@@ -75,6 +76,7 @@ class CameraSubscriber(Node):
 
         image_path = os.path.join(package_dir, 'src', 'self_driving_lab', 'camera', 'resource', 'calib_images', 'checkerboard')
         images = glob.glob(os.path.join(image_path, '*.jpg'))
+        print(image_path)
 
         for fname in images:
             img = cv2.imread(fname)
@@ -163,8 +165,10 @@ class ArucoMarkerDetector(Node):
                 if count >= 4:
                     self.logger.info("Image found")
                 count = 0
+                # cv2.imshow("frame", frame)
+                # cv2.waitKey(1)
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
+                aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250) 
                 parameters = aruco.DetectorParameters_create()
                 corners, ids, _ = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
@@ -200,6 +204,9 @@ class ArucoMarkerDetector(Node):
                     self.reset()
                     self.camera_subscriber.stop_streaming()
                     return FindArucoTag.Result()
+
+                elif ids is not None:
+                    print(ids)
 
                 self.reset()
                 time.sleep(0.05)
