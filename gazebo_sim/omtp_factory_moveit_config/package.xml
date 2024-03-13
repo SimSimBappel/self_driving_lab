@@ -16,6 +16,8 @@
 
   <author email="due6230@gmail.com">lasse</author>
 
+  <depend>behavior_tree_ros2_actions</depend>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <exec_depend>moveit_ros_move_group</exec_depend>

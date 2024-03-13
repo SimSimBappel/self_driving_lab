@@ -7,9 +7,10 @@
   <maintainer email="due6230@gmail.com">lass6230</maintainer>
   <license>TODO: License declaration</license>
 
+  <depend>behavior_tree_ros2_actions</depend>
+
   <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>behaviortree_ros2</build_depend>
-  <build_depend>behavior_tree_ros2_actions</build_depend>
   <build_depend>camera</build_depend>
 
   <test_depend>ament_lint_auto</test_depend>
