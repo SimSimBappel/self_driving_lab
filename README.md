@@ -26,6 +26,7 @@ git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin.
 cd ..
 cd ..
 cd ..
+sudo apt install ros2-humble-gazebo-ros2-control
 colcon build --packages-ignore camera
 colcon build --packages-select camera --symlink-install
 source install/setup.bash
