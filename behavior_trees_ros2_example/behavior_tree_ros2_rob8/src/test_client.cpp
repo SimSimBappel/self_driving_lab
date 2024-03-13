@@ -60,7 +60,7 @@ public:
 
 
 const std::string default_bt_xml_file = 
-    ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml";
+    ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/test2.xml";
 
   // Simple tree, used to execute once each action.
 //   static const char* xml_text = R"(

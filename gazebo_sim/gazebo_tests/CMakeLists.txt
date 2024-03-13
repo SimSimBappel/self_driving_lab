@@ -25,7 +25,7 @@ find_package(rclpy REQUIRED)
 install(DIRECTORY
 #   meshes
   # urdf
-  #controllers
+  # controllers
   models
   # launch
   DESTINATION share/${PROJECT_NAME}

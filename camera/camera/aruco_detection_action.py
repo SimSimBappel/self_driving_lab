@@ -9,7 +9,7 @@ import tf_transformations
 from rclpy.node import Node
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import PoseStamped
 from behavior_tree_ros2_actions.action import FindArucoTag
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
@@ -176,18 +176,18 @@ class ArucoMarkerDetector(Node):
                     index = np.where(ids == goal_handle.request.id)[0][0]
                     rvec, tvec, _ = aruco.estimatePoseSingleMarkers(corners[index], self.aruco_size, self.camera_subscriber.camera_matrix, self.camera_subscriber.distortion_coeffs)
                     if rvec is not None and tvec is not None:
-                        marker_pose_msg = TransformStamped()
+                        marker_pose_msg = PoseStamped()
                         marker_pose_msg.header.stamp = self.get_clock().now().to_msg()
                         marker_pose_msg.header.frame_id = "camera"
-                        marker_pose_msg.child_frame_id = f"marker_{goal_handle.request.id}"
-                        marker_pose_msg.transform.translation.x = tvec[0][0][0]
-                        marker_pose_msg.transform.translation.y = tvec[0][0][1]
-                        marker_pose_msg.transform.translation.z = tvec[0][0][2]
+                        # marker_pose_msg.child_frame_id = f"marker_{goal_handle.request.id}"
+                        marker_pose_msg.pose.position.x = tvec[0][0][0]
+                        marker_pose_msg.pose.position.y = tvec[0][0][1]
+                        marker_pose_msg.pose.position.z = tvec[0][0][2]
                         q = tf_transformations.quaternion_from_euler(rvec[0][0][0], rvec[0][0][1], rvec[0][0][2])
-                        marker_pose_msg.transform.rotation.x = q[0]
-                        marker_pose_msg.transform.rotation.y = q[1]
-                        marker_pose_msg.transform.rotation.z = q[2]
-                        marker_pose_msg.transform.rotation.w = q[3]
+                        marker_pose_msg.pose.orientation.x = q[0]
+                        marker_pose_msg.pose.orientation.y = q[1]
+                        marker_pose_msg.pose.orientation.z = q[2]
+                        marker_pose_msg.pose.orientation.w = q[3]
                         self.found_object = True
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg

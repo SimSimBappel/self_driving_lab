@@ -16,11 +16,11 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<int>("id"), OutputPort<geometry_msgs::msg::TransformStamped>("Transform")});
+    return providedBasicPorts({InputPort<int>("id"), OutputPort<geometry_msgs::msg::PoseStamped>("Transform")});
   }
 
   bool setGoal(Goal& goal) override{
-    auto id = getInput<int>("tag_id");
+    auto id = getInput<int>("id");
     goal.id = id.value();
     return true;
   }
