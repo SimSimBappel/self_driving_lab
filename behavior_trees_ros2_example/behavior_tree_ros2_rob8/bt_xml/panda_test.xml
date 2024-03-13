@@ -62,8 +62,8 @@
                    action_name="__default__placeholder__"/>
       <ArmMovePoseAction name="arm"
                          pose="{in_pose}"
-                         speed="0.5"
-                         accel="0.5"
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
@@ -71,27 +71,27 @@
       <Script code="home:=&apos;0.0;0.5;0.0;0.0;0.0;0.0;0.0&apos;"/>
       <ArmMoveJointsAction name="arm_joint_pose"
                            joints="{home}"
-                           speed="0.9"
-                           accel="0.9"
+                           speed="0.2"
+                           accel="0.2"
                            action_name="__default__placeholder__"/>
       <Script code="offset:=&apos;0.5;0.0;0.0;0.0;0.0;0.0;0.0&apos;"/>
       <ArmPoseOffsetCalculation offset="{offset}"
                                 pose="{home}"
                                 pose_w_offset="{home}"/>
       <ArmMoveJointsAction joints="{home}"
-                           speed="0.3"
-                           accel="0.3"
+                           speed="0.2"
+                           accel="0.2"
                            action_name="__default__placeholder__"/>
       <GripperAction name="gripper_close"
-                     speed="0.6"
-                     accel="0.6"
+                     speed="0.2"
+                     accel="0.2"
                      open="false"
                      action_name="__default__placeholder__"/>
       <Script code="object_pose:=&apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
       <ArmMovePoseAction name="arm"
                          pose="{object_pose}"
-                         speed="0.6"
-                         accel="0.6"
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
@@ -108,8 +108,8 @@
       <Script code="object_pose:=&apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
       <ArmMovePoseAction name="arm"
                          pose="{object_pose}"
-                         speed="0.6"
-                         accel="0.6"
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
       <SleepAction name="sleepA"
                    msec="200"
@@ -117,7 +117,6 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <SubTree ID="bob_bob"/>
     </Sequence>
   </BehaviorTree>
 
@@ -135,14 +134,14 @@
                                    pose="{target_pose_msg}"
                                    pose_w_offset="{approch_pose}"/>
       <GripperJointAction joint_2="0.03"
-                          speed="0.6"
-                          accel="0.6"
+                          speed="0.2"
+                          accel="0.2"
                           joint_1="0.03"
                           action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePoseMsgAction pose="{approch_pose}"
-                            speed="0.6"
-                            accel="0.6"
+                            speed="0.2"
+                            accel="0.2"
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizPtpPoseMsgAction pose="{target_pose_msg}"
