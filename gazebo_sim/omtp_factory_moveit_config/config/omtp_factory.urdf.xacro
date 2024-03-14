@@ -1,19 +1,33 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="omtp_factory">
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+    <xacro:arg name="use_sim_time" default="false" />
+
+<!-- [move_group-9] [INFO] [1710415641.992481918] [moveit_robot_model.robot_model]: Loading robot model 'omtp_factory'...
+[move_group-9] [WARN] [1710415641.992505114] [moveit_robot_model.robot_model]: Skipping virtual joint 'world_joint' because its child frame 'panda_link0' does not match the URDF frame 'world_interface'
+[move_group-9] [INFO] [1710415641.992515230] [moveit_robot_model.robot_model]: No root/virtual joint specified in SRDF. Assuming fixed joint -->
 
     <!-- Import omtp_factory urdf file -->
     <!-- <xacro:include filename="$(find omtp_lecture1)/urdf/omtp_custom.urdf.xacro" /> -->
     <xacro:include filename="$(find omtp_lecture1)/urdf/omtp_custom_factory.urdf.xacro" />
     <!-- <xacro:include filename="$(find ariac_sensors)/models/basic_logical_camera/model.sdf" /> -->
     <!-- Import control_xacro -->
-    <xacro:include filename="omtp_factory.ros2_control.xacro" />
-    
-    
-    <xacro:omtp_factory_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
-    <!-- <xacro:include filename="omtp_factory.ros2_gazebo_control.xacro" />
-    <xacro:omtp_factory_ros2_gazebo_control name="GazeboSystem" initial_positions_file="$(arg initial_positions_file)"/> -->
+    <!-- Real robot -->
+    <xacro:if value="$(arg use_sim_time)">
+        <warning>sim time is true</warning>
+        <xacro:include filename="omtp_factory.ros2_control.xacro" />
+        <xacro:omtp_factory_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+    </xacro:if>
+    
+
+    <!-- Gazebo -->
+    <xacro:unless value="$(arg use_sim_time)">
+        <warning>sim time is false</warning>
+        <xacro:include filename="omtp_factory.ros2_gazebo_control.xacro" />
+        <xacro:omtp_factory_ros2_gazebo_control name="GazeboSystem" initial_positions_file="$(arg initial_positions_file)"/>
+    </xacro:unless>
+    
 
     <xacro:property name="M_PI"              value="3.1415926535897931"/>
 	<xacro:arg      name="camera_pose_trans" default="0 1.2 2.0"/>
