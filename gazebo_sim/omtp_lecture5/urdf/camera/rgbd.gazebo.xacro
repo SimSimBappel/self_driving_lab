@@ -189,14 +189,14 @@ This is the Gazebo URDF model for an rgbd camera adapted from the Intel RealSens
       <depthUpdateRate>30.0</depthUpdateRate>
       <colorUpdateRate>30.0</colorUpdateRate>
       <infraredUpdateRate>1.0</infraredUpdateRate>
-      <depthTopicName>camera/aligned_depth_to_color/image_raw</depthTopicName>
-      <depthCameraInfoTopicName>camera/depth/camera_info</depthCameraInfoTopicName>
-      <colorTopicName>camera/color/image_raw</colorTopicName>
-      <colorCameraInfoTopicName>camera/color/camera_info</colorCameraInfoTopicName>
-      <infrared1TopicName>camera/infra1/image_raw</infrared1TopicName>
-      <infrared1CameraInfoTopicName>camera/infra1/camera_info</infrared1CameraInfoTopicName>
-      <infrared2TopicName>camera/infra2/image_raw</infrared2TopicName>
-      <infrared2CameraInfoTopicName>camera/infra2/camera_info</infrared2CameraInfoTopicName>
+      <depthTopicName>${topics_ns}aligned_depth_to_color/image_raw</depthTopicName>
+      <depthCameraInfoTopicName>${topics_ns}depth/camera_info</depthCameraInfoTopicName>
+      <colorTopicName>${topics_ns}color/image_raw</colorTopicName>
+      <colorCameraInfoTopicName>${topics_ns}color/camera_info</colorCameraInfoTopicName>
+      <infrared1TopicName>${topics_ns}infra1/image_raw</infrared1TopicName>
+      <infrared1CameraInfoTopicName>${topics_ns}infra1/camera_info</infrared1CameraInfoTopicName>
+      <infrared2TopicName>${topics_ns}infra2/image_raw</infrared2TopicName>
+      <infrared2CameraInfoTopicName>${topics_ns}infra2/camera_info</infrared2CameraInfoTopicName>
       <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
       <depthOpticalframeName>${depth_optical_frame}</depthOpticalframeName>
       <infrared1OpticalframeName>${infrared1_optical_frame}</infrared1OpticalframeName>
@@ -204,25 +204,9 @@ This is the Gazebo URDF model for an rgbd camera adapted from the Intel RealSens
       <rangeMinDepth>0.3</rangeMinDepth>
       <rangeMaxDepth>3.0</rangeMaxDepth>
       <pointCloud>true</pointCloud>
-      <pointCloudTopicName>camera/depth/color/points</pointCloudTopicName>
+      <pointCloudTopicName>${topics_ns}depth/color/points</pointCloudTopicName>
       <pointCloudCutoff>0.3</pointCloudCutoff>
       </plugin>
-      <!-- <plugin name="${topics_ns}" filename="libdepth_camera_gazebo_plugin.so">
-        <prefix>${camera_name}</prefix>
-        <depthUpdateRate>30.0</depthUpdateRate>
-        <infraredUpdateRate>30.0</infraredUpdateRate>
-        <depthTopicName>depth/image_raw</depthTopicName>
-        <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
-        <infrared1TopicName>infra1/image_raw</infrared1TopicName>
-        <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
-        <infrared2TopicName>infra2/image_raw</infrared2TopicName>
-        <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
-        <depthOpticalframeName>${depth_optical_frame}</depthOpticalframeName>
-        <infrared1OpticalframeName>${infrared1_optical_frame}</infrared1OpticalframeName>
-        <infrared2OpticalframeName>${infrared2_optical_frame}</infrared2OpticalframeName>
-        <rangeMinDepth>0.2</rangeMinDepth>
-        <rangeMaxDepth>10.0</rangeMaxDepth>
-      </plugin> -->
     </gazebo>
 
     <!-- rgb camera -->
