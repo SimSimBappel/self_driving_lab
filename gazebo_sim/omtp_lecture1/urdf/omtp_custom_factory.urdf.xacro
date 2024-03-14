@@ -52,6 +52,10 @@
   <xacro:arm_gazebo arm_id="$(arg arm_id_1)"/>
   <xacro:arm_control arm_id="$(arg arm_id_1)"/> -->
 
+  <xacro:include filename="$(find gazebo_tests)/models/aruco_cube/aruco_cube.urdf.xacro"/>
+  <xacro:aruco_cube_macro>
+      <origin xyz="0.0 1.2 1.2" rpy="0.0 0.0 0.0"/>
+  </xacro:aruco_cube_macro>
 
 
 

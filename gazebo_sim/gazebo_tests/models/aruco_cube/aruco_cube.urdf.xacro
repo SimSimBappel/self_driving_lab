@@ -1,27 +1,29 @@
 <?xml version="1.0"?>
-<robot name="aruco_cube">
-  <xacro:macro name="aruco_cube_macro" params="prefix">
-    <link name="link">
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <mass value="0.25"/>
-        <inertia ixx="0.00001066664" ixy="0.0" ixz="0.0" iyy="0.00001066664" iyz="0.0" izz="0.00001066664"/>
-      </inertial>
+<robot name="aruco_cube" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-      <collision name="collision">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <mesh filename="model://aruco_cube/meshes/aruco_cube_8cm.dae"/>
-        </geometry>
-      </collision>
+<xacro:macro name="aruco_cube_macro" params="*origin">
+  <link name="cube_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.25"/>
+      <inertia ixx="0.00001066664" ixy="0.0" ixz="0.0" iyy="0.00001066664" iyz="0.0" izz="0.00001066664"/>
+    </inertial>
 
-      <visual name="visual">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <mesh filename="model://aruco_cube/meshes/aruco_cube_8cm.dae"/>
-        </geometry>
-      </visual>
+    <collision name="collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="model://aruco_cube/meshes/aruco_cube_8cm.dae"/>
+      </geometry>
+    </collision>
 
+    <visual name="visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="model://aruco_cube/meshes/aruco_cube_8cm.dae"/>
+      </geometry>
+    </visual>
+
+    <gazebo reference="cube_link">
       <velocity_decay>
         <linear value="0.0"/>
         <angular value="0.0"/>
@@ -30,6 +32,12 @@
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
       <gravity>1</gravity>
-    </link>
-  </xacro:macro>
+    </gazebo>
+  </link>
+  <joint name="aruco_cube_joint" type="fixed">
+    <xacro:insert_block name="origin" />
+    <parent link="world_interface"/>
+    <child link="cube_link"/>
+  </joint>
+</xacro:macro>
 </robot>
