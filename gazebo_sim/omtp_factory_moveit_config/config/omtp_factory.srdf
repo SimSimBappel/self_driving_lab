@@ -88,5 +88,5 @@
     <disable_collisions link1="panda_link3" link2="panda_link5" reason="Adjacent"/>
     <!-- <disable_collisions link1="panda_link6" link2="panda_link8" reason="Never"/> -->
     
-    <disable_collisions link1="robot1_pedestal_link" link2="robot2_pedestal_link" reason="Adjacent"/>
+    <!-- <disable_collisions link1="robot1_pedestal_link" link2="robot2_pedestal_link" reason="Adjacent"/> -->
 </robot>
