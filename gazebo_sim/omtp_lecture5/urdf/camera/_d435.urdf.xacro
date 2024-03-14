@@ -59,7 +59,6 @@ aluminum peripherial evaluation case.
         <geometry>
           <!-- <box size="${d435_cam_width} ${d435_cam_height} ${d435_cam_depth}"/> -->
           <mesh filename="file://$(find realsense2_description)/meshes/d435.dae" />
-          <!--<mesh filename="file://$(find realsense2_description)/meshes/d435/d435.dae" />-->
         </geometry>
         <material name="${name}_aluminum"/>
       </visual>
