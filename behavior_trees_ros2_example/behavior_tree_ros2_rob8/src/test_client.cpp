@@ -101,7 +101,28 @@ int main(int argc, char **argv)
   params_gripper.wait_for_server_timeout = std::chrono::milliseconds(1000);
   params_gripper.default_port_value = "gripper_service";
   factory.registerNodeType<GripperAction>("GripperAction",params_gripper);
-////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_grasp;
+  params_gripper_franka_grasp.nh = nh;
+  params_gripper_franka_grasp.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_grasp.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_grasp.default_port_value = "panda_gripper/grasp";
+  factory.registerNodeType<FrankaGraspGripperAction>("FrankaGraspGripperAction",params_gripper_franka_grasp);
+  //////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_homing;
+  params_gripper_franka_homing.nh = nh;
+  params_gripper_franka_homing.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_homing.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_homing.default_port_value = "panda_gripper/homing";
+  factory.registerNodeType<FrankaHomeGripperAction>("FrankaHomeGripperAction",params_gripper_franka_homing);
+  ////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_move;
+  params_gripper_franka_move.nh = nh;
+  params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_move.default_port_value = "panda_gripper/move";
+  factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
+  ////////////////////////////////////////////////////////////////////////////////////////
   RosNodeParams params_aruco;
   params_aruco.nh = nh;
   params_aruco.server_timeout = std::chrono::milliseconds(2000);

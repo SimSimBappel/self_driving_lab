@@ -15,6 +15,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(behavior_tree_ros2_actions REQUIRED)
+find_package(franka_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -24,7 +25,8 @@ set(THIS_PACKAGE_DEPS
     geometry_msgs
     tf2_geometry_msgs
     tf2
-    behavior_tree_ros2_actions )
+    behavior_tree_ros2_actions
+    franka_msgs )
 
 add_executable(test_load 
     src/sleep_action.cpp
