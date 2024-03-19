@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="grasp_pose_msg">
+    <Sequence>
+      <Sleep msec="200"/>
+      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{approch_pose}"/>
+      <GripperJointAction joint_2="0.03"
+                          speed="0.2"
+                          accel="0.2"
+                          joint_1="0.03"
+                          action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <FrankaGraspGripperAction width="0.02"
+                                speed="0.03"
+                                force="10"
+                                epsilon="0.01"
+                                action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="haptic_calibration">
+    <AlwaysSuccess/>
+  </BehaviorTree>
+
+  <BehaviorTree ID="place_pose_msg">
+    <Sequence>
+      <Sleep msec="200"/>
+      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{approch_pose}"/>
+      <Sleep msec="200"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <FrankaMoveGripperAction width="0.04"
+                               speed="0.03"
+                               action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="visual_calibration">
+    <AlwaysSuccess/>
+  </BehaviorTree>
+
+  <BehaviorTree ID="visual_grasp">
+    <Sequence>
+      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <ArucoAction id="{id}"
+                   Transform="{object_pose_msg}"
+                   action_name="__default__placeholder__"/>
+      <SubTree ID="grasp_pose_msg"
+               target_pose_msg="{object_pose_msg}"
+               approch_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="ArmMovePlizLinPoseMsgAction">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ArmMovePoseMsgAction">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ArmPoseMsgOffsetCalculation">
+      <input_port name="offset"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="pose_w_offset"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+    </Action>
+    <Action ID="ArucoAction">
+      <input_port name="id"
+                  type="int"/>
+      <output_port name="Transform"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="FrankaGraspGripperAction">
+      <input_port name="width"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="force"
+                  type="double"/>
+      <input_port name="epsilon"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="FrankaMoveGripperAction">
+      <input_port name="width"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="GripperJointAction">
+      <input_port name="joint_2"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="joint_1"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <SubTree ID="grasp_pose_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="approch_offset"/>
+    </SubTree>
+  </TreeNodesModel>
+
+</root>
