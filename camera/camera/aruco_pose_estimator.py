@@ -42,6 +42,8 @@ class CameraSubscriber(Node):
         self.pose_array = PoseArray()
         self.info_msg = None
 
+        self.datastamp = None
+
         script_dir = os.path.dirname(os.path.abspath(__file__))
         package_dir = os.path.dirname(script_dir)
         self.calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
@@ -73,7 +75,8 @@ class CameraSubscriber(Node):
         try:
             # Convert ROS Image message to OpenCV image
             self.img_raw = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
-
+            self.markers = ArucoMarkers()
+            self.pose_array = PoseArray()
             # if self.camera_frame == "":
             #     self.markers.header.frame_id = self.info_msg.header.frame_id
             #     self.pose_array.header.frame_id = self.info_msg.header.frame_id
@@ -83,7 +86,7 @@ class CameraSubscriber(Node):
             self.markers.header.frame_id = 'camera_color_optical_frame'
             self.pose_array.header.frame_id = 'camera_color_optical_frame'
             
-
+            self.datastamp = data.header.stamp
             self.markers.header.stamp = data.header.stamp
             self.pose_array.header.stamp = data.header.stamp
         except Exception as e:
@@ -110,8 +113,8 @@ class CameraSubscriber(Node):
 
         # If calibration file doesn't exist, perform calibration
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        objp = np.zeros((6*7,3), np.float32)
-        objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
+        objp = np.zeros((9*6,3), np.float32)
+        objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
         objpoints = [] # 3d point in real world space
         imgpoints = [] # 2d points in image plane.
 
@@ -124,9 +127,10 @@ class CameraSubscriber(Node):
         print(image_path)
 
         for fname in images:
+            self.logger.info(f"img: {fname}")
             img = cv2.imread(fname)
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-            ret, corners = cv2.findChessboardCorners(gray, (7,6),None)
+            ret, corners = cv2.findChessboardCorners(gray, (9,6),None)
             if ret == True:
                 objpoints.append(objp)
                 corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
@@ -222,8 +226,7 @@ class ArucoMarkerDetector(Node):
     def reset(self):
         """Delete image after using"""
         self.camera_subscriber.img_raw = None
-        markers = None
-        pose_array = None
+        
 
     def execute_callback(self, goal_handle):
         self.logger.info("Looking for ID:" + str(goal_handle.request.id))
@@ -244,19 +247,27 @@ class ArucoMarkerDetector(Node):
                 if count >= 4:
                     self.logger.info("Image found")
                 count = 0
-                
+                markers = None
+                pose_array = None
                 markers = ArucoMarkers()
                 pose_array = PoseArray()
-            
+                markers.header.frame_id = 'camera_color_optical_frame'
+                pose_array.header.frame_id = 'camera_color_optical_frame'
+                markers.header.stamp = self.camera_subscriber.datastamp
                 # frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=None,
                 #                                                 aruco_detector=self.aruco_detector,
                 #                                                 marker_size=self.marker_size, matrix_coefficients=self.intrinsic_mat,
                 #                                                 distortion_coefficients=self.distortion, pose_array=self.camera_subscriber.pose_array, markers=self.camera_subscriber.markers)
 
-                frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=None,
+                frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
                                                                 aruco_detector=self.aruco_detector,
                                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.camera_matrix,
                                                                 distortion_coefficients=self.camera_subscriber.distortion_coeffs, pose_array=self.camera_subscriber.pose_array, markers=self.camera_subscriber.markers)
+
+                # frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
+                #                                                 aruco_detector=self.aruco_detector,
+                #                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.camera_matrix,
+                #                                                 distortion_coefficients=self.camera_subscriber.distortion_coeffs, pose_array=PoseArray(), markers=ArucoMarkers())
         
                 if markers.marker_ids is not None:
                     if self.debug:
@@ -272,7 +283,7 @@ class ArucoMarkerDetector(Node):
                         index = markers.marker_ids.index(goal_handle.request.id)
                         marker_pose_msg = PoseStamped()
                         marker_pose_msg.header.stamp = self.get_clock().now().to_msg()
-                        marker_pose_msg.header.frame_id = "camera"
+                        marker_pose_msg.header.frame_id = self.camera_frame
                         # marker_pose_msg.child_frame_id = f"marker_{goal_handle.request.id}"
                         marker_pose_msg.pose.position.x = markers.poses[index].position.x
                         marker_pose_msg.pose.position.y = markers.poses[index].position.y
