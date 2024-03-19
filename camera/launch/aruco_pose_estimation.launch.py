@@ -102,15 +102,29 @@ def generate_launch_description():
     )
 
     # launch realsense camera node
-    cam_feed_launch_file = PathJoinSubstitution(
-        [FindPackageShare("realsense2_camera"), "launch", "rs_launch.py"]
-    )
+    # cam_feed_launch_file = PathJoinSubstitution(
+    #     [FindPackageShare("realsense2_camera"), "launch", "rs_launch.py"]
+    # )
+    
 
+    # camera_feed_node = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(cam_feed_launch_file),
+    #     launch_arguments={
+    #         "pointcloud.enable": "true",
+    #         "enable_color": "true",
+    #     }.items(),
+    #     condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
+    # )
+
+    cam_feed_launch_file = PathJoinSubstitution(
+        [FindPackageShare("camera"), "launch", "rs.launch.py"]
+    )
     camera_feed_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(cam_feed_launch_file),
         launch_arguments={
             "pointcloud.enable": "true",
             "enable_color": "true",
+            "depth_module.profile": "1280,720,15",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
     )
@@ -136,6 +150,6 @@ def generate_launch_description():
         # Nodes
         aruco_node, 
         camera_feed_node,
-        rviz2_node,
+        # rviz2_node,
         
     ])
