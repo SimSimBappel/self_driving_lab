@@ -787,6 +787,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       move_group_->setMaxVelocityScalingFactor(goal->speed);
       // move_group_->setMaxAccelerationScalingFactor(0.6);
       // move_group_->setMaxVelocityScalingFactor(0.6);
+      moveit_msgs::msg::JointConstraint jcm;
+      jcm.joint_name = "panda_joint2";
+      jcm.position = 0.0;
+      jcm.tolerance_below = -1.7028;
+      jcm.tolerance_above = 1.7028;
       if(goal->pose.header.frame_id != ""){
         move_group_->setPoseReferenceFrame(goal->pose.header.frame_id);
       }
