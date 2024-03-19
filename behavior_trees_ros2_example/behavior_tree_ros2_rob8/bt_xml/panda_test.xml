@@ -48,6 +48,7 @@
 
   <BehaviorTree ID="MainTree">
     <Sequence>
+      <Sleep msec="200"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
@@ -100,69 +101,6 @@
     </Sequence>
   </BehaviorTree>
 
-  <BehaviorTree ID="grasp_pose_msg">
-    <Sequence>
-      <Sleep msec="200"/>
-      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
-                                   pose="{target_pose_msg}"
-                                   pose_w_offset="{approch_pose}"/>
-      <GripperJointAction joint_2="0.03"
-                          speed="0.2"
-                          accel="0.2"
-                          joint_1="0.03"
-                          action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePoseMsgAction pose="{approch_pose}"
-                            speed="0.2"
-                            accel="0.2"
-                            action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <FrankaGraspGripperAction width="0.02"
-                                speed="0.03"
-                                force="10"
-                                epsilon="0.01"
-                                action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
-    </Sequence>
-  </BehaviorTree>
-
-  <BehaviorTree ID="place_pose_msg">
-    <Sequence>
-      <Sleep msec="200"/>
-      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
-                                   pose="{target_pose_msg}"
-                                   pose_w_offset="{approch_pose}"/>
-      <Sleep msec="200"/>
-      <ArmMovePoseMsgAction pose="{approch_pose}"
-                            speed="0.2"
-                            accel="0.2"
-                            action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <FrankaMoveGripperAction width="0.04"
-                               speed="0.03"
-                               action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
-    </Sequence>
-  </BehaviorTree>
-
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
     <Action ID="ArmArrayToPoseAction">
@@ -170,17 +108,6 @@
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
       <output_port name="pose"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-    </Action>
-    <Action ID="ArmMovePlizLinPoseMsgAction">
-      <input_port name="pose"
-                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
     </Action>
     <Action ID="ArmMovePoseAction">
       <input_port name="pose"
@@ -193,25 +120,6 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
-    <Action ID="ArmMovePoseMsgAction">
-      <input_port name="pose"
-                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="ArmPoseMsgOffsetCalculation">
-      <input_port name="offset"
-                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-      <input_port name="pose"
-                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-      <output_port name="pose_w_offset"
-                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-    </Action>
     <Action ID="ArmPoseOffsetCalculation">
       <input_port name="offset"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -219,19 +127,6 @@
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
       <output_port name="pose_w_offset"
                    type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-    </Action>
-    <Action ID="FrankaGraspGripperAction">
-      <input_port name="width"
-                  type="double"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="force"
-                  type="double"/>
-      <input_port name="epsilon"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
     </Action>
     <Action ID="FrankaHomeGripperAction">
       <input_port name="action_name"
@@ -254,19 +149,6 @@
                   type="double"/>
       <input_port name="open"
                   type="unsigned int"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="GripperJointAction">
-      <input_port name="joint_2"
-                  type="double"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="joint_1"
-                  type="double"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>

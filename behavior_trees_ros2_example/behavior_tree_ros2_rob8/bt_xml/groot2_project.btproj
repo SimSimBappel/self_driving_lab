@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4" project_name="Project">
+    <include path="database_trees.xml"/>
+    <include path="liquid_handling.xml"/>
+    <include path="manipulator_trees.xml"/>
+    <include path="mobile_base_trees.xml"/>
+    <include path="panda_test.xml"/>
+    <include path="stirring.xml"/>
+    <!-- Description of Node Models (used by Groot) -->
+    <TreeNodesModel>
+        <Action ID="ArmArrayToPoseAction">
+            <input_port name="array" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="ArmMovePlizLinPoseMsgAction">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="ArmMovePlizPtpPoseMsgAction">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="ArmMovePoseAction">
+            <input_port name="pose" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="ArmMovePoseMsgAction">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="ArmPoseMsgOffsetCalculation">
+            <input_port name="offset" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <output_port name="pose_w_offset" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+        </Action>
+        <Action ID="ArmPoseOffsetCalculation">
+            <input_port name="offset" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="pose" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <output_port name="pose_w_offset" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+        </Action>
+        <Action ID="ArucoAction">
+            <input_port name="id" type="int"/>
+            <output_port name="Transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="FrankaGraspGripperAction">
+            <input_port name="width" type="double"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="force" type="double"/>
+            <input_port name="epsilon" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="FrankaHomeGripperAction">
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="FrankaMoveGripperAction">
+            <input_port name="width" type="double"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="GripperAction">
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="open" type="unsigned int"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="GripperJointAction">
+            <input_port name="joint_2" type="double"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="joint_1" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="PrintValue">
+            <input_port name="message" type="std::string"/>
+        </Action>
+        <Action ID="SleepAction">
+            <input_port name="msec" type="unsigned int"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <SubTree ID="grasp_pose_msg" editable="true">
+            <input_port name="target_pose_msg"/>
+            <input_port name="approch_offset"/>
+        </SubTree>
+        <SubTree ID="place_pose_msg" editable="true">
+            <input_port name="target_pose_msg"/>
+            <input_port name="approch_offset"/>
+        </SubTree>
+        <SubTree ID="visual_grasp" editable="true">
+            <input_port name="id"/>
+            <input_port name="lookout_pose_msg"/>
+        </SubTree>
+    </TreeNodesModel>
+</root>

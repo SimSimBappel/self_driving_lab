@@ -16,6 +16,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(behavior_tree_ros2_actions REQUIRED)
 find_package(franka_msgs REQUIRED)
+find_package(pgsql_interfaces REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -26,7 +27,8 @@ set(THIS_PACKAGE_DEPS
     tf2_geometry_msgs
     tf2
     behavior_tree_ros2_actions
-    franka_msgs )
+    franka_msgs
+    pgsql_interfaces )
 
 add_executable(test_load 
     src/sleep_action.cpp
@@ -43,6 +45,7 @@ add_executable(test_load
     src/gripper_behaviors.cpp
     src/arm_behaviors.cpp
     src/camera_behaviors.cpp
+    src/database_behaviors.cpp
     src/test_client.cpp)
     
   ament_target_dependencies(test_client ${THIS_PACKAGE_DEPS})
