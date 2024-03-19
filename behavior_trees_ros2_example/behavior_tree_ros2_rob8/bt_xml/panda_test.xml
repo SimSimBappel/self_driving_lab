@@ -48,14 +48,11 @@
 
   <BehaviorTree ID="MainTree">
     <Sequence>
-      <Script code="in_name:= &apos;john&apos; "/>
-      <SubTree ID="MySub"
-               sub_in_value="42"
-               sub_in_name="{in_name}"
-               sub_out_result="{out_result}"
-               sub_out_state="{out_state}"/>
-      <ScriptCondition code=" out_result==69 &amp;&amp; out_state==&apos;ACTIVE&apos; "/>
-      <Script code="in_pose:= &apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos;"/>
+      <FrankaHomeGripperAction action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.04"
+                               speed="0.03"
+                               action_name="__default__placeholder__"/>
+      <Script code="in_pose:= &apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
       <PrintValue message="start"/>
       <Sleep msec="200"/>
       <ArmMovePoseAction name="arm"
@@ -64,20 +61,6 @@
                          accel="0.2"
                          action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <Script code="home:=&apos;0.0;0.5;0.0;0.0;0.0;0.0;0.0&apos;"/>
-      <ArmMoveJointsAction name="arm_joint_pose"
-                           joints="{home}"
-                           speed="0.2"
-                           accel="0.2"
-                           action_name="__default__placeholder__"/>
-      <Script code="offset:=&apos;0.5;0.0;0.0;0.0;0.0;0.0;0.0&apos;"/>
-      <ArmPoseOffsetCalculation offset="{offset}"
-                                pose="{home}"
-                                pose_w_offset="{home}"/>
-      <ArmMoveJointsAction joints="{home}"
-                           speed="0.2"
-                           accel="0.2"
-                           action_name="__default__placeholder__"/>
       <GripperAction name="gripper_close"
                      speed="0.2"
                      accel="0.2"
@@ -92,27 +75,21 @@
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <Script code="object_pose:=&apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
+      <Script code="object_pose:=&apos;0.57106;-0.23937;0.13521;-3.142;0.0;0.0&apos;"/>
       <ArmArrayToPoseAction array="{object_pose}"
                             pose="{object_pose_msg}"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg}"
-               approch_offset="0.0;0.0;0.1;0.0;0.0;0.0"/>
+               approch_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <SleepAction name="sleepA"
                    msec="200"
                    action_name="__default__placeholder__"/>
-      <Script code="object_pose:=&apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
-      <ArmMovePoseAction name="arm"
-                         pose="{object_pose}"
-                         speed="0.2"
-                         accel="0.2"
-                         action_name="__default__placeholder__"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
-      <SleepAction name="sleepA"
-                   msec="200"
-                   action_name="__default__placeholder__"/>
+      <Script code="object_pose:=&apos;0.57106;0.10937;0.13521;-3.142;0.0;0.0&apos;"/>
+      <ArmArrayToPoseAction array="{object_pose}"
+                            pose="{object_pose_msg}"/>
+      <SubTree ID="place_pose_msg"
+               target_pose_msg="{object_pose_msg}"
+               approch_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
     </Sequence>
   </BehaviorTree>
 
@@ -140,24 +117,44 @@
                             accel="0.2"
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <ArmMovePlizPtpPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
                                    speed="0.1"
                                    accel="0.1"
                                    action_name="__default__placeholder__"/>
-      <ArmMovePlizPtpPoseMsgAction pose="{target_pose_msg}"
+      <Sleep msec="200"/>
+      <FrankaGraspGripperAction width="0.02"
+                                speed="0.03"
+                                force="10"
+                                epsilon="0.01"
+                                action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="place_pose_msg">
+    <Sequence>
+      <Sleep msec="200"/>
+      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{approch_pose}"/>
+      <Sleep msec="200"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
                                    speed="0.1"
                                    accel="0.1"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <GripperJointAction joint_2="0.01"
-                          speed="0.3"
-                          accel="0.3"
-                          joint_1="0.01"
-                          action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.04"
+                               speed="0.03"
+                               action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
                                    speed="0.1"
@@ -174,29 +171,7 @@
       <output_port name="pose"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
     </Action>
-    <Action ID="ArmMoveJointsAction">
-      <input_port name="joints"
-                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
     <Action ID="ArmMovePlizLinPoseMsgAction">
-      <input_port name="pose"
-                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="ArmMovePlizPtpPoseMsgAction">
       <input_port name="pose"
                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <input_port name="speed"
@@ -245,6 +220,33 @@
       <output_port name="pose_w_offset"
                    type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
     </Action>
+    <Action ID="FrankaGraspGripperAction">
+      <input_port name="width"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="force"
+                  type="double"/>
+      <input_port name="epsilon"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="FrankaHomeGripperAction">
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="FrankaMoveGripperAction">
+      <input_port name="width"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="GripperAction">
       <input_port name="speed"
                   type="double"/>
@@ -280,6 +282,16 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <SubTree ID="grasp_pose_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="approch_offset"/>
+    </SubTree>
+    <SubTree ID="place_pose_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="approch_offset"/>
+    </SubTree>
   </TreeNodesModel>
 
 </root>

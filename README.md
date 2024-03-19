@@ -4,12 +4,14 @@ AAU Robotics 8 semester project
 ## Dependencies
 install libfranka from [here](https://frankaemika.github.io/docs/installation_linux.html)
 ```
-sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2*
+pip3 install opencv-python opencv-contrib-python transforms3d
+sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2* ros-humble-tf-transformations
 cd ~
 mkdir -p ros2_ws/src
 cd ros2_ws/src
 git clone -b humble https://github.com/BehaviorTree/BehaviorTree.ROS2
 git clone https://github.com/tenfoldpaper/panda_ros2
+git clone https://github.com/AIRLab-POLIMI/ros2-aruco-pose-estimation # may need to be with --symlink-install
 cd ..
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DFranka_DIR:PATH=/home/$USER/libfranka/build
 source install/setup.bash
