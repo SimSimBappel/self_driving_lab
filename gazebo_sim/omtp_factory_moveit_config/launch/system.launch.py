@@ -113,7 +113,7 @@ def generate_launch_description():
 
     
     included_launch_description = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(get_package_share_directory("camera"), 'launch', 'camera.launch.py')),
+        PythonLaunchDescriptionSource(os.path.join(get_package_share_directory("camera"), 'launch', 'aruco_pose_estimation.launch.py')),
         launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time')}.items()
     )
 
