@@ -117,14 +117,14 @@ def generate_launch_description():
     # )
 
     cam_feed_launch_file = PathJoinSubstitution(
-        [FindPackageShare("camera"), "launch", "rs.launch.py"]
+        [FindPackageShare("realsense2_camera"), "launch", "rs_launch.py"]
     )
     camera_feed_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(cam_feed_launch_file),
         launch_arguments={
             "pointcloud.enable": "true",
             "enable_color": "true",
-            "depth_module.profile": "1280,720,15",
+        # "rgb_camera.profile": "1920,1080,6",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
     )
