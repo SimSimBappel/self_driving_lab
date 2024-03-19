@@ -222,6 +222,8 @@ class ArucoMarkerDetector(Node):
     def reset(self):
         """Delete image after using"""
         self.camera_subscriber.img_raw = None
+        markers = None
+        pose_array = None
 
     def execute_callback(self, goal_handle):
         self.logger.info("Looking for ID:" + str(goal_handle.request.id))
@@ -242,6 +244,7 @@ class ArucoMarkerDetector(Node):
                 if count >= 4:
                     self.logger.info("Image found")
                 count = 0
+                
                 markers = ArucoMarkers()
                 pose_array = PoseArray()
             
@@ -285,24 +288,30 @@ class ArucoMarkerDetector(Node):
                         result.marker_pose_msg = marker_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
                         goal_handle.succeed()
-                        self.reset()
                         self.camera_subscriber.stop_streaming()
+                        self.reset()
                         return result
 
                     elif markers.marker_ids.count(goal_handle.request.id) > 1:
                         self.logger.warn(f"{goal_handle.request.id} is in the array more than once.")
                         self.logger.info(str(markers.marker_ids))
                         goal_handle.abort()
-                        self.reset()
                         self.camera_subscriber.stop_streaming()
+                        self.reset()
                         return FindArucoTag.Result()
 
-                    else:
+                    elif self.debug:
                         self.logger.info(f"{goal_handle.request.id} is not in the array.")
-                        # self.logger.info(str(markers.marker_ids))
+                        self.logger.info(str(markers.marker_ids))
             
                 self.reset()
                 time.sleep(0.05)
+
+        self.logger.warn(f"ID: {goal_handle.request.id} is not in the array. TIMEOUT")
+        self.camera_subscriber.stop_streaming()
+        self.reset()
+        goal_handle.abort()
+        return FindArucoTag.Result()
 
 
     def initialize_parameters(self):
