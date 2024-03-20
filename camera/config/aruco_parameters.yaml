@@ -15,3 +15,4 @@
         output_image_topic: /aruco/image # Output topic with visualization of detected markers drawn on image
         # Debug
         debug: False
+        use_rviz: False

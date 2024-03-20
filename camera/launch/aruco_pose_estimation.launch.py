@@ -34,6 +34,12 @@ def generate_launch_description():
         description='Use simulation time',
     )
 
+    use_rviz_arg = DeclareLaunchArgument(
+        name='use_rviz',
+        default_value='false',
+        description='launch rviz',
+    )
+
     marker_size_arg = DeclareLaunchArgument(
         name='marker_size',
         default_value=str(config['marker_size']),
@@ -101,43 +107,35 @@ def generate_launch_description():
         emulate_tty=True
     )
 
-    # launch realsense camera node
-    # cam_feed_launch_file = PathJoinSubstitution(
-    #     [FindPackageShare("realsense2_camera"), "launch", "rs_launch.py"]
-    # )
-    
-
-    # camera_feed_node = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(cam_feed_launch_file),
-    #     launch_arguments={
-    #         "pointcloud.enable": "true",
-    #         "enable_color": "true",
-    #     }.items(),
-    #     condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
-    # )
 
     cam_feed_launch_file = PathJoinSubstitution(
         [FindPackageShare("realsense2_camera"), "launch", "rs_launch.py"]
     )
+
     camera_feed_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(cam_feed_launch_file),
         launch_arguments={
             "pointcloud.enable": "true",
             "enable_color": "true",
-        # "rgb_camera.profile": "1920,1080,6",
+            "rgb_camera.profile": "1920,1080,6",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
     )
 
+    rviz_config_file = os.path.join(get_package_share_directory('camera'), 'config', 'cam_default.rviz')
+    print(rviz_config_file)
     rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
-        arguments=[]
+        arguments=['-d', rviz_config_file],
+        condition=IfCondition(LaunchConfiguration('use_rviz')),
     )
 
     return LaunchDescription([
         # Arguments
         use_sim_time_arg,
+        use_rviz_arg,
+
         marker_size_arg,
         debug_arg,
         aruco_dictionary_id_arg,
@@ -150,6 +148,6 @@ def generate_launch_description():
         # Nodes
         aruco_node, 
         camera_feed_node,
-        # rviz2_node,
+        rviz2_node,
         
     ])
