@@ -1,10 +1,7 @@
-import os
 import cv2
 import time
-import glob
 import rclpy
 import numpy as np
-from cv2 import aruco
 import tf_transformations
 from rclpy.node import Node
 from cv_bridge import CvBridge
@@ -12,7 +9,6 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseStamped
 from behavior_tree_ros2_actions.action import FindArucoTag
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
-
 from aruco_pose_estimation.utils import ARUCO_DICT
 from aruco_pose_estimation.pose_estimation import pose_estimation
 from sensor_msgs.msg import CameraInfo
@@ -26,7 +22,7 @@ class CameraSubscriber(Node):
     def __init__(self, image_topic, info_topic, debug=False):
         super().__init__('camera_subscriber')
         self.image_sub = self.create_subscription(
-                Image, image_topic, self.image_callback, 1#qos_profile_sensor_data
+                Image, image_topic, self.image_callback, 1 #qos_profile_sensor_data
             )
         self.image_sub
         self.info_sub = self.create_subscription(
@@ -42,22 +38,13 @@ class CameraSubscriber(Node):
             self.streaming = False
         self.img_raw = None
         self.img_copy = None
-        self.img_none = False
-        # self.markers = ArucoMarkers()
-        self.pose_array = PoseArray()
         self.info_msg = None
         self.debug = debug
         self.datastamp = None
-
-        self.info_msg = None
         self.intrinsic_mat = None
         self.distortion = None
+        self.runonce = False
 
-        # script_dir = os.path.dirname(os.path.abspath(__file__))
-        # package_dir = os.path.dirname(script_dir)
-        # self.calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
-        # print(self.calibration_file_path)
-        # self.camera_matrix, self.distortion_coeffs = self.calib_cam(self.calibration_file_path)
 
 
     def info_callback(self, info_msg):
@@ -79,27 +66,16 @@ class CameraSubscriber(Node):
             return
 
         if self.info_msg is None:
-            self.logger.warn("No camera info has been received!")
+            if self.runonce:
+                self.logger.warn("No camera info has been received!")
             return
         
         try:
             # Convert ROS Image message to OpenCV image
             self.img_raw = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
             self.img_copy = self.img_raw.copy()
-            # self.markers = ArucoMarkers()
-            self.pose_array = PoseArray()
-            # if self.camera_frame == "":
-            #     self.markers.header.frame_id = self.info_msg.header.frame_id
-                # self.pose_array.header.frame_id = self.info_msg.header.frame_id
-            # else:
-            #     self.markers.header.frame_id = self.camera_frame
-            #     self.pose_array.header.frame_id = self.camera_frame
-            # self.markers.header.frame_id = 'camera_color_optical_frame'
-            # self.pose_array.header.frame_id = 'camera_color_optical_frame'
-            
+            self.runonce = True
             self.datastamp = data.header.stamp
-            # self.markers.header.stamp = data.header.stamp
-            # self.pose_array.header.stamp = data.header.stamp
         except Exception as e:
             self.logger.warn(str(e))
             return
@@ -113,52 +89,6 @@ class CameraSubscriber(Node):
     def stop_streaming(self):
         if not self.debug:
             self.streaming = False
-
-    # def calib_cam(self, calibration_file_path): 
-    #     """Calibrate camera from file or images"""
-    #     if os.path.exists(calibration_file_path):
-    #         # Load calibration data from file
-    #         with np.load(calibration_file_path) as data:
-    #             mtx, dist = [data[i] for i in ('mtx', 'dist')]
-    #         self.logger.info("Camera calibration data loaded from file.")
-    #         return mtx, dist
-
-    #     # If calibration file doesn't exist, perform calibration
-    #     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    #     objp = np.zeros((9*6,3), np.float32)
-    #     objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
-    #     objpoints = [] # 3d point in real world space
-    #     imgpoints = [] # 2d points in image plane.
-
-    #     package_dir = os.path.abspath(__file__)
-    #     for i in range(2): 
-    #         package_dir = os.path.dirname(os.path.dirname(package_dir))
-
-    #     image_path = os.path.join(package_dir, 'src', 'self_driving_lab', 'camera', 'resource', 'calib_images', 'checkerboard')
-    #     images = glob.glob(os.path.join(image_path, '*.jpg'))
-    #     print(image_path)
-
-    #     for fname in images:
-    #         self.logger.info(f"img: {fname}")
-    #         img = cv2.imread(fname)
-    #         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    #         ret, corners = cv2.findChessboardCorners(gray, (9,6),None)
-    #         if ret == True:
-    #             objpoints.append(objp)
-    #             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-    #             imgpoints.append(corners2)
-
-    #     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
-
-    #     self.logger.debug("matrix: " + str(mtx))
-    #     self.logger.debug("distortion: " + str(dist))
-    #     self.logger.info("Camera calibrated")
-
-    #     # Save calibration data to file
-    #     np.savez(calibration_file_path, mtx=mtx, dist=dist)
-    #     self.logger.info("Camera calibration data saved to file.")
-
-    #     return mtx, dist  # Return camera matrix and distortion coefficients
 
 
 class ArucoMarkerDetector(Node):
@@ -182,13 +112,11 @@ class ArucoMarkerDetector(Node):
         self.result = None
         self.aruco_size = 0.0435 # Meters
         self.camera_subscriber.start_streaming()
+        self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
         if self.debug:
             self.poses_pub = self.create_publisher(PoseArray, self.markers_visualization_topic, 10)
             self.markers_pub = self.create_publisher(ArucoMarkers, self.detected_markers_topic, 10)
             self.image_pub = self.create_publisher(Image, self.output_image_topic, 10)
-
-
-        
 
         # Make sure we have a valid dictionary id:
         try:
@@ -202,11 +130,6 @@ class ArucoMarkerDetector(Node):
             )
             options = "\n".join([s for s in ARUCO_DICT])
             self.logger.error("valid options: {}".format(options))
-    
-        # Set up fields for camera parameters
-        self.info_msg = None
-        self.intrinsic_mat = None
-        self.distortion = None
 
         # code for updated version of cv2 (4.7.0)
         self.aruco_dictionary = cv2.aruco.getPredefinedDictionary(dictionary_id)
@@ -216,37 +139,10 @@ class ArucoMarkerDetector(Node):
         if self.debug:
             print("Debug mode enabled")
             self.timer = self.create_timer(1.0, self.detector_callback)
-
-
-
-
-    def destroy(self):
-        """Shutdown all components of node"""
-        self.camera_subscriber.destroy_node()
-        self.action_server.destroy()
-        super().destroy_node()
     
-    def goal_callback(self, goal_request):
-        """Accept or reject a client request to begin an action."""
-        if goal_request.id > -1 and goal_request.id < 251:
-            self.logger.info('Received goal request ID:' + str(goal_request.id))
-            return GoalResponse.ACCEPT
-        else:
-            self.logger.info('Goal request ID:' + str(goal_request.id) + "is not in range!")
-            return GoalResponse.REJECT
-
-    def cancel_callback(self, goal_handle):
-        """Accept or reject a client request to cancel an action."""
-        self.logger.info('Received cancel request')
-        return CancelResponse.ACCEPT
-    
-    def reset(self):
-        """Delete image after using"""
-        self.camera_subscriber.img_raw = None
-        
 
     def execute_callback(self, goal_handle):
-        self.logger.info("Looking for ID:" + str(goal_handle.request.id))
+        # self.logger.info("Looking for ID:" + str(goal_handle.request.id))
         self.found_object = False
         self.result = None
         start_time = time.time()
@@ -261,8 +157,6 @@ class ArucoMarkerDetector(Node):
                 if count == 4:
                     self.logger.warn("Image not retrieved!")
             else:
-                if count >= 4:
-                    self.logger.info("Image found")
                 count = 0
                 markers = None
                 pose_array = None
@@ -272,11 +166,6 @@ class ArucoMarkerDetector(Node):
                 pose_array.header.frame_id = 'camera_color_optical_frame'
                 markers.header.stamp = self.camera_subscriber.datastamp
 
-                # frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
-                #                                                 aruco_detector=self.aruco_detector,
-                #                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.camera_matrix,
-                #                                                 distortion_coefficients=self.camera_subscriber.distortion_coeffs, pose_array=self.camera_subscriber.pose_array, markers=self.camera_subscriber.markers)
-
                 _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
                                                                 aruco_detector=self.aruco_detector,
                                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
@@ -284,22 +173,20 @@ class ArucoMarkerDetector(Node):
 
                 if markers.marker_ids is not None:
                     if markers.marker_ids.count(goal_handle.request.id) == 1:
-                        # self.logger.info(f"{goal_handle.request.id} is in the array only once.")
                         index = markers.marker_ids.index(goal_handle.request.id)
                         marker_pose_msg = PoseStamped()
                         marker_pose_msg.header.stamp = self.get_clock().now().to_msg()
                         marker_pose_msg.header.frame_id = self.camera_frame
-                        # marker_pose_msg.child_frame_id = f"marker_{goal_handle.request.id}"
                         marker_pose_msg.pose.position.x = markers.poses[index].position.x
                         marker_pose_msg.pose.position.y = markers.poses[index].position.y
                         marker_pose_msg.pose.position.z = markers.poses[index].position.z
-                        marker_pose_msg.pose.orientation.x = -1.0 * markers.poses[index].orientation.x  # Flip the orientation by multiplying by -1.0
+                        marker_pose_msg.pose.orientation.x = markers.poses[index].orientation.x  
                         marker_pose_msg.pose.orientation.y = markers.poses[index].orientation.y
                         marker_pose_msg.pose.orientation.z = markers.poses[index].orientation.z
                         marker_pose_msg.pose.orientation.w = markers.poses[index].orientation.w
-                        self.found_object = True
-                        self.logger.info(str(marker_pose_msg))
-                        self.logger.info(str(index))
+                        marker_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose)
+                        self.pose_pub.publish(marker_pose_msg)
+                        # self.found_object = True
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
@@ -310,7 +197,7 @@ class ArucoMarkerDetector(Node):
 
                     elif markers.marker_ids.count(goal_handle.request.id) > 1:
                         self.logger.warn(f"{goal_handle.request.id} is in the array more than once.")
-                        self.logger.info(str(markers.marker_ids))
+                        # self.logger.info(str(markers.marker_ids))
                         goal_handle.abort()
                         self.camera_subscriber.stop_streaming()
                         self.reset()
@@ -318,7 +205,7 @@ class ArucoMarkerDetector(Node):
 
                     elif self.debug:
                         self.logger.info(f"{goal_handle.request.id} is not in the array.")
-                        self.logger.info(str(markers.marker_ids))
+                        # self.logger.info(str(markers.marker_ids))
             
                 self.reset()
                 time.sleep(0.05)
@@ -347,13 +234,11 @@ class ArucoMarkerDetector(Node):
                     distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
 
             if len(markers.marker_ids) > 0:
-                # Publish the results with the poses and markes positions
-                # for i, marker in enumerate(pose_array.poses):
-                    # pose_array.poses[i].orientation.z = -pose_array.poses[i].orientation.z  # Flip the orientation by multiplying by -1.0
-                    # pose_array.poses[i].orientation.x = np.sin(np.pi/2) * pose_array.poses[i].orientation.x
-                    # pose_array.poses[i].orientation.y = np.cos(np.pi/4) * pose_array.poses[i].orientation.y
-                    # pose_array.poses[i].orientation.z = np.cos(np.pi/2) * pose_array.poses[i].orientation.z
-                    # pose_array.poses[i].orientation.w = np.sin(np.pi/2) * -pose_array.poses[i].orientation.w
+                
+                for i, pose in enumerate(pose_array.poses):
+                    pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
+
+                # Publish the results with the poses and markes positions    
                 self.poses_pub.publish(pose_array)
                 self.markers_pub.publish(markers)
             else:
@@ -362,9 +247,55 @@ class ArucoMarkerDetector(Node):
             # publish the image frame with computed markers positions over the image
             self.image_pub.publish(self.camera_subscriber.bridge.cv2_to_imgmsg(frame, "rgb8"))
             self.camera_subscriber.img_copy = None
-        else:
+        elif self.camera_subscriber.runonce:
             print("No image received")
-            
+
+
+    def turn_around_x_axis(self, pose_msg: PoseStamped, angle=np.pi) -> PoseStamped:
+        euler_angles = tf_transformations.euler_from_quaternion([
+            pose_msg.orientation.x,
+            pose_msg.orientation.y,
+            pose_msg.orientation.z,
+            pose_msg.orientation.w
+        ])
+        # Edit the Euler angles as needed
+        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
+
+        # Convert the Euler angles back to quaternion
+        quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
+
+        pose_msg.orientation.x = quat[0]
+        pose_msg.orientation.y = quat[1]
+        pose_msg.orientation.z = quat[2]
+        pose_msg.orientation.w = quat[3]
+        
+        return pose_msg 
+    
+
+    def destroy(self):
+        """Shutdown all components of node"""
+        self.camera_subscriber.destroy_node()
+        self.action_server.destroy()
+        super().destroy_node()
+    
+
+    def goal_callback(self, goal_request):
+        """Accept or reject a client request to begin an action."""
+        if goal_request.id > -1 and goal_request.id < 251:
+            self.logger.info('Received goal request ID:' + str(goal_request.id))
+            return GoalResponse.ACCEPT
+        else:
+            self.logger.info('Goal request ID:' + str(goal_request.id) + "is not in range!")
+            return GoalResponse.REJECT
+
+    def cancel_callback(self, goal_handle):
+        """Accept or reject a client request to cancel an action."""
+        self.logger.info('Received cancel request')
+        return CancelResponse.ACCEPT
+    
+    def reset(self):
+        """Delete image after using"""
+        self.camera_subscriber.img_raw = None       
 
     def initialize_parameters(self):
         # Declare and read parameters from aruco_params.yaml
@@ -486,29 +417,28 @@ class ArucoMarkerDetector(Node):
         self.use_depth_input = (
             self.get_parameter("use_depth_input").get_parameter_value().bool_value
         )
-        self.logger.info(f"Use depth input: {self.use_depth_input}")
+        # self.logger.info(f"Use depth input: {self.use_depth_input}")
 
         self.image_topic = (
             self.get_parameter("image_topic").get_parameter_value().string_value
         )
-        self.logger.info(f"Input image topic: {self.image_topic}")
+        # self.logger.info(f"Input image topic: {self.image_topic}")
 
         self.depth_image_topic = (
             self.get_parameter("depth_image_topic").get_parameter_value().string_value
         )
-        self.logger.info(f"Input depth image topic: {self.depth_image_topic}")
+        # self.logger.info(f"Input depth image topic: {self.depth_image_topic}")
 
         self.info_topic = (
             self.get_parameter("camera_info_topic").get_parameter_value().string_value
         )
-        self.logger.info(f"Image camera info topic: {self.info_topic}")
+        # self.logger.info(f"Image camera info topic: {self.info_topic}")
 
         self.camera_frame = (
             self.get_parameter("camera_frame").get_parameter_value().string_value
         )
         self.logger.info(f"Camera frame: {self.camera_frame}")
 
-        # Output topics
         self.detected_markers_topic = (
             self.get_parameter("detected_markers_topic").get_parameter_value().string_value
         )
