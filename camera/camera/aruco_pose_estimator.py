@@ -5,17 +5,15 @@ import numpy as np
 import tf_transformations
 from rclpy.node import Node
 from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
-from geometry_msgs.msg import PoseStamped
-from behavior_tree_ros2_actions.action import FindArucoTag
-from rclpy.action import ActionServer, CancelResponse, GoalResponse
-from aruco_pose_estimation.utils import ARUCO_DICT
-from aruco_pose_estimation.pose_estimation import pose_estimation
-from sensor_msgs.msg import CameraInfo
 from rclpy.qos import qos_profile_sensor_data
-from geometry_msgs.msg import PoseArray
 from aruco_interfaces.msg import ArucoMarkers
+from sensor_msgs.msg import CameraInfo, Image
+from aruco_pose_estimation.utils import ARUCO_DICT
+from geometry_msgs.msg import PoseStamped, PoseArray
+from behavior_tree_ros2_actions.action import FindArucoTag
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
+from aruco_pose_estimation.pose_estimation import pose_estimation
+from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
 
 class CameraSubscriber(Node):
@@ -99,14 +97,6 @@ class ArucoMarkerDetector(Node):
         self.initialize_parameters()
         self.camera_subscriber = CameraSubscriber(self.image_topic, self.info_topic, self.debug)
         
-        self.action_server = ActionServer(
-            self,
-            FindArucoTag,
-            'detect_marker_pose',
-            execute_callback=self.execute_callback,
-            goal_callback=self.goal_callback,
-            cancel_callback=self.cancel_callback
-            )
         self.timeout = 10 # Secounds
         self.found_object = False
         self.result = None
@@ -139,6 +129,15 @@ class ArucoMarkerDetector(Node):
         if self.debug:
             print("Debug mode enabled")
             self.timer = self.create_timer(1.0, self.detector_callback)
+        
+        self.action_server = ActionServer(
+            self,
+            FindArucoTag,
+            'detect_marker_pose',
+            execute_callback=self.execute_callback,
+            goal_callback=self.goal_callback,
+            cancel_callback=self.cancel_callback
+            )
     
 
     def execute_callback(self, goal_handle):
