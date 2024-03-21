@@ -33,6 +33,7 @@ ament_target_dependencies(move_robot_server Eigen3 behavior_tree_ros2_actions rc
 include_directories(include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY rviz DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY urdf DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS moveL
   move_robot_server
