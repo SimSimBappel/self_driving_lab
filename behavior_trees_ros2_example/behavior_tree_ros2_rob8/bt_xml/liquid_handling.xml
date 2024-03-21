@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root BTCPP_format="4">
   <BehaviorTree ID="Add">
-    <AlwaysSuccess/>
+    <Sequence>
+      <Fallback>
+        <AlwaysSuccess/>
+      </Fallback>
+      <SubTree ID="get_reagent"/>
+      <SubTree ID="pour_reagent"/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="Separate">
@@ -9,6 +15,16 @@
   </BehaviorTree>
 
   <BehaviorTree ID="Transfer">
+    <AlwaysSuccess/>
+  </BehaviorTree>
+
+  <BehaviorTree ID="get_reagent">
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="pour_reagent">
     <AlwaysSuccess/>
   </BehaviorTree>
 
