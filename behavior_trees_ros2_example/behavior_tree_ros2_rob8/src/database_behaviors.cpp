@@ -47,8 +47,8 @@ class AddChemicalNode: public RosServiceNode<AddChemical>
   {
     return providedBasicPorts({
         OutputPort<std::string>("message"),
-        OutputPort<int8_t>("id"),
-        InputPort<std::string>("name"),
+        OutputPort<int8_t>("id_"),
+        InputPort<std::string>("name_"),
         InputPort<int8_t>("safety_level"),
         InputPort<std::string>("formula")});
   }
@@ -58,7 +58,7 @@ class AddChemicalNode: public RosServiceNode<AddChemical>
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
+    getInput("name_", request->name);
     getInput("formula", request->formula);
     getInput("safety_level", request->safety_level);
     // must return true if we are ready to send the request
@@ -70,7 +70,7 @@ class AddChemicalNode: public RosServiceNode<AddChemical>
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
     RCLCPP_INFO(node_->get_logger(), "Sum: %ld", response->success);
-    setOutput("id",response->id);
+    setOutput("id_",response->id);
     setOutput("message",response->message);
     return NodeStatus::SUCCESS;
   }
@@ -107,8 +107,8 @@ class AddWorkstationNode: public RosServiceNode<AddWorkstation>
   {
     return providedBasicPorts({
         OutputPort<std::string>("message"),
-        OutputPort<int8_t>("id"),
-        InputPort<std::string>("name"),
+        OutputPort<int8_t>("id_"),
+        InputPort<std::string>("name_"),
         
         InputPort<std::string>("type")});
   }
@@ -118,7 +118,7 @@ class AddWorkstationNode: public RosServiceNode<AddWorkstation>
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
+    getInput("name_", request->name);
     getInput("type", request->type);
     
     // must return true if we are ready to send the request
@@ -130,7 +130,7 @@ class AddWorkstationNode: public RosServiceNode<AddWorkstation>
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
     RCLCPP_INFO(node_->get_logger(), "Sum: %ld", response->success);
-    setOutput("id",response->id);
+    setOutput("id_",response->id);
     setOutput("message",response->message);
     return NodeStatus::SUCCESS;
   }
@@ -166,9 +166,9 @@ class UpsertChemicalLocationNode: public RosServiceNode<UpsertChemicalLocation>
   {
     return providedBasicPorts({
         OutputPort<std::string>("message"),
-        InputPort<int8_t>("id"),
+        InputPort<int8_t>("id_"),
         InputPort<int8_t>("location_id"),
-        InputPort<std::string>("name"),
+        InputPort<std::string>("name_"),
         InputPort<std::string>("formula"),
         InputPort<geometry_msgs::msg::Pose>("location_base"),
         InputPort<geometry_msgs::msg::Pose>("location_hand")});
@@ -180,9 +180,9 @@ class UpsertChemicalLocationNode: public RosServiceNode<UpsertChemicalLocation>
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
+    getInput("name_", request->name);
     getInput("formula", request->formula);
-    getInput("id", request->id);
+    getInput("id_", request->id);
     getInput("location_id", request->location_id);
     getInput("location_base", request->location_base);
     getInput("location_hand", request->location_hand);
@@ -230,9 +230,9 @@ class UpsertWorkstationLocationNode: public RosServiceNode<UpsertWorkstationLoca
   {
     return providedBasicPorts({
         OutputPort<std::string>("message"),
-        InputPort<int8_t>("id"),
+        InputPort<int8_t>("id_"),
         InputPort<int8_t>("location_id"),
-        InputPort<std::string>("name"),
+        InputPort<std::string>("name_"),
         InputPort<geometry_msgs::msg::Pose>("location_base"),
         InputPort<geometry_msgs::msg::Pose>("location_hand")});
 
@@ -243,8 +243,8 @@ class UpsertWorkstationLocationNode: public RosServiceNode<UpsertWorkstationLoca
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
-    getInput("id", request->id);
+    getInput("name_", request->name);
+    getInput("id_", request->id);
     getInput("location_id", request->location_id);
     getInput("location_base", request->location_base);
     getInput("location_hand", request->location_hand);
@@ -294,9 +294,9 @@ class GetAllChemicalLocationsNode: public RosServiceNode<GetAllChemicalLocations
     return providedBasicPorts({
         OutputPort<std::string>("message"),
         OutputPort<std::vector<pgsql_interfaces::msg::ChemicalLocation>>("locations"),
-        InputPort<int8_t>("id"),
+        InputPort<int8_t>("id_"),
         InputPort<std::string>("formula"),
-        InputPort<std::string>("name"),});
+        InputPort<std::string>("name_"),});
 
   }
 
@@ -305,8 +305,8 @@ class GetAllChemicalLocationsNode: public RosServiceNode<GetAllChemicalLocations
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
-    getInput("id", request->id);
+    getInput("name_", request->name);
+    getInput("id_", request->id);
     getInput("formula", request->formula);
     
     // must return true if we are ready to send the request
@@ -356,9 +356,9 @@ class GetAllWorkstationLocationsNode: public RosServiceNode<GetAllWorkstationLoc
     return providedBasicPorts({
         OutputPort<std::string>("message"),
         OutputPort<std::vector<pgsql_interfaces::msg::WorkstationLocation>>("locations"),
-        InputPort<int8_t>("id"),
+        InputPort<int8_t>("id_"),
         InputPort<std::string>("formula"),
-        InputPort<std::string>("name"),});
+        InputPort<std::string>("name_"),});
 
   }
 
@@ -367,8 +367,8 @@ class GetAllWorkstationLocationsNode: public RosServiceNode<GetAllWorkstationLoc
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    getInput("name", request->name);
-    getInput("id", request->id);
+    getInput("name_", request->name);
+    getInput("id_", request->id);
     getInput("formula", request->formula);
     
     // must return true if we are ready to send the request
