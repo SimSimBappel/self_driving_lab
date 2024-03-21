@@ -86,6 +86,26 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="visual_pour">
+    <Sequence>
+      <ArmMovePoseMsgAction pose="{vessel_lookout}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <ArucoAction id="{workstation_id}"
+                   Transform="{aruco_pose}"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{aruco_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{pour_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
     <Action ID="ArmMovePlizLinPoseMsgAction">
