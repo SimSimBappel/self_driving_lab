@@ -28,6 +28,7 @@ static const std::string base_link = "panda_link0";
 static const std::string PLANNING_GRIPPER_GROUP = "hand";
 static const std::vector<std::string> gripper_joint_names = {"panda_finger_joint1", "panda_finger_joint2"}; //{"gripper_joint1", "gripper_joint2"};
 static const std::vector<std::string> arm_joint_names = {"panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4", "panda_joint5", "panda_joint6", "panda_joint7"};
+
 // static const std::string PLANNING_GROUP = "arm_group";
 
 // static const std::string PLANNING_GRIPPER_GROUP = "gripper";
@@ -77,6 +78,13 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_accepted, this, _1));
     
+    this->action_server_arm_move_pose_msg_tcp_ = rclcpp_action::create_server<ArmMovePoseMsgTcp>(
+      this,
+      "arm_move_pose_msg_tcp_service",
+      std::bind(&MoveRobotServer::arm_move_pose_msg_tcp_handle_goal, this, _1, _2),
+      std::bind(&MoveRobotServer::arm_move_pose_msg_tcp_handle_cancel, this, _1),
+      std::bind(&MoveRobotServer::arm_move_pose_msg_tcp_handle_accepted, this, _1));
+
     this->action_server_arm_move_pliz_ptp_pose_msg_ = rclcpp_action::create_server<ArmMovePlizPtpPoseMsg>(
       this,
       "arm_move_pliz_ptp_pose_msg_service",
@@ -129,6 +137,8 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_group_->setMaxVelocityScalingFactor(MAX_VELOCITY_SCALE);
     move_group_->setMaxAccelerationScalingFactor(MAX_ACCELERATION_SCALE);
     move_group_->setPlanningPipelineId("ompl");
+    move_group_->setEndEffectorLink(tcp_frame); /// or move_group_->setEndEffector();
+    
     // move_group_->setPlannerId("PTP");
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
@@ -341,11 +351,51 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     // this needs to return quickly to avoid blocking the executor, so spin up a new thread
     // std::thread{std::bind(&SleepActionServer::execute, this, _1), goal_handle}.detach();
     const auto goal = goal_handle->get_goal();
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    move_group_->setNamedTarget("ready");
+    move_group_->setStartStateToCurrentState();
     auto feedback = std::make_shared<Home::Feedback>();
     auto result = std::make_shared<Home::Result>();
-    result->done = true;
-    goal_handle->succeed(result);
-    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+    
+    bool success = static_cast<bool>(move_group_->plan(my_plan));
+              RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+              if(success == true){
+                  //move_group.move();
+                  // move_group_->setStartStateToCurrentState();
+                  if(move_group_->execute(my_plan).val == 1){
+                    result->done = true;
+                    goal_handle->succeed(result);
+                    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                  }
+                  else{
+                    move_group_->setStartStateToCurrentState();
+                    move_group_->setNamedTarget("ready");
+                    bool success = static_cast<bool>(move_group_->plan(my_plan));
+                      RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+                    if(success == true){
+                      // move_group.move();
+                      move_group_->setStartStateToCurrentState();
+                      if(move_group_->execute(my_plan).val == 1){
+                        result->done = true;
+                        goal_handle->succeed(result);
+                        RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                      }
+                      else{
+                        result->done = false;
+                        goal_handle->abort(result);
+                        RCLCPP_INFO(this->get_logger(), "Goal arborted");
+                      }
+                      
+                    }
+
+                  }
+              }
+              else{
+                  result->done = false;
+                  goal_handle->abort(result);
+                  RCLCPP_INFO(this->get_logger(), "Goal arborted");
+                }
+    
 
   }
 
@@ -847,6 +897,70 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
   }
 
 
+
+rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const ArmMovePoseMsgTcp::Goal> goal)
+  {
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_cancel(
+    const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void MoveRobotServer::arm_move_pose_msg_tcp_handle_accepted(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&MoveRobotServer::arm_move_pose_msg_tcp_execute, this, _1), goal_handle}.detach();
+  
+  }
+
+  void MoveRobotServer::arm_move_pose_msg_tcp_execute(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle){
+      auto result = std::make_shared<ArmMovePoseMsgTcp::Result>();
+      
+      const auto goal = goal_handle->get_goal();
+      auto pose = goal->pose;
+      move_group_->setPlanningPipelineId("ompl");
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      move_group_->setEndEffectorLink(goal->tcp_frame);
+      // move_group_->setMaxAccelerationScalingFactor(0.6);
+      // move_group_->setMaxVelocityScalingFactor(0.6);
+      moveit_msgs::msg::JointConstraint jcm;
+      jcm.joint_name = "panda_joint2";
+      jcm.position = 0.0;
+      jcm.tolerance_below = -1.7028;
+      jcm.tolerance_above = 1.7028;
+      if(goal->pose.header.frame_id != ""){
+        move_group_->setPoseReferenceFrame(goal->pose.header.frame_id);
+      }
+      else{
+        move_group_->setPoseReferenceFrame(base_link);
+      }
+      
+      if(MoveRobotServer::Move(pose))
+      {
+          move_group_->setEndEffectorLink(tcp_frame);
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          move_group_->setEndEffectorLink(tcp_frame);
+          result->done = false;
+          goal_handle->abort(result);
+          RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      }
+    
+  }
+
+
 rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePose::Goal> goal)
@@ -1010,6 +1124,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
   }
+
+
 
 //////////  SLEEP ACTION //////////////
 

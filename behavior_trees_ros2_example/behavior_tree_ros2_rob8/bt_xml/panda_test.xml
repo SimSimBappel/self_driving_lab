@@ -177,6 +177,14 @@
       <input_port name="target_pose_msg"/>
       <input_port name="approch_offset"/>
     </SubTree>
+    <Action ID="ArmMovePoseMsgTcpAction">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="tcp_frame" type="std::string"/>
+            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
+        </Action>
+
   </TreeNodesModel>
 
 </root>

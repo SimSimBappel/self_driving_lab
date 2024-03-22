@@ -221,6 +221,13 @@ int main(int argc, char **argv)
   params_arm_move_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
   factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
 
+  RosNodeParams params_arm_move_pose_msg_tcp;
+  params_arm_move_pose_msg_tcp.nh = nh;
+  params_arm_move_pose_msg_tcp.default_port_value = "arm_move_pose_msg_tcp_service";
+  params_arm_move_pose_msg_tcp.server_timeout = std::chrono::milliseconds(2000);
+  params_arm_move_pose_msg_tcp.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  factory.registerNodeType<ArmMovePoseMsgTcpAction>("ArmMovePoseMsgTcpAction",params_arm_move_pose_msg_tcp);
+
   RosNodeParams params_arm_move_pliz_ptp_pose_msg;
   params_arm_move_pliz_ptp_pose_msg.nh = nh;
   params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";

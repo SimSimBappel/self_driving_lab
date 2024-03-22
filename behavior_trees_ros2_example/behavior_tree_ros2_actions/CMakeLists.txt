@@ -27,6 +27,7 @@ set(THIS_PACKAGE_DEPS
 
 
 set(action_files
+    "action/ArmMovePoseMsgTcp.action"
     "action/Sleep.action"
     "action/FindArucoTag.action"
     "action/Home.action"
