@@ -47,10 +47,14 @@ set(action_files
     # "action/GlobalPlanner.action"
     # "action/HybridPlanner.action"
   )
+
+  set(srv_files
+    "srv/Xdl.srv"
+  )
   
   rosidl_generate_interfaces(${PROJECT_NAME}
     # ${msg_files}
-    # ${srv_files}
+    ${srv_files}
     ${action_files}
     DEPENDENCIES
       action_msgs

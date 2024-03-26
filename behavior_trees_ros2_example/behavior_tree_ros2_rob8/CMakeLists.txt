@@ -39,6 +39,14 @@ add_executable(test_load
     
  ament_target_dependencies(test_load ${THIS_PACKAGE_DEPS})
 
+ add_executable(behavior_server 
+    src/sleep_action.cpp
+    src/gripper_behaviors.cpp
+    src/arm_behaviors.cpp
+    src/camera_behaviors.cpp
+    src/behavior_server.cpp)
+    
+ ament_target_dependencies(behavior_server ${THIS_PACKAGE_DEPS})
 
   add_executable(test_client 
     src/sleep_action.cpp
@@ -61,6 +69,7 @@ ament_target_dependencies(sleep2_plugin ${THIS_PACKAGE_DEPS})
 install(TARGETS
   test_client
   test_load
+  behavior_server
   # sleep_client_dyn
   
   # sleep_server

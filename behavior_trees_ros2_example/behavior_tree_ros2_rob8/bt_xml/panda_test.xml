@@ -48,13 +48,19 @@
 
   <BehaviorTree ID="MainTree">
     <Sequence>
-      <HomeArmAction action_name="__default__placeholder__"/>
+      <SubTree ID="init"/>
       <Sleep msec="200"/>
-      <FrankaHomeGripperAction action_name="__default__placeholder__"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Script code="in_pose:= &apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
+      <ArmArrayToPoseAction array="{in_pose}"
+                            pose="{tcp_pose_test}"/>
+      <ArmMovePoseMsgTcpAction pose="{tcp_pose_test}"
+                               speed="0.1"
+                               accel="0.1"
+                               tcp_frame="panda_hand_tcp"
+                               action_name="__default__placeholder__"/>
       <PrintValue message="start"/>
       <Sleep msec="200"/>
       <ArmMovePoseAction name="arm"
@@ -121,6 +127,19 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <Action ID="ArmMovePoseMsgTcpAction">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="tcp_frame"
+                  type="std::string"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="ArmPoseOffsetCalculation">
       <input_port name="offset"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -128,11 +147,6 @@
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
       <output_port name="pose_w_offset"
                    type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-    </Action>
-    <Action ID="FrankaHomeGripperAction">
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
     </Action>
     <Action ID="FrankaMoveGripperAction">
       <input_port name="width"
@@ -150,11 +164,6 @@
                   type="double"/>
       <input_port name="open"
                   type="unsigned int"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="HomeArmAction">
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>

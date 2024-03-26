@@ -41,6 +41,13 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="init">
+    <Sequence>
+      <HomeArmAction action_name="__default__placeholder__"/>
+      <FrankaHomeGripperAction action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
   <BehaviorTree ID="place_pose_msg">
     <Sequence>
       <Sleep msec="200"/>
@@ -164,6 +171,11 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <Action ID="FrankaHomeGripperAction">
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="FrankaMoveGripperAction">
       <input_port name="width"
                   type="double"/>
@@ -182,6 +194,11 @@
                   type="double"/>
       <input_port name="joint_1"
                   type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="HomeArmAction">
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>

@@ -157,7 +157,9 @@ private:
 
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscription_gripper_;
 
-    std::string tcp_frame = "panda_link8";
+    // std::string tcp_frame = "panda_link8";
+    std::string tcp_frame = "panda_hand_tcp";
+
 
     bool MoveGripper(const std_msgs::msg::Float64MultiArray & msg);
     bool ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg);
