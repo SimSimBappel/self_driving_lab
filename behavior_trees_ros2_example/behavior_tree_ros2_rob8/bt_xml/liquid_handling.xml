@@ -11,24 +11,66 @@
   </BehaviorTree>
 
   <BehaviorTree ID="Separate">
-    <AlwaysSuccess/>
-  </BehaviorTree>
-
-  <BehaviorTree ID="Transfer">
-    <AlwaysSuccess/>
-  </BehaviorTree>
-
-  <BehaviorTree ID="get_reagent">
     <Sequence>
       <AlwaysSuccess/>
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="Transfer">
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="get_reagent">
+    <Sequence>
+      <GetAllChemicalLocationsNode message="{mesage_result}"
+                                   formula="&quot;H2O&quot;"
+                                   locations="{location_result}"
+                                   id_="10"
+                                   name_="&quot;h2O&quot;"
+                                   service_name="__default__placeholder__"/>
+      <Fallback>
+        <AlwaysSuccess/>
+        <SubTree ID="move_base"/>
+      </Fallback>
+      <SubTree ID="visual_grasp"
+               id="2"
+               lookout_pose_msg="{location_result}"/>
+    </Sequence>
+  </BehaviorTree>
+
   <BehaviorTree ID="pour_reagent">
-    <AlwaysSuccess/>
+    <Sequence>
+      <Fallback>
+        <AlwaysSuccess/>
+      </Fallback>
+      <SubTree ID="visual_pour"/>
+    </Sequence>
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
-  <TreeNodesModel/>
+  <TreeNodesModel>
+    <Action ID="GetAllChemicalLocationsNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <input_port name="formula"
+                  type="std::string"/>
+      <output_port name="locations"
+                   type="std::vector&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt;, std::allocator&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt; &gt; &gt;"/>
+      <input_port name="id_"
+                  type="signed char"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
+    <SubTree ID="visual_grasp"
+             editable="true">
+      <input_port name="id"/>
+      <input_port name="lookout_pose_msg"/>
+    </SubTree>
+  </TreeNodesModel>
 
 </root>

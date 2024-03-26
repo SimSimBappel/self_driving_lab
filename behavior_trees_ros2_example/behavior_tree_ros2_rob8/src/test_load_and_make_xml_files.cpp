@@ -7,6 +7,7 @@
 #include "gripper_behaviors.cpp"
 #include "camera_behaviors.cpp"
 #include "arm_behaviors.cpp"
+#include "database_behaviors.cpp"
 #include "behaviortree_ros2/plugins.hpp"
 #include "yaml-cpp/yaml.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"
@@ -65,28 +66,18 @@ const std::string default_bt_xml_file =
 const std::string default_bt_xml_foler = 
     ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml";
   // Simple tree, used to execute once each action.
-//   static const char* xml_text = R"(
-//  <root BTCPP_format="4">
-//      <BehaviorTree>#include "behaviortree_cpp/bt_factory.h"
-//         <Sequence>
-//             <PrintValue message="start"/>
-//             <GripperAction name="gripper_open" open="true"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.1,0.0,1.529,0.0"/>
-//             <GripperAction name="gripper_close" open="false"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
-//             <ArmMovePoseAction name="arm" pose="-0.1,-0.6,0.4,0.0,0.0,-1.529"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.1,0.0,1.529,0.0"/>
-//             <GripperAction name="gripper_open" open="true"/>
-//             <ArmMovePoseAction name="arm" pose="0.45,0.1,0.165,0.0,1.529,0.0"/>
-//             <ArmMovePoseAction name="arm" pose="0.1,-0.6,0.4,0.0,0.0,-1.529"/>
-//             <GripperAction name="gripper_close" open="false"/>
-//             <PrintValue message="sleep completed"/>
-//         </Sequence>
-//      </BehaviorTree>
-//  </root>
-//  )";
+  static const char* xml_text = R"(
+ <root BTCPP_format="4">
+     <BehaviorTree ID="test_xdl">
+        <Sequence>
+            <PrintValue message="start"/>
+            <SubTree ID="Add" reagent='carbonyl' vessel='reactor' amount='2 eq'/>
+            <SubTree ID="Add"/>
+            <SubTree ID="Add"/>
+        </Sequence>
+     </BehaviorTree>
+ </root>
+ )";
 
 int main(int argc, char **argv)
 {
@@ -96,6 +87,89 @@ int main(int argc, char **argv)
   BehaviorTreeFactory factory;
 
   factory.registerNodeType<PrintValue>("PrintValue");
+
+    //////////////////DATABASE/////////////////
+  RosNodeParams params_database_add_chemical;
+  params_database_add_chemical.nh = nh;
+  params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
+  params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_add_chemical.default_port_value = "add_chemical_service";
+  factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
+
+  RosNodeParams params_database_add_workstation;
+  params_database_add_workstation.nh = nh;
+  params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
+  params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_add_workstation.default_port_value = "add_workstation_service";
+  factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
+
+  RosNodeParams params_database_upsert_chemical_location;
+  params_database_upsert_chemical_location.nh = nh;
+  params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
+  params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
+  factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
+
+  RosNodeParams params_database_upsert_workstation_location;
+  params_database_upsert_workstation_location.nh = nh;
+  params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
+  params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
+  factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
+
+  RosNodeParams params_database_get_all_chemical_locations;
+  params_database_get_all_chemical_locations.nh = nh;
+  params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
+  factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
+
+  RosNodeParams params_database_get_all_workstaion_locations;
+  params_database_get_all_workstaion_locations.nh = nh;
+  params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
+  factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
+
+  RosNodeParams params_database_remove_chemical;
+  params_database_remove_chemical.nh = nh;
+  params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
+  params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_remove_chemical.default_port_value = "remove_chemical_service";
+  factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
+
+  RosNodeParams params_database_remove_workstation;
+  params_database_remove_workstation.nh = nh;
+  params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
+  params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_remove_workstation.default_port_value = "remove_workstation_service";
+  factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
+
+  ///////////////////////////////////
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_grasp;
+  params_gripper_franka_grasp.nh = nh;
+  params_gripper_franka_grasp.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_grasp.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_grasp.default_port_value = "panda_gripper/grasp";
+  factory.registerNodeType<FrankaGraspGripperAction>("FrankaGraspGripperAction",params_gripper_franka_grasp);
+  //////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_homing;
+  params_gripper_franka_homing.nh = nh;
+  params_gripper_franka_homing.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_homing.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_homing.default_port_value = "panda_gripper/homing";
+  factory.registerNodeType<FrankaHomeGripperAction>("FrankaHomeGripperAction",params_gripper_franka_homing);
+  ////////////////////////////////////////////////////////////////////////////
+  RosNodeParams params_gripper_franka_move;
+  params_gripper_franka_move.nh = nh;
+  params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
+  params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_gripper_franka_move.default_port_value = "panda_gripper/move";
+  factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
+  ////////////////////////////////////////////////////////////////////////////////////////
   
   RosNodeParams params_gripper;
   params_gripper.nh = nh;
@@ -156,6 +230,12 @@ int main(int argc, char **argv)
   params_arm_move_pliz_lin_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
   factory.registerNodeType<ArmMovePlizLinPoseMsgAction>("ArmMovePlizLinPoseMsgAction",params_arm_move_pliz_lin_pose_msg);
 
+  RosNodeParams params_home_arm;
+  params_home_arm.nh = nh;
+  params_home_arm.server_timeout = std::chrono::milliseconds(2000);
+  params_home_arm.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_home_arm.default_port_value = "home_arm";
+  factory.registerNodeType<HomeArmAction>("HomeArmAction",params_home_arm);
 
   RosNodeParams params;
   params.nh = nh;
@@ -171,24 +251,32 @@ int main(int argc, char **argv)
   factory.registerNodeType<SleepAction>("SleepAction", params);
 #endif
 
-//   nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
-//   std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
+  // nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
+  // std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
     // std::string search_directory = "./";
-  using std::filesystem::directory_iterator;
-  for (auto const& entry : directory_iterator(default_bt_xml_foler)) 
-  {
-    if( entry.path().extension() == ".xml")
-    {
-      factory.registerBehaviorTreeFromFile(entry.path().string());
-    }
-  }
+  
+  // using std::filesystem::directory_iterator;
+  // for (auto const& entry : directory_iterator(default_bt_xml_foler)) 
+  // {
+  //   if( entry.path().extension() == ".xml")
+  //   {
+  //     factory.registerBehaviorTreeFromFile(entry.path().string());
+  //   }
+  // }
+  
 
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/stirring.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/mobile_base_trees.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/manipulator_trees.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/liquid_handling.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/database_trees.xml");
   std::string xml_models = BT::writeTreeNodesModelXML(factory);
   std::cout << "----------- XML file  ----------\n"
             << xml_models
             << "--------------------------------\n";
 
-//   factory.registerBehaviorTreeFromFile(tree_xml_file_);
+  // factory.registerBehaviorTreeFromFile(tree_xml_file_);
   auto tree = factory.createTree("MainTree");
 
   // std::cout << BT::writeTreeToXML(tree);

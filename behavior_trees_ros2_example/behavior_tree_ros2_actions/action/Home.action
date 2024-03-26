@@ -1,5 +1,5 @@
 #goal definition
-int32 msec_timeout
+
 ---
 #result definition
 bool done

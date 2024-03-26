@@ -36,7 +36,9 @@
   </BehaviorTree>
 
   <BehaviorTree ID="haptic_calibration">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="place_pose_msg">
@@ -68,7 +70,9 @@
   </BehaviorTree>
 
   <BehaviorTree ID="visual_calibration">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="visual_grasp">
@@ -83,6 +87,26 @@
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg}"
                approch_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="visual_pour">
+    <Sequence>
+      <ArmMovePoseMsgAction pose="{vessel_lookout}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <ArucoAction id="{workstation_id}"
+                   Transform="{aruco_pose}"
+                   action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{aruco_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{pour_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 

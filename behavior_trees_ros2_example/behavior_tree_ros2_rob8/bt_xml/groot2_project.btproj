@@ -8,6 +8,21 @@
     <include path="stirring.xml"/>
     <!-- Description of Node Models (used by Groot) -->
     <TreeNodesModel>
+        <Action ID="AddChemicalNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="formula" type="std::string"/>
+            <output_port name="id_" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="safety_level" type="signed char"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="AddWorkstationNode">
+            <output_port name="message" type="std::string"/>
+            <output_port name="id_" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="type" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="ArmArrayToPoseAction">
             <input_port name="array" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
             <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
@@ -34,6 +49,13 @@
             <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="speed" type="double"/>
             <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="ArmMovePoseMsgTcpAction">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="tcp_frame" type="std::string"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="ArmPoseMsgOffsetCalculation">
@@ -66,6 +88,22 @@
             <input_port name="speed" type="double"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
+        <Action ID="GetAllChemicalLocationsNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="formula" type="std::string"/>
+            <output_port name="locations" type="std::vector&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt;, std::allocator&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt; &gt; &gt;"/>
+            <input_port name="id_" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="GetAllWorkstationLocationsNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="formula" type="std::string"/>
+            <output_port name="locations" type="std::vector&lt;pgsql_interfaces::msg::WorkstationLocation_&lt;std::allocator&lt;void&gt; &gt;, std::allocator&lt;pgsql_interfaces::msg::WorkstationLocation_&lt;std::allocator&lt;void&gt; &gt; &gt; &gt;"/>
+            <input_port name="id_" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="GripperAction">
             <input_port name="speed" type="double"/>
             <input_port name="accel" type="double"/>
@@ -79,12 +117,46 @@
             <input_port name="joint_1" type="double"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
+        <Action ID="HomeArmAction">
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
         <Action ID="PrintValue">
             <input_port name="message" type="std::string"/>
+        </Action>
+        <Action ID="RemoveChemicalNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="chemical_id" type="int"/>
+            <input_port name="location_id" type="int"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="RemoveWorkstationNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="workstation_id" type="int"/>
+            <input_port name="location_id" type="int"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="SleepAction">
             <input_port name="msec" type="unsigned int"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="UpsertChemicalLocationNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="formula" type="std::string"/>
+            <input_port name="id_" type="signed char"/>
+            <input_port name="location_hand" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="location_id" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="location_base" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="UpsertWorkstationLocationNode">
+            <output_port name="message" type="std::string"/>
+            <input_port name="id_" type="signed char"/>
+            <input_port name="location_hand" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="location_id" type="signed char"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="location_base" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <SubTree ID="grasp_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>

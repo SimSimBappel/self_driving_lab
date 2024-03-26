@@ -26,7 +26,7 @@
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
-#include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pose_msg_tcp.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_ptp_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
@@ -104,6 +104,14 @@ public:
     void arm_move_pose_msg_handle_accepted(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle);
     void arm_move_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle);
 
+
+    using ArmMovePoseMsgTcp = behavior_tree_ros2_actions::action::ArmMovePoseMsgTcp;
+    using GoalHandleArmMovePoseMsgTcp = rclcpp_action::ServerGoalHandle<ArmMovePoseMsgTcp>;
+    rclcpp_action::GoalResponse arm_move_pose_msg_tcp_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMovePoseMsgTcp::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_pose_msg_tcp_handle_cancel(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle);
+    void arm_move_pose_msg_tcp_handle_accepted(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle);
+    void arm_move_pose_msg_tcp_execute(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle);
+
     using Sleep = behavior_tree_ros2_actions::action::Sleep;
     using GoalHandleSleep = rclcpp_action::ServerGoalHandle<Sleep>;
 
@@ -126,6 +134,8 @@ private:
 
     rclcpp_action::Server<ArmMovePoseMsg>::SharedPtr action_server_arm_move_pose_msg_;
 
+    rclcpp_action::Server<ArmMovePoseMsgTcp>::SharedPtr action_server_arm_move_pose_msg_tcp_;
+
     rclcpp_action::Server<ArmMovePlizPtpPoseMsg>::SharedPtr action_server_arm_move_pliz_ptp_pose_msg_;
 
     rclcpp_action::Server<ArmMovePlizLinPoseMsg>::SharedPtr action_server_arm_move_pliz_lin_pose_msg_;
@@ -146,6 +156,8 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr subscription_;
 
     rclcpp::Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscription_gripper_;
+
+    std::string tcp_frame = "panda_link8";
 
     bool MoveGripper(const std_msgs::msg::Float64MultiArray & msg);
     bool ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg);

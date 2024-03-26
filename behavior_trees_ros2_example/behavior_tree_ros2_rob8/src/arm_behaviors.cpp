@@ -4,11 +4,12 @@
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_pose_msg_tcp.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_ptp_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
-
+#include "behavior_tree_ros2_actions/action/home.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 
@@ -181,6 +182,47 @@ public:
   }
 };
 
+class HomeArmAction: public RosActionNode<behavior_tree_ros2_actions::action::Home>
+{
+public:
+  HomeArmAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::Home>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    return providedBasicPorts({});
+  }
+
+  bool setGoal(Goal& goal) override{
+    // auto frame = getInput<std::vector<double>>("joints");
+    // goal.joints = frame.value();
+    // auto speed = getInput<double>("speed");
+    // auto accel = getInput<double>("accel");
+    // goal.speed = speed.value();
+    // goal.accel = accel.value();
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
 class ArmMoveToFrameAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveToFrame>
 {
 public:
@@ -319,6 +361,59 @@ public:
     return NodeStatus::FAILURE;
   }
 };
+
+class ArmMovePoseMsgTcpAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePoseMsgTcp>
+{
+public:
+  ArmMovePoseMsgTcpAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMovePoseMsgTcp>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    // return providedBasicPorts({InputPort<std::string>("pose")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel"),InputPort<std::string>("tcp_frame")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
+    
+    
+    // goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    //  goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    goal.pose = pose.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    auto tcp_frame = getInput<std::string>("tcp_frame");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
+    goal.tcp_frame = tcp_frame.value();
+    
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
+
 
 class ArmMovePlizPtpPoseMsgAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizPtpPoseMsg>
 {
