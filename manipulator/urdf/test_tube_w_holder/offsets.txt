@@ -1,0 +1,18 @@
+# all the following are optical frames of aruco(z out from aruco x right y down) 
+tube holder aruco frame to tube grab horizontal frame
+x=0.0
+y=-103.5
+z=-71.1
+
+r=0.8272861
+p=0.0
+y=0.0
+
+beaker holder aruco to beaker top(z up, x right) frame
+x=0.0
+y=93.1
+z=31.5
+
+r=0.941545
+p=0.0
+y=0.0

@@ -9,11 +9,14 @@ from rclpy.qos import qos_profile_sensor_data
 from aruco_interfaces.msg import ArucoMarkers
 from sensor_msgs.msg import CameraInfo, Image
 from aruco_pose_estimation.utils import ARUCO_DICT
-from geometry_msgs.msg import PoseStamped, PoseArray
+from geometry_msgs.msg import PoseStamped, PoseArray, TransformStamped
 from behavior_tree_ros2_actions.action import FindArucoTag
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from aruco_pose_estimation.pose_estimation import pose_estimation
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
+
+import tf2_ros
+
 
 
 class CameraSubscriber(Node):
@@ -101,9 +104,12 @@ class ArucoMarkerDetector(Node):
         self.found_object = False
         self.result = None
         self.aruco_size = 0.0435 # Meters
-        self.camera_subscriber.start_streaming()
+
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
+        self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
+
         if self.debug:
+            self.camera_subscriber.start_streaming()
             self.poses_pub = self.create_publisher(PoseArray, self.markers_visualization_topic, 10)
             self.markers_pub = self.create_publisher(ArucoMarkers, self.detected_markers_topic, 10)
             self.image_pub = self.create_publisher(Image, self.output_image_topic, 10)
@@ -173,18 +179,35 @@ class ArucoMarkerDetector(Node):
                 if markers.marker_ids is not None:
                     if markers.marker_ids.count(goal_handle.request.id) == 1:
                         index = markers.marker_ids.index(goal_handle.request.id)
+                        test = TransformStamped()
+                        test.header.stamp = self.get_clock().now().to_msg()
+                        test.header.frame_id = self.camera_frame
+                        test.child_frame_id = "aruco_marker_" + str(goal_handle.request.id)
+                        test.transform.translation.x = markers.poses[index].position.x
+                        test.transform.translation.y = markers.poses[index].position.y 
+                        test.transform.translation.z = markers.poses[index].position.z 
+                        test.transform.rotation.x = markers.poses[index].orientation.x  
+                        test.transform.rotation.y = markers.poses[index].orientation.y
+                        test.transform.rotation.z = markers.poses[index].orientation.z
+                        test.transform.rotation.w = markers.poses[index].orientation.w
+                        test = self.tf_turn_around_x_axis(test)
+
+                        self.tf_broadcaster.sendTransform(test)
+
                         marker_pose_msg = PoseStamped()
-                        marker_pose_msg.header.stamp = self.get_clock().now().to_msg()
-                        marker_pose_msg.header.frame_id = self.camera_frame
-                        marker_pose_msg.pose.position.x = markers.poses[index].position.x
-                        marker_pose_msg.pose.position.y = markers.poses[index].position.y
-                        marker_pose_msg.pose.position.z = markers.poses[index].position.z
-                        marker_pose_msg.pose.orientation.x = markers.poses[index].orientation.x  
-                        marker_pose_msg.pose.orientation.y = markers.poses[index].orientation.y
-                        marker_pose_msg.pose.orientation.z = markers.poses[index].orientation.z
-                        marker_pose_msg.pose.orientation.w = markers.poses[index].orientation.w
-                        marker_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose)
+                        marker_pose_msg.header.stamp = test.header.stamp
+                        marker_pose_msg.header.frame_id = test.child_frame_id
+                        marker_pose_msg.pose.position.x = 0.0
+                        marker_pose_msg.pose.position.y = -0.09813 
+                        marker_pose_msg.pose.position.z = -0.06520 
+                        marker_pose_msg.pose.orientation.x = 0.0  
+                        marker_pose_msg.pose.orientation.y = 0.0
+                        marker_pose_msg.pose.orientation.z = 0.0
+                        marker_pose_msg.pose.orientation.w = 0.0
+                        marker_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose, 0.8272861)
                         self.pose_pub.publish(marker_pose_msg)
+
+
                         # self.found_object = True
                         result = FindArucoTag.Result()
                         result.marker_pose_msg = marker_pose_msg
@@ -248,6 +271,26 @@ class ArucoMarkerDetector(Node):
             self.camera_subscriber.img_copy = None
         elif self.camera_subscriber.runonce:
             print("No image received")
+
+    def tf_turn_around_x_axis(self, tf_msg: TransformStamped, angle=np.pi) -> TransformStamped:
+        euler_angles = tf_transformations.euler_from_quaternion([
+            tf_msg.transform.rotation.x,
+            tf_msg.transform.rotation.y,
+            tf_msg.transform.rotation.z,
+            tf_msg.transform.rotation.w
+        ])
+        # Edit the Euler angles as needed
+        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
+
+        # Convert the Euler angles back to quaternion
+        quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
+
+        tf_msg.transform.rotation.x = quat[0]
+        tf_msg.transform.rotation.y = quat[1]
+        tf_msg.transform.rotation.z = quat[2]
+        tf_msg.transform.rotation.w = quat[3]
+        
+        return tf_msg 
 
 
     def turn_around_x_axis(self, pose_msg: PoseStamped, angle=np.pi) -> PoseStamped:

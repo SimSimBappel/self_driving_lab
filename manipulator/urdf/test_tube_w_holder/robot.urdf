@@ -1,12 +1,12 @@
 <robot name="onshape">
-<link name="aruco">
+<link name="single_test_tube_holder">
 <visual>
 <origin xyz="0 0 0" rpy="0 -0 0" />
 <geometry>
 <mesh filename="file:///home/intelnuc/sdl_ws/src/self_driving_lab/manipulator/urdf/test_tube_w_holder/single_test_tube_holder.stl"/>
 </geometry>
 <material name="single_test_tube_holder_material">
-<color rgba="0.49803921568627451677 0.49803921568627451677 0.49803921568627451677 1.0"/>
+<color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
 </material>
 </visual>
 <collision>
@@ -15,16 +15,8 @@
 <mesh filename="file:///home/intelnuc/sdl_ws/src/self_driving_lab/manipulator/urdf/test_tube_w_holder/single_test_tube_holder.stl"/>
 </geometry>
 </collision>
-<inertial>
-<origin xyz="2.6299242492846397748e-18 0.0078377098868707209545 0.0099654231232401153245" rpy="0 0 0"/>
-<mass value="0.057500609429681978635" />
-<inertia ixx="1.54572705601582564e-05" ixy="0"  ixz="0" iyy="1.4955040551955072208e-05" iyz="-2.3186182348929328077e-06" izz="2.5050955189640513953e-05" />
-</inertial>
-</link>
-
-<link name="grab">
 <visual>
-<origin xyz="0 0 0.046249999999999999445" rpy="0 -0 0" />
+<origin xyz="-1.561251128379126385e-17 0.021749999999999995032 0.056749999999999994893" rpy="0 -0 0" />
 <geometry>
 <mesh filename="file:///home/intelnuc/sdl_ws/src/self_driving_lab/manipulator/urdf/test_tube_w_holder/test_tube.stl"/>
 </geometry>
@@ -33,37 +25,22 @@
 </material>
 </visual>
 <collision>
-<origin xyz="0 0 0.046249999999999999445" rpy="0 -0 0" />
+<origin xyz="-1.561251128379126385e-17 0.021749999999999995032 0.056749999999999994893" rpy="0 -0 0" />
 <geometry>
 <mesh filename="file:///home/intelnuc/sdl_ws/src/self_driving_lab/manipulator/urdf/test_tube_w_holder/test_tube.stl"/>
 </geometry>
 </collision>
 <inertial>
-<origin xyz="1.6776817914022830464e-19 6.5909300200988624845e-18 0.04274362962076798389" rpy="0 0 0"/>
-<mass value="0.010941905413065437791" />
-<inertia ixx="9.2930738205459342474e-06" ixy="0"  ixz="0" iyy="9.2930738205459342474e-06" iyz="0" izz="5.2631703864181700044e-07" />
+<origin xyz="0 0 0" rpy="0 0 0"/>
+<mass value="0" />
+<inertia ixx="0" ixy="0"  ixz="0" iyy="0" iyz="0" izz="0" />
 </inertial>
 </link>
-
-<joint name="test" type="revolute">
-<origin xyz="-1.561251128379126385e-17 0.021749999999999995032 0.010499999999999995448" rpy="0 -0 0" />
-<parent link="aruco" />
-<child link="grab" />
-<axis xyz="0 0 1"/>
-<limit effort="1" velocity="20" />
-<joint_properties friction="0.0"/>
-</joint>
-
 <joint name="single_test_tube_holder_joint" type="fixed">
 <origin xyz="1.0 0 0" rpy="0 0 0"/>
 <parent link="world"/>
-<child link="aruco"/>
+<child link="single_test_tube_holder"/>
 </joint>
 
-<joint name="idk" type="fixed">
-<origin xyz="0 0 0" rpy="0 0 0"/>
-<parent link="aruco"/>
-<child link="grab"/>
-</joint>
 
 </robot>
