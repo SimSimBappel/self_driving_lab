@@ -11,6 +11,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(pgsql_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
 find_library(PQXX_LIB pqxx)
 find_library(PQ_LIB pq)
@@ -27,16 +29,21 @@ target_link_libraries(database_service
  ${PQ_LIB}
 )
 
-ament_target_dependencies(database_service rclcpp pgsql_interfaces geometry_msgs# Add this line
-  # any other dependencies...
-)
+ament_target_dependencies(database_service rclcpp pgsql_interfaces geometry_msgs std_msgs ament_index_cpp)
 
 #target_link_libraries(database_service PRIVATE pqxx)
 
 install(
   TARGETS database_service
   DESTINATION lib/${PROJECT_NAME}
-  )
+)
+
+install(
+  DIRECTORY data/
+  DESTINATION share/${PROJECT_NAME}/data
+)
+
+# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

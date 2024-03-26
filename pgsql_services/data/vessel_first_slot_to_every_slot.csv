@@ -1,0 +1,3 @@
+frame_id,child_frame_id,translation_x,translation_y,translation_z,rotation_x,rotation_y,rotation_z,rotation_w
+slot_1,slot_2,1.5,0.0,0.0,0.0,0.0,0.0,1.0
+slot_1,slot_3,3.0,0.0,0.0,0.0,0.0,0.0,1.0

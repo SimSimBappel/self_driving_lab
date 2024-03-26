@@ -13,16 +13,17 @@ find_package(geometry_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   #"msg/Num.msg"
   #"srv/GetLocation.srv"
-  "msg/ChemicalLocation.msg"
-  "msg/WorkstationLocation.msg"
-  "srv/AddChemical.srv"
-  "srv/AddWorkstation.srv"
-  "srv/UpsertChemicalLocation.srv"
-  "srv/UpsertWorkstationLocation.srv"
-  "srv/GetAllChemicalLocations.srv"
-  "srv/GetAllWorkstationLocations.srv"
-  "srv/RemoveChemical.srv"
-  "srv/RemoveWorkstation.srv"
+  # "msg/ChemicalLocation.msg"
+  # "msg/WorkstationLocation.msg"
+  # "srv/AddChemical.srv"
+  # "srv/AddWorkstation.srv"
+  # "srv/UpsertChemicalLocation.srv"
+  # "srv/UpsertWorkstationLocation.srv"
+  # "srv/GetAllChemicalLocations.srv"
+  # "srv/GetAllWorkstationLocations.srv"
+  # "srv/RemoveChemical.srv"
+  "srv/GetVessel.srv"
+  "srv/GetChemical.srv"
   DEPENDENCIES 
     geometry_msgs
 )

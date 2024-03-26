@@ -22,4 +22,7 @@ docker compose down -v
 
 # Format system (Use with caution)
 rm -rf volumes/db/data/
+
+# Backup docker storage (not tested yet)
+docker container run --rm -v "nmsvol:/source" -v "$(pwd):/backup" -w /source debian tar czf /backup/nmsvol.tar.gz .
 ```

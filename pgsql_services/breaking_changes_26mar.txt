@@ -1,0 +1,22 @@
+Breaking changes:
+
+/home/kmh/Github/SDL/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/src/database_behaviors.cpp:8:10: fatal error: pgsql_interfaces/msg/chemical_location.hpp: No such file or directory
+    8 | #include "pgsql_interfaces/msg/chemical_location.hpp"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+gmake[2]: *** [CMakeFiles/test_client.dir/build.make:132: CMakeFiles/test_client.dir/src/database_behaviors.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+In file included from /home/kmh/Github/SDL/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/src/test_client.cpp:10:
+/home/kmh/Github/SDL/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/src/database_behaviors.cpp:8:10: fatal error: pgsql_interfaces/msg/chemical_location.hpp: No such file or directory
+    8 | #include "pgsql_interfaces/msg/chemical_location.hpp"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+
+gmake[2]: *** [CMakeFiles/test_client.dir/build.make:146: CMakeFiles/test_client.dir/src/test_client.cpp.o] Error 1
+In file included from /home/kmh/Github/SDL/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/src/test_load_and_make_xml_files.cpp:10:
+/home/kmh/Github/SDL/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/src/database_behaviors.cpp:8:10: fatal error: pgsql_interfaces/msg/chemical_location.hpp: No such file or directory
+    8 | #include "pgsql_interfaces/msg/chemical_location.hpp"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

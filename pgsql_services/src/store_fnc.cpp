@@ -1,54 +1,3 @@
-// ROS2
-#include <rclcpp/rclcpp.hpp>
-#include "std_msgs/msg/header.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
-#include <ament_index_cpp/get_package_share_directory.hpp>
-
-
-
-// MSG
-// #include "pgsql_interfaces/msg/chemical_location.hpp"
-// #include "pgsql_interfaces/msg/workstation_location.hpp"
-
-// SRV
-#include "pgsql_interfaces/srv/get_vessel.hpp"
-#include "pgsql_interfaces/srv/get_chemical.hpp"
-
-// LIBS
-#include "pgsql_services/type_converter.h"
-
-#include <nlohmann/json.hpp>
-#include <pqxx/pqxx>
-#include "csv.h"
-
-class DatabaseService : public rclcpp::Node {
-public:
-    DatabaseService() : Node("database_service") {
-        this->db_name = this->declare_parameter<std::string>("db_name", "postgres");
-        this->db_user = this->declare_parameter<std::string>("db_user", "postgres");
-        this->db_password = this->declare_parameter<std::string>("db_password", "your-super-secret-and-long-postgres-password");
-        this->db_host = this->declare_parameter<std::string>("db_host", "127.0.0.1");
-        this->db_port = this->declare_parameter<std::string>("db_port", "5432");
-
-
-        get_vessel_service_ = this->create_service<pgsql_interfaces::srv::GetVessel>(
-            "get_vessel",
-            std::bind(&DatabaseService::get_vessel, this, std::placeholders::_1, std::placeholders::_2));
-
-        get_chemical_service_ = this->create_service<pgsql_interfaces::srv::GetChemical>(
-            "get_chemical",
-            std::bind(&DatabaseService::get_chemical, this, std::placeholders::_1, std::placeholders::_2));
-    }
-    
-
-private:
-    std::string db_name;
-    std::string db_user;
-    std::string db_password;
-    std::string db_host;
-    std::string db_port;
-
 
     // ros2 service call /get_vessel pgsql_interfaces/srv/GetVessel "{name: 'vessel_name'}"
     void get_vessel(const std::shared_ptr<pgsql_interfaces::srv::GetVessel::Request> request,
@@ -147,7 +96,7 @@ private:
 }
 
     // ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'chemical_name'}"
-    void get_chemical(const std::shared_ptr<pgsql_interfaces::srv::GetChemical::Request> request,
+    void get_chemical(const std::shared_ptr<pgsql_interfaces::srv::Chemical::Request> request,
                     std::shared_ptr<pgsql_interfaces::srv::GetChemical::Response> response) {
         try {
             pqxx::connection C("dbname=" + db_name + " user=" + db_user +
@@ -177,7 +126,6 @@ private:
 
                 for (auto new_row : placement_result) {
                     int slot_id = new_row["slot_id"].as<int>();
-                    bool empty_bottle = new_row["empty"].as<bool>();
                     std::string slot_query = "SELECT * FROM tray_slot WHERE slot_id = " + W.quote(slot_id) + ";";
                     pqxx::result slot_result = W.exec(slot_query);
 
@@ -227,7 +175,6 @@ private:
                                 response->aruco_id = aruco_id; // You need to get this value from somewhere
                                 response->aruco_to_slot_transform = aruco_to_first_slot_transform;
                                 response->slot_to_slot_transform = first_slot_to_current_slot_transform;
-                                response->empty = empty_bottle;
                                 response->success = true;
                                 response->message = "Chemical found";
                           }
@@ -244,46 +191,3 @@ private:
     }
 }
 
-
-geometry_msgs::msg::TransformStamped read_transform_from_csv(const std::string& csv_file, int slot_id = -1) {
-    // Open the CSV file
-    io::CSVReader<9> in(csv_file);
-    in.read_header(io::ignore_extra_column, "frame_id", "child_frame_id", "translation_x", "translation_y", "translation_z", "rotation_x", "rotation_y", "rotation_z", "rotation_w");
-    std::string frame_id, child_frame_id;
-    double translation_x, translation_y, translation_z, rotation_x, rotation_y, rotation_z, rotation_w;
-    while(in.read_row(frame_id, child_frame_id, translation_x, translation_y, translation_z, rotation_x, rotation_y, rotation_z, rotation_w)){
-        // If a slot_id is provided, skip rows until the slot_id matches the child_frame_id
-        if (slot_id != -1 && child_frame_id != "slot_" + std::to_string(slot_id)) {
-            continue;
-        }
-
-        // Create a TransformStamped
-        geometry_msgs::msg::TransformStamped transform_stamped;
-        transform_stamped.header.frame_id = frame_id;
-        transform_stamped.child_frame_id = child_frame_id;
-        transform_stamped.transform.translation.x = translation_x;
-        transform_stamped.transform.translation.y = translation_y;
-        transform_stamped.transform.translation.z = translation_z;
-        transform_stamped.transform.rotation.x = rotation_x;
-        transform_stamped.transform.rotation.y = rotation_y;
-        transform_stamped.transform.rotation.z = rotation_z;
-        transform_stamped.transform.rotation.w = rotation_w;
-
-        return transform_stamped;
-    }
-
-    // If no matching transform is found, return an empty TransformStamped
-    return geometry_msgs::msg::TransformStamped();
-}
-
-    rclcpp::Service<pgsql_interfaces::srv::GetVessel>::SharedPtr get_vessel_service_;
-    rclcpp::Service<pgsql_interfaces::srv::GetChemical>::SharedPtr get_chemical_service_;
-};
-
-int main(int argc, char **argv) {
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<DatabaseService>();
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return 0;
-}

@@ -1,0 +1,13 @@
+string name
+---
+# workstation
+string workstation_name
+geometry_msgs/PoseStamped lookout_pose
+
+# tray
+int8 aruco_id
+geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> hardcoded transform (aruco -> slot_id == 1)
+geometry_msgs/TransformStamped slot_to_slot_transform           # slot_id -> hardcoded transform (slot_id == 1 -> selected slot_id)
+
+bool success
+string message

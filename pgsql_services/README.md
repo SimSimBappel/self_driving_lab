@@ -8,57 +8,62 @@ sudo apt-get install -y libpqxx-dev libpqxx-6.4
 ## Testing services
 Please see docstrings in source code or .srv and .msg files for detailed compositions of services. 
 
-### Add chemical
-This functionality allows the addition of chemicals to the database
-```
-ros2 service call /add_chemical pgsql_interfaces/srv/AddChemical "{name: 'natrium_chloride', formula: 'NaCL', safety_level: 0}"
-```
-### Add workstation
-This functionality allows the addition of workstations to the database
-```
-ros2 service call /add_workstation pgsql_interfaces/srv/AddWorkstation "{name: 'stirring', type: 'workstation'}"
-```
-
-### Upsert chemical location 
-This functionality allows upsertion of chemical locations to the database, if location_id passed the location is updated, if not a new location is inserted. 
-
-Before this step an actual chemical should be added (this is searched in 'chemical' table)
-```
-ros2 service call /upsert_chemical_location pgsql_interfaces/srv/UpsertChemicalLocation "{id: 1, name: 'natrium_chloride', formula: 'NaCL', location_base: {position: {x: 1.0, y: 2.0, z: 3.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_hand: {position: {x: 4.0, y: 5.0, z: 6.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_id: 1}"
-
-ros2 service call /upsert_chemical_location pgsql_interfaces/srv/UpsertChemicalLocation "{id: 1, name: 'natrium_chloride', formula: 'NaCL', location_base: {position: {x: 1.0, y: 2.0, z: 3.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_hand: {position: {x: 4.0, y: 5.0, z: 6.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}"
-```
-
-### Upsert workstation location 
-This functionality allows upsertion of workstation locations to the database, if location_id passed the location is updated, if not a new location is inserted. 
-
-Before this step an actual workstation should be added (this is searched in 'workstation' table)
-```
-ros2 service call /upsert_workstation_location pgsql_interfaces/srv/UpsertWorkstationLocation "{id: 1, name: '', type: '', location_base: {position: {x: 1.0, y: 2.0, z: 3.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_hand: {position: {x: 4.0, y: 5.0, z: 6.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_id: 1}"
-
-ros2 service call /upsert_workstation_location pgsql_interfaces/srv/UpsertWorkstationLocation "{id: 1, name: '', type: '', location_base: {position: {x: 1.0, y: 2.0, z: 3.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}, location_hand: {position: {x: 4.0, y: 5.0, z: 6.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}"
-```
+## Todo
+[ ] - Internal relateSlots(), to relate increasing slot_ids to a local set. i.e. T1: 1, 2, 3 ; T2: 1 (4), 2 (5), 3 (6)
+[ ] - Add static transforms to respective .csv files in ../data directory (aruco->slot1) and (slot1 -> rest)
+[ ] - Place vessel/chemical (upsert fnc) -> findslots() internal function
+[ ] - Various adding to system flows, like: workstation -> arucotag -> tray/machine -> (tray_slots) -> vessel/chemical -> placement_tables
+[ ] - lookupAruco -> if needed
+[ ] - Tidy up recurring code
+[ ] - fix csv.h strcpy fnc -> null cases, if we feel like it. 
 
 
-### Get all chemical or workstation locations (two services)
-This functionality returns all chemical or workstation locations as a list, as one chemical or workstation can be present in several places. 
 
+### Get Vessel
 ```
-ros2 service call /get_all_chemical_locations pgsql_interfaces/srv/GetAllChemicalLocations "{id: 1, name: '', formula: ''}"
-ros2 service call /get_all_workstation_locations pgsql_interfaces/srv/GetAllWorkstationLocations "{id: 1, name: '', type: ''}"
-```
-
-### Remove workstation or chemical (two services)
-In the first case the actual workstation is removed with locational cascade removal of all locations. 
-```
-ros2 service call /remove_workstation pgsql_interfaces/srv/RemoveWorkstation "{workstation_id: 1}"
-```
-
-For a specific location removal, pass the location_id to the same service
-```
-ros2 service call /remove_chemical pgsql_interfaces/srv/RemoveChemical "{chemical_id: 1, location_id: ''}"
+request: 
+'name' 
+---
+response:
+string workstation_name
+geometry_msgs/PoseStamped lookout_pose               
+int8 aruco_id                                                       
+geometry_msgs/TransformStamped aruco_to_slot_transform              
+geometry_msgs/TransformStamped slot_to_slot_transform         
+bool success
+string message
 ```
 
+#### Example CLI
+```
+ros2 service call /get_vessel pgsql_interfaces/srv/GetVessel "{name: 'beaker'}"
+---
+pgsql_interfaces.srv.GetVessel_Response(name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=506852090), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=1, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=505478335), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.7000000000000001, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=505489042), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), success=True, message='Vessel found')
+```
+
+### Get Chemical
+```
+request: 
+'name' 
+---
+response:
+string workstation_name
+geometry_msgs/PoseStamped lookout_pose               
+int8 aruco_id                                                       
+geometry_msgs/TransformStamped aruco_to_slot_transform              
+geometry_msgs/TransformStamped slot_to_slot_transform   
+bool empty      
+bool success
+string message
+```
+
+#### Example CLI
+```
+ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'natrium_chloride'}"
+---
+pgsql_interfaces.srv.GetChemical_Response(workstation_name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=645658287), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=2, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644511923), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.5, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644531086), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, message='Chemical found')
+
+```
 
 
 
