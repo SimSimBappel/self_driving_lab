@@ -58,7 +58,8 @@ public:
 
 
 //-----------------------------------------------------
-
+const std::string default_bt_xml_foler = 
+    ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml";
 
 const std::string default_bt_xml_file = 
     ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml";
@@ -252,21 +253,44 @@ int main(int argc, char **argv)
 
   factory.registerNodeType<ArmPoseOffsetCalculation>("ArmPoseOffsetCalculation");
 
+  RosNodeParams params_home_arm;
+  params_home_arm.nh = nh;
+  params_home_arm.server_timeout = std::chrono::milliseconds(2000);
+  params_home_arm.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_home_arm.default_port_value = "home_arm";
+
+  factory.registerNodeType<HomeArmAction>("HomeArmAction",params_home_arm);
+
 #ifdef USE_SLEEP_PLUGIN
   RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
 #else
   factory.registerNodeType<SleepAction>("SleepAction", params);
 #endif
 
-  nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
-  std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
+  // using std::filesystem::directory_iterator;
+  // for (auto const& entry : directory_iterator(default_bt_xml_foler)) 
+  // {
+  //   if( entry.path().extension() == ".xml")
+  //   {
+  //     factory.registerBehaviorTreeFromFile(entry.path().string());
+  //   }
+  // }
+  // nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
+  // std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
+
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/stirring.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/mobile_base_trees.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/manipulator_trees.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/liquid_handling.xml");
+  factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/database_trees.xml");
 
   std::string xml_models = BT::writeTreeNodesModelXML(factory);
   std::cout << "----------- XML file  ----------\n"
             << xml_models
             << "--------------------------------\n";
 
-  factory.registerBehaviorTreeFromFile(tree_xml_file_);
+  // factory.registerBehaviorTreeFromFile(tree_xml_file_);
   auto tree = factory.createTree("MainTree");
 
   // std::cout << BT::writeTreeToXML(tree);

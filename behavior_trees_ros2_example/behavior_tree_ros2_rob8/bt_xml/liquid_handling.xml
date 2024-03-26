@@ -11,28 +11,32 @@
   </BehaviorTree>
 
   <BehaviorTree ID="Separate">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="Transfer">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="get_reagent">
     <Sequence>
       <GetAllChemicalLocationsNode message="{mesage_result}"
-                                   formula="&quot;&quot;"
+                                   formula="&quot;H2O&quot;"
                                    locations="{location_result}"
-                                   id_=""
-                                   name_="{name_}"
+                                   id_="10"
+                                   name_="&quot;h2O&quot;"
                                    service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
         <SubTree ID="move_base"/>
       </Fallback>
       <SubTree ID="visual_grasp"
-               id=""
-               lookout_pose_msg=""/>
+               id="2"
+               lookout_pose_msg="{location_result}"/>
     </Sequence>
   </BehaviorTree>
 

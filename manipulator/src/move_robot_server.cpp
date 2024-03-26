@@ -333,7 +333,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const Home::Goal> goal)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal requesdddt with sleep time %d", goal->msec_timeout);
+    RCLCPP_INFO(this->get_logger(), "Received goal homing");
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
@@ -354,6 +354,8 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     move_group_->setNamedTarget("ready");
     move_group_->setStartStateToCurrentState();
+    move_group_->setMaxVelocityScalingFactor(0.1);
+    move_group_->setMaxAccelerationScalingFactor(0.1);
     auto feedback = std::make_shared<Home::Feedback>();
     auto result = std::make_shared<Home::Result>();
     

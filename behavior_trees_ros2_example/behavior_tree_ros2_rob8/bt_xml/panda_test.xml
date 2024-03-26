@@ -3,16 +3,16 @@
   <BehaviorTree ID="Grasp">
     <Sequence>
       <Script code="in_name:= &apos;0.623;-0.2;0.281;-3.142;0.0;0.0&apos; "/>
-      <GripperAction speed=""
-                     accel=""
+      <GripperAction speed="0.02"
+                     accel="0.02"
                      open="open"
                      action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{in_name}"
-                         speed=""
-                         accel=""
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
-      <GripperAction speed=""
-                     accel=""
+      <GripperAction speed="0.02"
+                     accel="0.02"
                      open="close"
                      action_name="__default__placeholder__"/>
     </Sequence>
@@ -20,39 +20,37 @@
 
   <BehaviorTree ID="GraspObject">
     <Sequence>
-      <GripperAction speed=""
-                     accel=""
+      <GripperAction speed="0.02"
+                     accel="0.02"
                      open="open"
                      action_name="__default__placeholder__"/>
       <ArmPoseOffsetCalculation offset="&apos;0.0;0.0;0.1;0.0;0.0;0.0&apos;"
                                 pose="{goal}"
                                 pose_w_offset="{goal_w_offset}"/>
       <ArmMovePoseAction pose="{goal_w_offset}"
-                         speed=""
-                         accel=""
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{goal}"
-                         speed=""
-                         accel=""
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
-      <GripperAction speed=""
-                     accel=""
+      <GripperAction speed="0.02"
+                     accel="0.02"
                      open="close"
                      action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{goal_w_offset}"
-                         speed=""
-                         accel=""
+                         speed="0.2"
+                         accel="0.2"
                          action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="MainTree">
     <Sequence>
+      <HomeArmAction action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <Fallback>
-        <ScriptCondition code="{gripper_home}"/>
-        <FrankaHomeGripperAction action_name="__default__placeholder__"/>
-      </Fallback>
+      <FrankaHomeGripperAction action_name="__default__placeholder__"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
@@ -156,6 +154,11 @@
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
     </Action>
+    <Action ID="HomeArmAction">
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="PrintValue">
       <input_port name="message"
                   type="std::string"/>
@@ -177,14 +180,6 @@
       <input_port name="target_pose_msg"/>
       <input_port name="approch_offset"/>
     </SubTree>
-    <Action ID="ArmMovePoseMsgTcpAction">
-            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-            <input_port name="speed" type="double"/>
-            <input_port name="accel" type="double"/>
-            <input_port name="tcp_frame" type="std::string"/>
-            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
-        </Action>
-
   </TreeNodesModel>
 
 </root>

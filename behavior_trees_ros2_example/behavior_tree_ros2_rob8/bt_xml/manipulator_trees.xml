@@ -36,7 +36,9 @@
   </BehaviorTree>
 
   <BehaviorTree ID="haptic_calibration">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="place_pose_msg">
@@ -68,7 +70,9 @@
   </BehaviorTree>
 
   <BehaviorTree ID="visual_calibration">
-    <AlwaysSuccess/>
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="visual_grasp">

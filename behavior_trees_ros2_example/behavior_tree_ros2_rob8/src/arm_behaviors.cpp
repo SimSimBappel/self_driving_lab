@@ -9,7 +9,7 @@
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
-
+#include "behavior_tree_ros2_actions/action/home.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 
@@ -162,6 +162,47 @@ public:
     auto accel = getInput<double>("accel");
     goal.speed = speed.value();
     goal.accel = accel.value();
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+
+class HomeArmAction: public RosActionNode<behavior_tree_ros2_actions::action::Home>
+{
+public:
+  HomeArmAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::Home>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    return providedBasicPorts({});
+  }
+
+  bool setGoal(Goal& goal) override{
+    // auto frame = getInput<std::vector<double>>("joints");
+    // goal.joints = frame.value();
+    // auto speed = getInput<double>("speed");
+    // auto accel = getInput<double>("accel");
+    // goal.speed = speed.value();
+    // goal.accel = accel.value();
     return true;
   }
 
@@ -371,6 +412,8 @@ public:
     return NodeStatus::FAILURE;
   }
 };
+
+
 
 class ArmMovePlizPtpPoseMsgAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePlizPtpPoseMsg>
 {
