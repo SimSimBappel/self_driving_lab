@@ -88,62 +88,85 @@ int main(int argc, char **argv)
 
   factory.registerNodeType<PrintValue>("PrintValue");
 
+
+  RosNodeParams params_database_get_chemicals;
+  params_database_get_chemicals.nh = nh;
+  params_database_get_chemicals.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_chemicals.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_chemicals.default_port_value = "get_chemical";
+  factory.registerNodeType<GetChemicalNode>("GetChemicalNode",params_database_get_chemicals);
+
+  RosNodeParams params_database_get_vessel;
+  params_database_get_vessel.nh = nh;
+  params_database_get_vessel.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_vessel.default_port_value = "get_vessel";
+  factory.registerNodeType<GetVesselNode>("GetVesselNode",params_database_get_vessel);
+
+  RosNodeParams params_database_place_vessel;
+  params_database_place_vessel.nh = nh;
+  params_database_place_vessel.server_timeout = std::chrono::milliseconds(2000);
+  params_database_place_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_place_vessel.default_port_value = "place_vessel";
+  factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
+
+
     //////////////////DATABASE/////////////////
-  RosNodeParams params_database_add_chemical;
-  params_database_add_chemical.nh = nh;
-  params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
-  params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_add_chemical.default_port_value = "add_chemical_service";
-  factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
+  // RosNodeParams params_database_add_chemical;
+  // params_database_add_chemical.nh = nh;
+  // params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_add_chemical.default_port_value = "add_chemical_service";
+  // factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
 
-  RosNodeParams params_database_add_workstation;
-  params_database_add_workstation.nh = nh;
-  params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
-  params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_add_workstation.default_port_value = "add_workstation_service";
-  factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
+  // RosNodeParams params_database_add_workstation;
+  // params_database_add_workstation.nh = nh;
+  // params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_add_workstation.default_port_value = "add_workstation_service";
+  // factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
 
-  RosNodeParams params_database_upsert_chemical_location;
-  params_database_upsert_chemical_location.nh = nh;
-  params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
-  params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
-  factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
+  // RosNodeParams params_database_upsert_chemical_location;
+  // params_database_upsert_chemical_location.nh = nh;
+  // params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
+  // factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
 
-  RosNodeParams params_database_upsert_workstation_location;
-  params_database_upsert_workstation_location.nh = nh;
-  params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
-  params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
-  factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
+  // RosNodeParams params_database_upsert_workstation_location;
+  // params_database_upsert_workstation_location.nh = nh;
+  // params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
+  // factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
 
-  RosNodeParams params_database_get_all_chemical_locations;
-  params_database_get_all_chemical_locations.nh = nh;
-  params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
-  params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
-  factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
+  // RosNodeParams params_database_get_all_chemical_locations;
+  // params_database_get_all_chemical_locations.nh = nh;
+  // params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
+  // factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
 
-  RosNodeParams params_database_get_all_workstaion_locations;
-  params_database_get_all_workstaion_locations.nh = nh;
-  params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
-  params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
-  factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
+  // RosNodeParams params_database_get_all_workstaion_locations;
+  // params_database_get_all_workstaion_locations.nh = nh;
+  // params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
+  // factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
 
-  RosNodeParams params_database_remove_chemical;
-  params_database_remove_chemical.nh = nh;
-  params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
-  params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_remove_chemical.default_port_value = "remove_chemical_service";
-  factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
+  // RosNodeParams params_database_remove_chemical;
+  // params_database_remove_chemical.nh = nh;
+  // params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_remove_chemical.default_port_value = "remove_chemical_service";
+  // factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
 
-  RosNodeParams params_database_remove_workstation;
-  params_database_remove_workstation.nh = nh;
-  params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
-  params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_database_remove_workstation.default_port_value = "remove_workstation_service";
-  factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
+  // RosNodeParams params_database_remove_workstation;
+  // params_database_remove_workstation.nh = nh;
+  // params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
+  // params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  // params_database_remove_workstation.default_port_value = "remove_workstation_service";
+  // factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
 
   ///////////////////////////////////
 

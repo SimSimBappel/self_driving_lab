@@ -2,6 +2,7 @@
 #include "behaviortree_ros2/plugins.hpp"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "behavior_tree_ros2_actions/action/find_aruco_tag.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 
 using namespace BT;
 
@@ -16,12 +17,16 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<int>("id"), OutputPort<geometry_msgs::msg::PoseStamped>("Transform")});
+    return providedBasicPorts({InputPort<int>("id"),InputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),InputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"), OutputPort<geometry_msgs::msg::PoseStamped>("Transform")});
   }
 
   bool setGoal(Goal& goal) override{
     auto id = getInput<int>("id");
+    auto aruco_to_slot_transform = getInput<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform");
+    auto slot_to_slot_transform = getInput<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform");
     goal.id = id.value();
+    goal.aruco_to_slot_transform = aruco_to_slot_transform.value();
+    goal.slot_to_slot_transform = slot_to_slot_transform.value();
     return true;
   }
 

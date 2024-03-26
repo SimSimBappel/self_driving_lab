@@ -62,8 +62,8 @@ class BehaviorServer : public rclcpp::Node
 {
   public:
     BehaviorServer(const rclcpp::NodeOptions &options)
-    : Node("example_services_node", options), node_(std::make_shared<rclcpp::Node>("example_group_node"))
-        //   executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
+    : Node("behavior_services_node", options), node_(std::make_shared<rclcpp::Node>("behavior_exe_services_node"))
+          ,executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
     {
     
       this->service_ = create_service<behavior_tree_ros2_actions::srv::Xdl>("xdl_service", std::bind(&BehaviorServer::Xdl_service, this,
@@ -74,117 +74,137 @@ class BehaviorServer : public rclcpp::Node
 
         factory.registerNodeType<PrintValue>("PrintValue");
 
+        RosNodeParams params_database_get_chemicals;
+  params_database_get_chemicals.nh = this->node_;
+  params_database_get_chemicals.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_chemicals.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_chemicals.default_port_value = "get_chemical";
+  factory.registerNodeType<GetChemicalNode>("GetChemicalNode",params_database_get_chemicals);
+
+  RosNodeParams params_database_get_vessel;
+  params_database_get_vessel.nh = this->node_;
+  params_database_get_vessel.server_timeout = std::chrono::milliseconds(2000);
+  params_database_get_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_get_vessel.default_port_value = "get_vessel";
+  factory.registerNodeType<GetVesselNode>("GetVesselNode",params_database_get_vessel);
+
+  RosNodeParams params_database_place_vessel;
+  params_database_place_vessel.nh = this->node_;
+  params_database_place_vessel.server_timeout = std::chrono::milliseconds(2000);
+  params_database_place_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_place_vessel.default_port_value = "place_vessel";
+  factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
 
         //////////////////DATABASE/////////////////
-        RosNodeParams params_database_add_chemical;
-        params_database_add_chemical.nh = node_;
-        params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
-        params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_add_chemical.default_port_value = "add_chemical_service";
-        factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
+        // RosNodeParams params_database_add_chemical;
+        // params_database_add_chemical.nh = this->node_;
+        // params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_add_chemical.default_port_value = "add_chemical_service";
+        // factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
 
-        RosNodeParams params_database_add_workstation;
-        params_database_add_workstation.nh = node_;
-        params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
-        params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_add_workstation.default_port_value = "add_workstation_service";
-        factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
+        // RosNodeParams params_database_add_workstation;
+        // params_database_add_workstation.nh = this->node_;
+        // params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_add_workstation.default_port_value = "add_workstation_service";
+        // factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
 
-        RosNodeParams params_database_upsert_chemical_location;
-        params_database_upsert_chemical_location.nh = node_;
-        params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
-        params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
-        factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
+        // RosNodeParams params_database_upsert_chemical_location;
+        // params_database_upsert_chemical_location.nh = this->node_;
+        // params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
+        // factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
 
-        RosNodeParams params_database_upsert_workstation_location;
-        params_database_upsert_workstation_location.nh = node_;
-        params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
-        params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
-        factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
+        // RosNodeParams params_database_upsert_workstation_location;
+        // params_database_upsert_workstation_location.nh = this->node_;
+        // params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
+        // factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
 
-        RosNodeParams params_database_get_all_chemical_locations;
-        params_database_get_all_chemical_locations.nh = node_;
-        params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
-        params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
-        factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
+        // RosNodeParams params_database_get_all_chemical_locations;
+        // params_database_get_all_chemical_locations.nh = this->node_;
+        // params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
+        // factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
 
-        RosNodeParams params_database_get_all_workstaion_locations;
-        params_database_get_all_workstaion_locations.nh = node_;
-        params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
-        params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
-        factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
+        // RosNodeParams params_database_get_all_workstaion_locations;
+        // params_database_get_all_workstaion_locations.nh = this->node_;
+        // params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
+        // factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
 
-        RosNodeParams params_database_remove_chemical;
-        params_database_remove_chemical.nh = node_;
-        params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
-        params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_remove_chemical.default_port_value = "remove_chemical_service";
-        factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
+        // RosNodeParams params_database_remove_chemical;
+        // params_database_remove_chemical.nh = this->node_;
+        // params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_remove_chemical.default_port_value = "remove_chemical_service";
+        // factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
 
-        RosNodeParams params_database_remove_workstation;
-        params_database_remove_workstation.nh = node_;
-        params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
-        params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_database_remove_workstation.default_port_value = "remove_workstation_service";
-        factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
+        // RosNodeParams params_database_remove_workstation;
+        // params_database_remove_workstation.nh = this->node_;
+        // params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
+        // params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        // params_database_remove_workstation.default_port_value = "remove_workstation_service";
+        // factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
 
         ///////////////////////////////////
         
         RosNodeParams params_gripper;
-        params_gripper.nh = node_;
+        params_gripper.nh = this->node_;
         params_gripper.server_timeout = std::chrono::milliseconds(2000);
         params_gripper.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_gripper.default_port_value = "gripper_service";
         factory.registerNodeType<GripperAction>("GripperAction",params_gripper);
         //////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_grasp;
-        params_gripper_franka_grasp.nh = node_;
+        params_gripper_franka_grasp.nh = this->node_;
         params_gripper_franka_grasp.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_grasp.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_gripper_franka_grasp.default_port_value = "panda_gripper/grasp";
         factory.registerNodeType<FrankaGraspGripperAction>("FrankaGraspGripperAction",params_gripper_franka_grasp);
         //////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_homing;
-        params_gripper_franka_homing.nh = node_;
+        params_gripper_franka_homing.nh = this->node_;
         params_gripper_franka_homing.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_homing.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_gripper_franka_homing.default_port_value = "panda_gripper/homing";
         factory.registerNodeType<FrankaHomeGripperAction>("FrankaHomeGripperAction",params_gripper_franka_homing);
         ////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_move;
-        params_gripper_franka_move.nh = node_;
+        params_gripper_franka_move.nh = this->node_;
         params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_gripper_franka_move.default_port_value = "panda_gripper/move";
         factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
         ////////////////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_aruco;
-        params_aruco.nh = node_;
+        params_aruco.nh = this->node_;
         params_aruco.server_timeout = std::chrono::milliseconds(2000);
         params_aruco.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_aruco.default_port_value = "detect_marker_pose";
         factory.registerNodeType<FindArucoTagAction>("ArucoAction",params_aruco);
         ////////////////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_arm_mode_pose;
-        params_arm_mode_pose.nh = node_;
+        params_arm_mode_pose.nh = this->node_;
         params_arm_mode_pose.server_timeout = std::chrono::milliseconds(2000);
         params_arm_mode_pose.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_arm_mode_pose.default_port_value = "arm_move_pose_service";
         factory.registerNodeType<ArmMovePoseAction>("ArmMovePoseAction",params_arm_mode_pose);
 
         RosNodeParams params_arm_mode_joints;
-        params_arm_mode_joints.nh = node_;
+        params_arm_mode_joints.nh = this->node_;
         params_arm_mode_joints.server_timeout = std::chrono::milliseconds(2000);
         params_arm_mode_joints.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_arm_mode_joints.default_port_value = "arm_move_joints_service";
         factory.registerNodeType<ArmMoveJointsAction>("ArmMoveJointsAction",params_arm_mode_joints);
 
         RosNodeParams params_gripper_joint;
-        params_gripper_joint.nh = node_;
+        params_gripper_joint.nh = this->node_;
 
         params_gripper_joint.default_port_value = "gripper_joint_service";
         factory.registerNodeType<GripperJointAction>("GripperJointAction",params_gripper_joint);
@@ -193,21 +213,21 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmPoseMsgOffsetCalculation>("ArmPoseMsgOffsetCalculation");
 
         RosNodeParams params_arm_move_pose_msg;
-        params_arm_move_pose_msg.nh = node_;
+        params_arm_move_pose_msg.nh = this->node_;
         params_arm_move_pose_msg.default_port_value = "arm_move_pose_msg_service";
         params_arm_move_pose_msg.server_timeout = std::chrono::milliseconds(2000);
         params_arm_move_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
         factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
 
         RosNodeParams params_arm_move_pose_msg_tcp;
-        params_arm_move_pose_msg_tcp.nh = node_;
+        params_arm_move_pose_msg_tcp.nh = this->node_;
         params_arm_move_pose_msg_tcp.default_port_value = "arm_move_pose_msg_tcp_service";
         params_arm_move_pose_msg_tcp.server_timeout = std::chrono::milliseconds(2000);
         params_arm_move_pose_msg_tcp.wait_for_server_timeout = std::chrono::milliseconds(1000);
         factory.registerNodeType<ArmMovePoseMsgTcpAction>("ArmMovePoseMsgTcpAction",params_arm_move_pose_msg_tcp);
 
         RosNodeParams params_arm_move_pliz_ptp_pose_msg;
-        params_arm_move_pliz_ptp_pose_msg.nh = node_;
+        params_arm_move_pliz_ptp_pose_msg.nh = this->node_;
         params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";
         params_arm_move_pliz_ptp_pose_msg.server_timeout = std::chrono::milliseconds(2000);
         params_arm_move_pliz_ptp_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -215,7 +235,7 @@ class BehaviorServer : public rclcpp::Node
 
 
         RosNodeParams params_arm_move_pliz_lin_pose_msg;
-        params_arm_move_pliz_lin_pose_msg.nh = node_;
+        params_arm_move_pliz_lin_pose_msg.nh = this->node_;
         params_arm_move_pliz_lin_pose_msg.default_port_value = "arm_move_pliz_lin_pose_msg_service";
         params_arm_move_pliz_lin_pose_msg.server_timeout = std::chrono::milliseconds(2000);
         params_arm_move_pliz_lin_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -223,7 +243,7 @@ class BehaviorServer : public rclcpp::Node
 
 
         RosNodeParams params;
-        params.nh = node_;
+        params.nh = this->node_;
         params.server_timeout = std::chrono::milliseconds(2000);
         params.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params.default_port_value = "sleep_service";
@@ -231,7 +251,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmPoseOffsetCalculation>("ArmPoseOffsetCalculation");
 
         RosNodeParams params_home_arm;
-        params_home_arm.nh = node_;
+        params_home_arm.nh = this->node_;
         params_home_arm.server_timeout = std::chrono::milliseconds(2000);
         params_home_arm.wait_for_server_timeout = std::chrono::milliseconds(1000);
         params_home_arm.default_port_value = "home_arm";
@@ -304,7 +324,8 @@ class BehaviorServer : public rclcpp::Node
     BT::Tree tree_;
     std::unique_ptr<BT::Groot2Publisher> publisher_ptr_;
     BehaviorTreeFactory factory;
-
+    rclcpp::Executor::SharedPtr executor_;
+    std::thread executor_thread_;
 };
 
 

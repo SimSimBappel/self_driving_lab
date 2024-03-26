@@ -1,5 +1,7 @@
 # Request
-int32 id
+int8 id
+geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> hardcoded transform (aruco -> slot_id == 1)
+geometry_msgs/TransformStamped slot_to_slot_transform   
 ---
 # Result
 geometry_msgs/PoseStamped marker_pose_msg
