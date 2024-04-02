@@ -88,7 +88,9 @@
                             speed="0.2"
                             accel="0.2"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{id}"
+      <ArucoAction id="{aruco_id}"
+                   aruco_to_slot_transform="{aruco_to_slot}"
+                   slot_to_slot_transform="{slot_to_slot}"
                    Transform="{object_pose_msg}"
                    action_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
@@ -104,6 +106,8 @@
                             accel="0.2"
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{workstation_id}"
+                   aruco_to_slot_transform=""
+                   slot_to_slot_transform=""
                    Transform="{aruco_pose}"
                    action_name="__default__placeholder__"/>
       <ArmMovePoseMsgAction pose="{aruco_pose}"
@@ -152,6 +156,10 @@
     <Action ID="ArucoAction">
       <input_port name="id"
                   type="int"/>
+      <input_port name="aruco_to_slot_transform"
+                  type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="slot_to_slot_transform"
+                  type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <output_port name="Transform"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <input_port name="action_name"

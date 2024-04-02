@@ -21,7 +21,7 @@ public:
   }
 
   bool setGoal(Goal& goal) override{
-    auto id = getInput<int>("id");
+    auto id = getInput<int8_t>("id");
     auto aruco_to_slot_transform = getInput<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform");
     auto slot_to_slot_transform = getInput<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform");
     goal.id = id.value();

@@ -28,9 +28,6 @@
         <AlwaysSuccess/>
         <SubTree ID="move_base"/>
       </Fallback>
-      <SubTree ID="visual_grasp"
-               id="2"
-               lookout_pose_msg="{location_result}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -44,12 +41,6 @@
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
-  <TreeNodesModel>
-    <SubTree ID="visual_grasp"
-             editable="true">
-      <input_port name="id"/>
-      <input_port name="lookout_pose_msg"/>
-    </SubTree>
-  </TreeNodesModel>
+  <TreeNodesModel/>
 
 </root>
