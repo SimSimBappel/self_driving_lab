@@ -9,14 +9,15 @@ sudo apt-get install -y libpqxx-dev libpqxx-6.4
 Please see docstrings in source code or .srv and .msg files for detailed compositions of services. 
 
 ## Todo
-[ ] - Internal relateSlots(), to relate increasing slot_ids to a local set. i.e. T1: 1, 2, 3 ; T2: 1 (4), 2 (5), 3 (6)
+[x] - Internal relateSlots(), to relate increasing slot_ids to a local set. i.e. T1: 1, 2, 3 ; T2: 1 (4), 2 (5), 3 (6)
 [ ] - Add static transforms to respective .csv files in ../data directory (aruco->slot1) and (slot1 -> rest)
-[ ] - Place vessel/chemical (upsert fnc) -> findslots() internal function
+[x] - Place vessel/chemical (upsert fnc) -> findslots() internal function
+[ ] - Edge cases, what about when we grip the item? (remove)
+[ ] - What is the best returned chem / vessel ? Maybe return a list sorted. 
 [ ] - Various adding to system flows, like: workstation -> arucotag -> tray/machine -> (tray_slots) -> vessel/chemical -> placement_tables
 [ ] - lookupAruco -> if needed
 [ ] - Tidy up recurring code
 [ ] - fix csv.h strcpy fnc -> null cases, if we feel like it. 
-
 
 
 ### Get Vessel
@@ -105,5 +106,60 @@ Could not access database
 ros2 service call /place_vessel pgsql_interfaces/srv/PlaceVessel "{name: 'beaker', tray_id: 1}"
 ---
 pgsql_interfaces.srv.PlaceVessel_Response(workstation_name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711456628, nanosec=214935337), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=1, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711456628, nanosec=215027807), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.7000000000000001, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711456628, nanosec=215033176), frame_id='panda_link0'), child_frame_id='slot_3', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=3.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), success=True, message='Operation completed successfully')
+```
+
+
+### Remove Chemical Placement
+
+```
+request:
+string name
+int8 slot_id
+---
+response:
+bool success
+string message
+```
+
+#### Response Messages
+Operation completed successfully
+No chemical found in the specified slot"
+Chemical not found 
+Could not access database
+
+
+#### Example CLI
+
+```
+ros2 service call /remove_chemical_placement pgsql_interfaces/srv/RemoveChemicalPlacement "{name: 'natrium_chloride, slot_id: 4}"
+---
+pgsql_interfaces.srv.RemoveChemicalPlacement_Response(success=True, message='Operation completed successfully')
+```
+
+### Remove Vessel Placement
+
+```
+request:
+string name
+int8 slot_id
+---
+response:
+bool success
+string message
+```
+
+#### Response Messages
+Operation completed successfully
+No vessel found in the specified slot"
+Vessel not found 
+Could not access database
+
+
+#### Example CLI
+
+```
+ros2 service call /remove_vessel_placement pgsql_interfaces/srv/RemoveVesselPlacement "{name: 'beaker, slot_id: 4}"
+---
+pgsql_interfaces.srv.RemoveVesselPlacement_Response(success=True, message='Operation completed successfully')
 ```
 

@@ -1,0 +1,5 @@
+string name
+int8 slot_id
+---
+bool success
+string message

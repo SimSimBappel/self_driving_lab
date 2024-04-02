@@ -25,6 +25,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetVessel.srv"
   "srv/GetChemical.srv"
   "srv/PlaceVessel.srv"
+  "srv/PlaceChemical.srv"
+  "srv/RemoveChemicalPlacement.srv"
+  "srv/RemoveVesselPlacement.srv"
   DEPENDENCIES 
     geometry_msgs
 )
