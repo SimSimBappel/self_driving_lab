@@ -155,7 +155,7 @@
     </Action>
     <Action ID="ArucoAction">
       <input_port name="id"
-                  type="int"/>
+                  type="signed char"/>
       <input_port name="aruco_to_slot_transform"
                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <input_port name="slot_to_slot_transform"

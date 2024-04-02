@@ -16,6 +16,13 @@ from aruco_pose_estimation.pose_estimation import pose_estimation
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
 import tf2_ros
+import scipy
+from tf2_ros import TransformException
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+from scipy.spatial.transform import Rotation as R
+
+import numpy as np
 
 
 
@@ -45,6 +52,9 @@ class CameraSubscriber(Node):
         self.intrinsic_mat = None
         self.distortion = None
         self.runonce = False
+
+        
+
 
 
 
@@ -107,6 +117,8 @@ class ArucoMarkerDetector(Node):
 
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
 
         if self.debug:
             self.camera_subscriber.start_streaming()
@@ -144,6 +156,45 @@ class ArucoMarkerDetector(Node):
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback
             )
+    
+    def quaternion_multiply(self, q0, q1):
+        """
+        Multiplies two quaternions.
+
+        Input
+        :param q0: A 4 element array containing the first quaternion (q01, q11, q21, q31)
+        :param q1: A 4 element array containing the second quaternion (q02, q12, q22, q32)
+
+        Output
+        :return: A 4 element array containing the final quaternion (q03,q13,q23,q33)
+
+        """
+        # Extract the values from q0
+        w0 = q0[0]
+        x0 = q0[1]
+        y0 = q0[2]
+        z0 = q0[3]
+
+        # Extract the values from q1
+        w1 = q1[0]
+        x1 = q1[1]
+        y1 = q1[2]
+        z1 = q1[3]
+
+        # Computer the product of the two quaternions, term by term
+        q0q1_w = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
+        q0q1_x = w0 * x1 + x0 * w1 + y0 * z1 - z0 * y1
+        q0q1_y = w0 * y1 - x0 * z1 + y0 * w1 + z0 * x1
+        q0q1_z = w0 * z1 + x0 * y1 - y0 * x1 + z0 * w1
+
+        # Create a 4 element array containing the final quaternion
+        final_quaternion = np.array([q0q1_w, q0q1_x, q0q1_y, q0q1_z])
+
+        # Return a 4 element array containing the final quaternion (q02,q12,q22,q32)
+        return final_quaternion
+
+    
+
     
 
     def execute_callback(self, goal_handle):
@@ -193,17 +244,64 @@ class ArucoMarkerDetector(Node):
                         aruco = self.tf_turn_around_x_axis(aruco)
 
                         self.tf_broadcaster.sendTransform(aruco)
-
+                        
+                        try:
+                            t = self.tf_buffer.lookup_transform(
+                                # ("aruco_marker_" + str(goal_handle.request.id)),
+                                self.camera_frame,
+                                "panda_link0",
+                                rclpy.time.Time())
+                        except TransformException as ex:
+                            self.get_logger().info(
+                                f'Could not transform {("aruco_marker_" + str(goal_handle.request.id))} to {"panda_link0"}: {ex}')
+                            return
+                        
+                        # qm1 = tf_transformations.quaternion_matrix(aruco.transform.rotation)
+                        # qm2 = tf_transformations.quaternion_matrix(t.transform.rotation)
+                        # tf_transformations.transforms3d.quaternions.qmult(qm1, qm2)
+                        # r = R.from_quat([aruco.transform.rotation.x, aruco.transform.rotation.y, aruco.transform.rotation.z, aruco.transform.rotation.w])
+                        # r.as_matrix()
+                        # rt = R.from_quat([t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w])
+                        # rt.as_matrix()
+                        # dot_product = np.dot(rt.as_matrix, r.as_matrix())
                         grab_pose_msg = PoseStamped()
                         grab_pose_msg.header.stamp = aruco.header.stamp
                         grab_pose_msg.header.frame_id = aruco.child_frame_id
-                        grab_pose_msg.pose.position.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
-                        grab_pose_msg.pose.position.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
-                        grab_pose_msg.pose.position.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
-                        grab_pose_msg.pose.orientation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
-                        grab_pose_msg.pose.orientation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
-                        grab_pose_msg.pose.orientation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
-                        grab_pose_msg.pose.orientation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        grab_pose_msg.pose.position.x = t.transform.translation.x + goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
+                        grab_pose_msg.pose.position.y = t.transform.translation.y + goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
+                        grab_pose_msg.pose.position.z = t.transform.translation.z + goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        
+                        
+                        
+                        # slot1 = t -> aruco_slot--slot1
+                        q1 = []
+                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.x)
+                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.y)
+                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.z)
+                        q1.append(-goal_handle.request.slot_to_slot_transform.transform.rotation.w)
+
+                        # wanted_slot = slot1 -> slot_to_slot
+                        q2 = []
+                        q2.append(t.transform.rotation.x)
+                        q2.append(t.transform.rotation.y)
+                        q2.append(t.transform.rotation.z)
+                        q2.append(t.transform.rotation.w)
+
+                        q3 = []
+                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.x)
+                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.y)
+                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.z)
+                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.w)
+
+
+                        cam_to_slot1 = self.quaternion_multiply(q2, q3)
+                        slot1_to_wanted_slot = self.quaternion_multiply(cam_to_slot1, q1)
+
+                        # qr = self.quaternion_multiply(q2, q1_inv)
+                        grab_pose_msg.pose.orientation.x = slot1_to_wanted_slot[0]#goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
+                        grab_pose_msg.pose.orientation.y = slot1_to_wanted_slot[1]#goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
+                        grab_pose_msg.pose.orientation.z = slot1_to_wanted_slot[2]#goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
+                        grab_pose_msg.pose.orientation.w = slot1_to_wanted_slot[3]#goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
                         self.pose_pub.publish(grab_pose_msg)
 
                         # grab_pose_msg = PoseStamped()
