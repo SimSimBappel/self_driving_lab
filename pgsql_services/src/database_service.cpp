@@ -170,6 +170,9 @@ private:
     // ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'chemical_name'}"
     void get_chemical(const std::shared_ptr<pgsql_interfaces::srv::GetChemical::Request> request,
                     std::shared_ptr<pgsql_interfaces::srv::GetChemical::Response> response) {
+
+        std::cout << request << std::endl;
+
         try {
             pqxx::connection C("dbname=" + db_name + " user=" + db_user +
                             " password=" + db_password + " hostaddr=" + db_host +
@@ -251,6 +254,8 @@ private:
                                 response->empty = empty_bottle;
                                 response->success = true;
                                 response->message = "Chemical found";
+
+                                std::cout << response << std::endl;
                           }
                     }
                 }

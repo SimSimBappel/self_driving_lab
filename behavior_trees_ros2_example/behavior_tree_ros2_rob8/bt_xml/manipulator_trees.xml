@@ -95,7 +95,7 @@
                    action_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg}"
-               approch_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+               approch_offset="{approach_offset}"/>
     </Sequence>
   </BehaviorTree>
 

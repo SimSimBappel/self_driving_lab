@@ -204,10 +204,11 @@
             <input_port name="approch_offset"/>
         </SubTree>
         <SubTree ID="visual_grasp" editable="true">
-            <input_port name="id"/>
+            <input_port name="aruco_id"/>
             <input_port name="lookout_pose_msg"/>
             <input_port name="aruco_to_slot"/>
             <input_port name="slot_to_slot"/>
+            <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
         </SubTree>
     </TreeNodesModel>
 </root>

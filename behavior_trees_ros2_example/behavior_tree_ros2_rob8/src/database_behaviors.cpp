@@ -69,7 +69,11 @@ class GetChemicalNode: public RosServiceNode<GetChemical>
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
+    
     getInput("name_", request->name);
+    // auto name_ = getInput<std::string>("name_");
+    // request->name = name_.value();
+    RCLCPP_INFO(node_->get_logger(), "String chemical: %s", request->name.c_str());
     // must return true if we are ready to send the request
     return true;
   }
@@ -78,7 +82,7 @@ class GetChemicalNode: public RosServiceNode<GetChemical>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Sum: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->success);
     setOutput("aruco_id",response->aruco_id);
     setOutput("message",response->message);
     setOutput("success",response->success);
