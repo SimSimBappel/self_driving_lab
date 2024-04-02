@@ -1,0 +1,34 @@
+{
+"position": {
+    "x": 0.21641,
+    "y": -0.06338,
+    "z": 0.53001
+},
+"orientation": {
+    "w": 0.016735,
+    "x": 0.97185,
+    "y": -0.012606,
+    "z": 0.23468
+}
+}
+
+
+pgsql_interfaces.srv.GetChemical_Response(
+workstation_name='robot_base', 
+
+lookout_pose=geometry_msgs.msg.PoseStamped(
+header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1712049889, nanosec=741905410), frame_id='panda_link0'), 
+pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.21641, y=-0.06338, z=0.53001), orientation=geometry_msgs.msg.Quaternion(x=0.97185, y=-0.012606, z=0.23468, w=0.016735))), 
+
+aruco_id=20, 
+
+aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(
+header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1712049889, nanosec=739318443), frame_id='panda_link0'), child_frame_id='slot_1', 
+transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=-0.09813000000000001, z=-0.06520000000000001), 
+rotation=geometry_msgs.msg.Quaternion(x=0.402, y=0.0, z=0.0, w=0.916))), 
+
+slot_to_slot_transform=geometry_msgs.msg.TransformStamped(
+header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1712049889, nanosec=741572496), frame_id='panda_link0'), child_frame_id='', 
+transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, 
+
+message='Chemical found')
