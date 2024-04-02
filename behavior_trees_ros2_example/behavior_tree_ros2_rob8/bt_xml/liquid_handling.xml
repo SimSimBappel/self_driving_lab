@@ -24,12 +24,6 @@
 
   <BehaviorTree ID="get_reagent">
     <Sequence>
-      <GetAllChemicalLocationsNode message="{mesage_result}"
-                                   formula="&quot;H2O&quot;"
-                                   locations="{location_result}"
-                                   id_="10"
-                                   name_="&quot;h2O&quot;"
-                                   service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
         <SubTree ID="move_base"/>
@@ -51,21 +45,6 @@
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
-    <Action ID="GetAllChemicalLocationsNode">
-      <output_port name="message"
-                   type="std::string"/>
-      <input_port name="formula"
-                  type="std::string"/>
-      <output_port name="locations"
-                   type="std::vector&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt;, std::allocator&lt;pgsql_interfaces::msg::ChemicalLocation_&lt;std::allocator&lt;void&gt; &gt; &gt; &gt;"/>
-      <input_port name="id_"
-                  type="signed char"/>
-      <input_port name="name_"
-                  type="std::string"/>
-      <input_port name="service_name"
-                  default="__default__placeholder__"
-                  type="std::string">Service name</input_port>
-    </Action>
     <SubTree ID="visual_grasp"
              editable="true">
       <input_port name="id"/>
