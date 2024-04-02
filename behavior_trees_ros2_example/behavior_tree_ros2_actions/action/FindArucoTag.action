@@ -4,6 +4,6 @@ geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> h
 geometry_msgs/TransformStamped slot_to_slot_transform   
 ---
 # Result
-geometry_msgs/PoseStamped marker_pose_msg
+geometry_msgs/PoseStamped grab_pose_msg
 ---
 # Feedback

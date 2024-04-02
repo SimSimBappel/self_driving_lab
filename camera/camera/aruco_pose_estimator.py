@@ -179,38 +179,50 @@ class ArucoMarkerDetector(Node):
                 if markers.marker_ids is not None:
                     if markers.marker_ids.count(goal_handle.request.id) == 1:
                         index = markers.marker_ids.index(goal_handle.request.id)
-                        test = TransformStamped()
-                        test.header.stamp = self.get_clock().now().to_msg()
-                        test.header.frame_id = self.camera_frame
-                        test.child_frame_id = "aruco_marker_" + str(goal_handle.request.id)
-                        test.transform.translation.x = markers.poses[index].position.x
-                        test.transform.translation.y = markers.poses[index].position.y 
-                        test.transform.translation.z = markers.poses[index].position.z 
-                        test.transform.rotation.x = markers.poses[index].orientation.x  
-                        test.transform.rotation.y = markers.poses[index].orientation.y
-                        test.transform.rotation.z = markers.poses[index].orientation.z
-                        test.transform.rotation.w = markers.poses[index].orientation.w
-                        test = self.tf_turn_around_x_axis(test)
+                        aruco = TransformStamped()
+                        aruco.header.stamp = self.get_clock().now().to_msg()
+                        aruco.header.frame_id = self.camera_frame
+                        aruco.child_frame_id = "aruco_marker_" + str(goal_handle.request.id)
+                        aruco.transform.translation.x = markers.poses[index].position.x
+                        aruco.transform.translation.y = markers.poses[index].position.y 
+                        aruco.transform.translation.z = markers.poses[index].position.z 
+                        aruco.transform.rotation.x = markers.poses[index].orientation.x  
+                        aruco.transform.rotation.y = markers.poses[index].orientation.y
+                        aruco.transform.rotation.z = markers.poses[index].orientation.z
+                        aruco.transform.rotation.w = markers.poses[index].orientation.w
+                        aruco = self.tf_turn_around_x_axis(aruco)
 
-                        self.tf_broadcaster.sendTransform(test)
+                        self.tf_broadcaster.sendTransform(aruco)
 
-                        marker_pose_msg = PoseStamped()
-                        marker_pose_msg.header.stamp = test.header.stamp
-                        marker_pose_msg.header.frame_id = test.child_frame_id
-                        marker_pose_msg.pose.position.x = 0.0
-                        marker_pose_msg.pose.position.y = -0.09813 
-                        marker_pose_msg.pose.position.z = -0.06520 
-                        marker_pose_msg.pose.orientation.x = 0.0  
-                        marker_pose_msg.pose.orientation.y = 0.0
-                        marker_pose_msg.pose.orientation.z = 0.0
-                        marker_pose_msg.pose.orientation.w = 0.0
-                        marker_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose, 0.8272861)
-                        self.pose_pub.publish(marker_pose_msg)
+                        grab_pose_msg = PoseStamped()
+                        grab_pose_msg.header.stamp = aruco.header.stamp
+                        grab_pose_msg.header.frame_id = aruco.child_frame_id
+                        grab_pose_msg.pose.position.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
+                        grab_pose_msg.pose.position.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
+                        grab_pose_msg.pose.position.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        grab_pose_msg.pose.orientation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
+                        grab_pose_msg.pose.orientation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
+                        grab_pose_msg.pose.orientation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
+                        grab_pose_msg.pose.orientation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        self.pose_pub.publish(grab_pose_msg)
+
+                        # grab_pose_msg = PoseStamped()
+                        # grab_pose_msg.header.stamp = aruco.header.stamp
+                        # grab_pose_msg.header.frame_id = aruco.child_frame_id
+                        # grab_pose_msg.pose.position.x = 0.0
+                        # grab_pose_msg.pose.position.y = -0.09813 
+                        # grab_pose_msg.pose.position.z = -0.06520 
+                        # grab_pose_msg.pose.orientation.x = 0.0  
+                        # grab_pose_msg.pose.orientation.y = 0.0
+                        # grab_pose_msg.pose.orientation.z = 0.0
+                        # grab_pose_msg.pose.orientation.w = 0.0
+                        # grab_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose, 0.8272861)
+                        # self.pose_pub.publish(grab_pose_msg)
 
 
                         # self.found_object = True
                         result = FindArucoTag.Result()
-                        result.marker_pose_msg = marker_pose_msg
+                        result.grab_pose_msg = grab_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
                         goal_handle.succeed()
                         self.camera_subscriber.stop_streaming()

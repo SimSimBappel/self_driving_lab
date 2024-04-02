@@ -35,7 +35,7 @@ public:
   }
 
   BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
-    setOutput("Transform", wr.result->marker_pose_msg);
+    setOutput("Transform", wr.result->grab_pose_msg);
 
     // RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
     //            wr.result->done ? "true" : "false" );
