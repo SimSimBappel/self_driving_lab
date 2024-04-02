@@ -49,6 +49,14 @@
   <BehaviorTree ID="MainTree">
     <Sequence>
       <SubTree ID="init"/>
+      <Sequence>
+        <Script code="in_pose_test:= &apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
+        <ArmArrayToPoseAction array="{in_pose_test}"
+                              pose="{look_pose_test}"/>
+        <SubTree ID="visual_grasp"
+                 id="20"
+                 lookout_pose_msg="{look_pose_test}"/>
+      </Sequence>
       <Sleep msec="200"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
@@ -188,6 +196,11 @@
              editable="true">
       <input_port name="target_pose_msg"/>
       <input_port name="approch_offset"/>
+    </SubTree>
+    <SubTree ID="visual_grasp"
+             editable="true">
+      <input_port name="id"/>
+      <input_port name="lookout_pose_msg"/>
     </SubTree>
   </TreeNodesModel>
 
