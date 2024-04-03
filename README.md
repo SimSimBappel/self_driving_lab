@@ -3,6 +3,7 @@ AAU Robotics 8 semester project
 
 ## Dependencies
 install libfranka from [here](https://frankaemika.github.io/docs/installation_linux.html)
+get the 0.9.2 version during the git checkout command
 ```
 pip3 install opencv-python opencv-contrib-python transforms3d
 sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2* ros-humble-tf-transformations
@@ -28,7 +29,7 @@ git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin.
 cd ..
 cd ..
 cd ..
-sudo apt install ros2-humble-gazebo-ros2-control
+sudo apt install ros-humble-gazebo-ros2-control
 colcon build --packages-ignore camera
 colcon build --packages-select camera --symlink-install
 source install/setup.bash
@@ -38,12 +39,10 @@ source install/setup.bash
 Check seperate readme files for instructions. 
 
 
-# todo?
-## Running (in seprate terminals)
+# use?
+## Running
 ```
-ros2 launch omtp_factory_moveit_config demo.launch.py
-
-ros2 launch manipulator move_robot_server.launch.py
+ros2 launch manipulator system.launch.py
 ```
 
 
