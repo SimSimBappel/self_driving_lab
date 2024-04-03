@@ -88,7 +88,7 @@
 
   <gazebo>
     <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-      <parameters>$(find omtp_factory_moveit_config)/config/ros2_controllers.yaml</parameters>
+      <parameters>$(find omtp_factory_moveit_config)/config/ros2_controllers_gazebo.yaml</parameters>
     </plugin>
   </gazebo>
     </xacro:macro>
