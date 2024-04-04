@@ -46,7 +46,7 @@ def generate_launch_description():
 
     robot_ip = LaunchConfiguration(robot_ip_parameter_name)
     use_fake_hardware = LaunchConfiguration(use_fake_hardware_parameter_name)
-    load_gripper = LaunchConfiguration(load_gripper_parameter_name)
+    load_gripper = LaunchConfiguration(load_gripper_parameter_name, default=True)
     fake_sensor_commands = LaunchConfiguration(fake_sensor_commands_parameter_name)
 
 
