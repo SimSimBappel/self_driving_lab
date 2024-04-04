@@ -21,6 +21,8 @@ from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 from scipy.spatial.transform import Rotation as R
+from tf2_geometry_msgs import do_transform_pose
+
 
 import numpy as np
 
@@ -245,63 +247,106 @@ class ArucoMarkerDetector(Node):
 
                         self.tf_broadcaster.sendTransform(aruco)
                         
-                        try:
-                            t = self.tf_buffer.lookup_transform(
-                                "panda_link0",
-                                aruco.child_frame_id,
-                                rclpy.time.Time())
-                        except TransformException as ex:
-                            self.get_logger().info(
-                                f'Could not transform {("aruco_marker_" + str(goal_handle.request.id))} to {"panda_link0"}: {ex}')
-                            return
+                        # try:
+                        #     t = self.tf_buffer.lookup_transform(
+                        #         "panda_link0",
+                        #         aruco.child_frame_id,
+                        #         rclpy.time.Time())
+                        # except TransformException as ex:
+                        #     self.get_logger().info(
+                        #         f'Could not transform {("aruco_marker_" + str(goal_handle.request.id))} to {"panda_link0"}: {ex}')
+                        #     return
                         
-                        # qm1 = tf_transformations.quaternion_matrix(aruco.transform.rotation)
-                        # qm2 = tf_transformations.quaternion_matrix(t.transform.rotation)
-                        # tf_transformations.transforms3d.quaternions.qmult(qm1, qm2)
-                        # r = R.from_quat([aruco.transform.rotation.x, aruco.transform.rotation.y, aruco.transform.rotation.z, aruco.transform.rotation.w])
-                        # r.as_matrix()
-                        # rt = R.from_quat([t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w])
-                        # rt.as_matrix()
-                        # dot_product = np.dot(rt.as_matrix, r.as_matrix())
+                        
+    
+                        try:
+                            camera_to_base = self.tf_buffer.lookup_transform(
+                                "panda_link0",  # Target frame
+                                self.camera_frame,  # Source frame 
+                                rclpy.time.Time()
+                            )
+                                            
+                            # Transform the pose from camera frame to base frame
+                            base_to_aruco = do_transform_pose(aruco, camera_to_base)
+                        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+                            print("Exception occurred: ", e)
+                            
+                        # Static transform from aruco to first_slot
+                        aruco_to_first_slot = goal_handle.request.aruco_to_slot_transform#.transform
+
+                        # Static transform from first slot to wanted slot
+                        first_slot_to_wanted_slot = goal_handle.request.slot_to_slot_transform#.transform
+
+                        # Transform aruco pose to first_slot frame
+                        aruco_to_first_slot_pose = do_transform_pose(base_to_aruco, aruco_to_first_slot)
+                                        
+                        # Transform first slot to wanted slot
+                        first_slot_to_wanted_slot_pose = do_transform_pose(aruco_to_first_slot_pose, first_slot_to_wanted_slot)
+
                         grab_pose_msg = PoseStamped()
                         grab_pose_msg.header.stamp = aruco.header.stamp
                         grab_pose_msg.header.frame_id = 'panda_link0' #aruco.child_frame_id
-                        grab_pose_msg.pose.position.x = t.transform.translation.x + goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
-                        grab_pose_msg.pose.position.y = t.transform.translation.y + goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
-                        grab_pose_msg.pose.position.z = t.transform.translation.z + goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
-                        
-                        
-                        
-                        # slot1 = t -> aruco_slot--slot1
-                        q1 = []
-                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.x)
-                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.y)
-                        q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.z)
-                        q1.append(-goal_handle.request.slot_to_slot_transform.transform.rotation.w)
+                                        
+                        # Fill in the position from the transformed pose of the wanted slot
+                        grab_pose_msg.pose.position.x = first_slot_to_wanted_slot_pose.pose.position.x
+                        grab_pose_msg.pose.position.y = first_slot_to_wanted_slot_pose.pose.position.y
+                        grab_pose_msg.pose.position.z = first_slot_to_wanted_slot_pose.pose.position.z
 
-                        # wanted_slot = slot1 -> slot_to_slot
-                        q2 = []
-                        q2.append(t.transform.rotation.x)
-                        q2.append(t.transform.rotation.y)
-                        q2.append(t.transform.rotation.z)
-                        q2.append(t.transform.rotation.w)
-
-                        q3 = []
-                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.x)
-                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.y)
-                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.z)
-                        q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.w)
-
-
-                        cam_to_slot1 = self.quaternion_multiply(q2, q3)
-                        slot1_to_wanted_slot = self.quaternion_multiply(cam_to_slot1, q1)
-
-                        # qr = self.quaternion_multiply(q2, q1_inv)
-                        grab_pose_msg.pose.orientation.x = slot1_to_wanted_slot[0]#goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
-                        grab_pose_msg.pose.orientation.y = slot1_to_wanted_slot[1]#goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
-                        grab_pose_msg.pose.orientation.z = slot1_to_wanted_slot[2]#goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
-                        grab_pose_msg.pose.orientation.w = slot1_to_wanted_slot[3]#goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        # Fill in the orientation from the transformed pose of the wanted slot
+                        grab_pose_msg.pose.orientation.x = first_slot_to_wanted_slot_pose.pose.orientation.x
+                        grab_pose_msg.pose.orientation.y = first_slot_to_wanted_slot_pose.pose.orientation.y
+                        grab_pose_msg.pose.orientation.z = first_slot_to_wanted_slot_pose.pose.orientation.z
+                        grab_pose_msg.pose.orientation.w = first_slot_to_wanted_slot_pose.pose.orientation.w
+                                        
                         self.pose_pub.publish(grab_pose_msg)
+            
+                        # # qm1 = tf_transformations.quaternion_matrix(aruco.transform.rotation)
+                        # # qm2 = tf_transformations.quaternion_matrix(t.transform.rotation)
+                        # # tf_transformations.transforms3d.quaternions.qmult(qm1, qm2)
+                        # # r = R.from_quat([aruco.transform.rotation.x, aruco.transform.rotation.y, aruco.transform.rotation.z, aruco.transform.rotation.w])
+                        # # r.as_matrix()
+                        # # rt = R.from_quat([t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w])
+                        # # rt.as_matrix()
+                        # # dot_product = np.dot(rt.as_matrix, r.as_matrix())
+                        # grab_pose_msg = PoseStamped()
+                        # grab_pose_msg.header.stamp = aruco.header.stamp
+                        # grab_pose_msg.header.frame_id = 'panda_link0' #aruco.child_frame_id
+                        # grab_pose_msg.pose.position.x = t.transform.translation.x + goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
+                        # grab_pose_msg.pose.position.y = t.transform.translation.y + goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
+                        # grab_pose_msg.pose.position.z = t.transform.translation.z + goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        
+                        
+                        
+                        # # slot1 = t -> aruco_slot--slot1
+                        # q1 = []
+                        # q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.x)
+                        # q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.y)
+                        # q1.append(goal_handle.request.slot_to_slot_transform.transform.rotation.z)
+                        # q1.append(-goal_handle.request.slot_to_slot_transform.transform.rotation.w)
+
+                        # # wanted_slot = slot1 -> slot_to_slot
+                        # q2 = []
+                        # q2.append(t.transform.rotation.x)
+                        # q2.append(t.transform.rotation.y)
+                        # q2.append(t.transform.rotation.z)
+                        # q2.append(t.transform.rotation.w)
+
+                        # q3 = []
+                        # q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.x)
+                        # q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.y)
+                        # q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.z)
+                        # q3.append(goal_handle.request.aruco_to_slot_transform.transform.rotation.w)
+
+
+                        # cam_to_slot1 = self.quaternion_multiply(q2, q3)
+                        # slot1_to_wanted_slot = self.quaternion_multiply(cam_to_slot1, q1)
+
+                        # # qr = self.quaternion_multiply(q2, q1_inv)
+                        # grab_pose_msg.pose.orientation.x = slot1_to_wanted_slot[0]#goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
+                        # grab_pose_msg.pose.orientation.y = slot1_to_wanted_slot[1]#goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
+                        # grab_pose_msg.pose.orientation.z = slot1_to_wanted_slot[2]#goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
+                        # grab_pose_msg.pose.orientation.w = slot1_to_wanted_slot[3]#goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        # self.pose_pub.publish(grab_pose_msg)
 
                         # self.found_object = True
                         result = FindArucoTag.Result()
