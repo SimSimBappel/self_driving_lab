@@ -266,8 +266,7 @@ class ArucoMarkerDetector(Node):
 
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
-                        # rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
-                        rclpy.spin_once(self, timeout_sec=1.0)
+                        rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
 
                         try:
                             while not self.tf_buffer.can_transform("panda_link0",
@@ -278,7 +277,6 @@ class ArucoMarkerDetector(Node):
                                 print("transform not possible")
                                 self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
                                 rclpy.spin_once(self, timeout_sec=1.0)
-                                # time.sleep(1.0)
 
                             base_to_aruco = self.tf_buffer.lookup_transform(
                                 "panda_link0",
@@ -303,21 +301,21 @@ class ArucoMarkerDetector(Node):
                         self.pose_pub.publish(grab_pose_msg)
 
 
-                        # self.found_object = True
+                        self.found_object = True
                         result = FindArucoTag.Result()
                         result.grab_pose_msg = grab_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
-                        goal_handle.succeed()
                         self.camera_subscriber.stop_streaming()
                         self.reset()
+                        goal_handle.succeed()
                         return result
 
                     elif markers.marker_ids.count(goal_handle.request.id) > 1:
                         self.logger.warn(f"{goal_handle.request.id} is in the array more than once.")
                         # self.logger.info(str(markers.marker_ids))
-                        goal_handle.abort()
                         self.camera_subscriber.stop_streaming()
                         self.reset()
+                        goal_handle.abort()
                         return FindArucoTag.Result()
 
                     elif self.debug:
@@ -432,7 +430,8 @@ class ArucoMarkerDetector(Node):
     
     def reset(self):
         """Delete image after using"""
-        self.camera_subscriber.img_raw = None       
+        self.camera_subscriber.img_raw = None 
+
 
     def initialize_parameters(self):
         # Declare and read parameters from aruco_params.yaml
