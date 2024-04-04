@@ -187,8 +187,8 @@ int main(int argc, char **argv)
   ////////////////////////////////////////////////////////////////////////////////////////
   RosNodeParams params_aruco;
   params_aruco.nh = nh;
-  params_aruco.server_timeout = std::chrono::milliseconds(4000);
-  params_aruco.wait_for_server_timeout = std::chrono::milliseconds(4000);
+  params_aruco.server_timeout = std::chrono::milliseconds(8000);
+  params_aruco.wait_for_server_timeout = std::chrono::milliseconds(8000);
   params_aruco.default_port_value = "detect_marker_pose";
   factory.registerNodeType<FindArucoTagAction>("ArucoAction",params_aruco);
 ////////////////////////////////////////////////////////////////////////////////////////

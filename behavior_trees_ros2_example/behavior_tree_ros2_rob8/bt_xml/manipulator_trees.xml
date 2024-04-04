@@ -6,10 +6,10 @@
       <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
                                    pose="{target_pose_msg}"
                                    pose_w_offset="{approch_pose}"/>
-      <GripperJointAction joint_2="0.03"
-                          speed="0.2"
-                          accel="0.2"
-                          joint_1="0.03"
+      <GripperJointAction joint_2="0.04"
+                          speed="0.02"
+                          accel="0.02"
+                          joint_1="0.04"
                           action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePoseMsgAction pose="{approch_pose}"
@@ -18,8 +18,8 @@
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.1"
-                                   accel="0.1"
+                                   speed="0.025"
+                                   accel="0.025"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <FrankaGraspGripperAction width="0.02"
@@ -29,8 +29,8 @@
                                 action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.1"
-                                   accel="0.1"
+                                   speed="0.025"
+                                   accel="0.025"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
