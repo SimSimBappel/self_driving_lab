@@ -245,7 +245,7 @@ class ArucoMarkerDetector(Node):
                         aruco.transform.rotation.y = markers.poses[index].orientation.y
                         aruco.transform.rotation.z = markers.poses[index].orientation.z
                         aruco.transform.rotation.w = markers.poses[index].orientation.w
-                        aruco = self.tf_turn_around_x_axis(aruco)
+                        aruco = self.tf_turn_around_axis(aruco, x=np.pi)
 
                         # self.tf_broadcaster.sendTransform(aruco)
 
@@ -262,11 +262,11 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
                         grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
-                        
+                        grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
+
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
-                        # rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
-                        rclpy.spin_once(self, timeout_sec=1.0)
+                        rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
 
                         try:
                             while not self.tf_buffer.can_transform("panda_link0",
@@ -277,7 +277,6 @@ class ArucoMarkerDetector(Node):
                                 print("transform not possible")
                                 self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
                                 rclpy.spin_once(self, timeout_sec=1.0)
-                                # time.sleep(1.0)
 
                             base_to_aruco = self.tf_buffer.lookup_transform(
                                 "panda_link0",
@@ -302,21 +301,21 @@ class ArucoMarkerDetector(Node):
                         self.pose_pub.publish(grab_pose_msg)
 
 
-                        # self.found_object = True
+                        self.found_object = True
                         result = FindArucoTag.Result()
                         result.grab_pose_msg = grab_pose_msg
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
-                        goal_handle.succeed()
                         self.camera_subscriber.stop_streaming()
                         self.reset()
+                        goal_handle.succeed()
                         return result
 
                     elif markers.marker_ids.count(goal_handle.request.id) > 1:
                         self.logger.warn(f"{goal_handle.request.id} is in the array more than once.")
                         # self.logger.info(str(markers.marker_ids))
-                        goal_handle.abort()
                         self.camera_subscriber.stop_streaming()
                         self.reset()
+                        goal_handle.abort()
                         return FindArucoTag.Result()
 
                     elif self.debug:
@@ -366,7 +365,7 @@ class ArucoMarkerDetector(Node):
         elif self.camera_subscriber.runonce:
             print("No image received")
 
-    def tf_turn_around_x_axis(self, tf_msg: TransformStamped, angle=np.pi) -> TransformStamped:
+    def tf_turn_around_axis(self, tf_msg: TransformStamped, x=0.0, y=0.0, z=0.0) -> TransformStamped:
         euler_angles = tf_transformations.euler_from_quaternion([
             tf_msg.transform.rotation.x,
             tf_msg.transform.rotation.y,
@@ -374,7 +373,7 @@ class ArucoMarkerDetector(Node):
             tf_msg.transform.rotation.w
         ])
         # Edit the Euler angles as needed
-        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
+        edited_euler_angles = (euler_angles[0] + x, euler_angles[1] + y, euler_angles[2] + z)
 
         # Convert the Euler angles back to quaternion
         quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
@@ -431,7 +430,8 @@ class ArucoMarkerDetector(Node):
     
     def reset(self):
         """Delete image after using"""
-        self.camera_subscriber.img_raw = None       
+        self.camera_subscriber.img_raw = None 
+
 
     def initialize_parameters(self):
         # Declare and read parameters from aruco_params.yaml
