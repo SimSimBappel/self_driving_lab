@@ -9,7 +9,7 @@ from rclpy.qos import qos_profile_sensor_data
 from aruco_interfaces.msg import ArucoMarkers
 from sensor_msgs.msg import CameraInfo, Image
 from aruco_pose_estimation.utils import ARUCO_DICT
-from geometry_msgs.msg import PoseStamped, PoseArray, TransformStamped
+from geometry_msgs.msg import PoseStamped, PoseArray, TransformStamped, Pose
 from behavior_tree_ros2_actions.action import FindArucoTag
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from aruco_pose_estimation.pose_estimation import pose_estimation
@@ -17,7 +17,8 @@ from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
 import tf2_ros
 import scipy
-from tf2_ros import TransformException
+# from tf2_ros import BufferClient
+# from tf2_ros.buffer_interface import BUFFER_CLIENT_DEFAULT_OPTIONS_ASYNC
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 from scipy.spatial.transform import Rotation as R
@@ -120,6 +121,7 @@ class ArucoMarkerDetector(Node):
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
         self.tf_buffer = Buffer()
+        # self.tf_buffer = BufferClient(self, buffer_client_options=BUFFER_CLIENT_DEFAULT_OPTIONS_ASYNC)
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
         if self.debug:
@@ -245,60 +247,150 @@ class ArucoMarkerDetector(Node):
                         aruco.transform.rotation.w = markers.poses[index].orientation.w
                         aruco = self.tf_turn_around_x_axis(aruco)
 
-                        self.tf_broadcaster.sendTransform(aruco)
+                        # self.tf_broadcaster.sendTransform(aruco)
+
+
+
+                        grab_trans_msg = TransformStamped()
+                        grab_trans_msg.header.stamp = aruco.header.stamp
+                        grab_trans_msg.header.frame_id = aruco.child_frame_id
+                        grab_trans_msg.child_frame_id = "grab_pose"
+                        grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
+                        grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
+                        grab_trans_msg.transform.translation.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
+                        grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
+                        grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
+                        grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
                         
-                        # try:
-                        #     t = self.tf_buffer.lookup_transform(
-                        #         "panda_link0",
-                        #         aruco.child_frame_id,
-                        #         rclpy.time.Time())
-                        # except TransformException as ex:
-                        #     self.get_logger().info(
-                        #         f'Could not transform {("aruco_marker_" + str(goal_handle.request.id))} to {"panda_link0"}: {ex}')
-                        #     return
-                        
-                        
-    
+                        self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
+
+                        rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
+                        rclpy.spin_once(self, timeout_sec=1.0)
+
                         try:
-                            camera_to_base = self.tf_buffer.lookup_transform(
-                                "panda_link0",  # Target frame
-                                self.camera_frame,  # Source frame 
-                                rclpy.time.Time()
+                            print(self.tf_buffer.can_transform("panda_link0",
+                                grab_trans_msg.child_frame_id,
+                                rclpy.time.Time(),
+                                timeout=rclpy.time.Duration(seconds=1)
+                            ))
+                            while not self.tf_buffer.can_transform("panda_link0",
+                                        grab_trans_msg.child_frame_id,
+                                        rclpy.time.Time(),
+                                        timeout=rclpy.time.Duration(seconds=1)
+                                    ):
+                                print("transform not possible")
+                                self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
+                                rclpy.spin_once(self, timeout_sec=1.0)
+                                time.sleep(1.0)
+
+                            base_to_aruco = self.tf_buffer.lookup_transform(
+                                "panda_link0",
+                                grab_trans_msg.child_frame_id,
+                                rclpy.time.Time(),
+                                timeout=rclpy.time.Duration(seconds=1)
                             )
-                                            
+
+                          
+                            
+                            # base_to_aruco = self.tf_buffer.wait_for_transform_async(
+                            #     "panda_link0",
+                            #     grab_trans_msg.child_frame_id,
+                            #     aruco.header.stamp
+                            #     # rclpy.time.Time()
+                            # )
+                            # def trans_call(self):
+                            #     print("trnas avail")
+                            # self.tf_buffer.add_transform_callback(trans_call)
+
+
+                            print("camera_to_aruco: ")
+                            print(base_to_aruco)  
                             # Transform the pose from camera frame to base frame
-                            base_to_aruco = do_transform_pose(aruco, camera_to_base)
+                            # base_to_aruco = do_transform_pose(gg, camera_to_base)
                         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
                             print("Exception occurred: ", e)
-                            
-                        # Static transform from aruco to first_slot
-                        aruco_to_first_slot = goal_handle.request.aruco_to_slot_transform#.transform
-
-                        # Static transform from first slot to wanted slot
-                        first_slot_to_wanted_slot = goal_handle.request.slot_to_slot_transform#.transform
-
-                        # Transform aruco pose to first_slot frame
-                        aruco_to_first_slot_pose = do_transform_pose(base_to_aruco, aruco_to_first_slot)
-                                        
-                        # Transform first slot to wanted slot
-                        first_slot_to_wanted_slot_pose = do_transform_pose(aruco_to_first_slot_pose, first_slot_to_wanted_slot)
 
                         grab_pose_msg = PoseStamped()
                         grab_pose_msg.header.stamp = aruco.header.stamp
-                        grab_pose_msg.header.frame_id = 'panda_link0' #aruco.child_frame_id
-                                        
-                        # Fill in the position from the transformed pose of the wanted slot
-                        grab_pose_msg.pose.position.x = first_slot_to_wanted_slot_pose.pose.position.x
-                        grab_pose_msg.pose.position.y = first_slot_to_wanted_slot_pose.pose.position.y
-                        grab_pose_msg.pose.position.z = first_slot_to_wanted_slot_pose.pose.position.z
+                        grab_pose_msg.header.frame_id = "panda_link0"
+                        grab_pose_msg.pose.position.x = base_to_aruco.transform.translation.x
+                        grab_pose_msg.pose.position.y = base_to_aruco.transform.translation.y
+                        grab_pose_msg.pose.position.z = base_to_aruco.transform.translation.z
+                        grab_pose_msg.pose.orientation.x = base_to_aruco.transform.rotation.x
+                        grab_pose_msg.pose.orientation.y = base_to_aruco.transform.rotation.y
+                        grab_pose_msg.pose.orientation.z = base_to_aruco.transform.rotation.z
+                        grab_pose_msg.pose.orientation.w = base_to_aruco.transform.rotation.w
 
-                        # Fill in the orientation from the transformed pose of the wanted slot
-                        grab_pose_msg.pose.orientation.x = first_slot_to_wanted_slot_pose.pose.orientation.x
-                        grab_pose_msg.pose.orientation.y = first_slot_to_wanted_slot_pose.pose.orientation.y
-                        grab_pose_msg.pose.orientation.z = first_slot_to_wanted_slot_pose.pose.orientation.z
-                        grab_pose_msg.pose.orientation.w = first_slot_to_wanted_slot_pose.pose.orientation.w
-                                        
                         self.pose_pub.publish(grab_pose_msg)
+
+
+
+                        
+                        # grab_pose_msg = PoseStamped()
+                        # grab_pose_msg.header.stamp = aruco.header.stamp
+                        # grab_pose_msg.header.frame_id = 'panda_link0' #aruco.child_frame_id
+                                        
+                        # # Fill in the position from the transformed pose of the wanted slot
+                        # grab_pose_msg.pose.position.y = base_to_aruco.position.y
+                        # grab_pose_msg.pose.position.x = base_to_aruco.position.x
+                        # grab_pose_msg.pose.position.z = base_to_aruco.position.z
+
+                        # # Fill in the orientation from the transformed pose of the wanted slot
+                        # grab_pose_msg.pose.orientation.x = base_to_aruco.orientation.x
+                        # grab_pose_msg.pose.orientation.y = base_to_aruco.orientation.y
+                        # grab_pose_msg.pose.orientation.z = base_to_aruco.orientation.z
+                        # grab_pose_msg.pose.orientation.w = base_to_aruco.orientation.w
+                                        
+                        # self.pose_pub.publish(grab_pose_msg)
+
+                        # Lookup transform from camera frame to base frame
+                        # Lookup transform from camera frame to base frame
+                        # try:
+                        #     base_to_camera = self.tf_buffer.lookup_transform(
+                        #         "panda_link0",  # Target frame
+                        #         self.camera_frame,  # Source frame 
+                        #         rclpy.time.Time()
+                        #     )
+                        #     print("base_to_camera: ")
+                        #     print(base_to_camera)  
+                            
+                        #     # Transform the pose from camera frame to base frame
+                        #     base_to_camera_pose = do_transform_pose(aruco_pose, base_to_camera)
+                            
+                        # except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+                        #     print("Exception occurred: ", e)
+
+                        # # Static transform from aruco to first_slot
+                        # aruco_to_first_slot = goal_handle.request.aruco_to_slot_transform
+                        # print("aruco_to_first_slot: ")
+                        # print(aruco_to_first_slot)
+                        # aruco_to_first_slot.header.frame_id = "aruco_marker_" + str(goal_handle.request.id)
+
+                        # # Static transform from first slot to wanted slot
+                        # first_slot_to_wanted_slot = goal_handle.request.slot_to_slot_transform
+
+                        # # dummy_pose = Pose()
+                        # # dummy_pose.pose.position.x = base_to_camera_pose.position.x + goal_handle.request.aruco_to_slot_transform.transform.translation.x 
+                        # # dummy_pose.pose.position.y = base_to_camera_pose.position.y + goal_handle.request.aruco_to_slot_transform.transform.translation.y
+                        # # dummy_pose.pose.position.z = base_to_camera_pose.position.z + goal_handle.request.aruco_to_slot_transform.transform.translation.z
+
+                        # # Transform pose from aruco to first slot frame
+                        # aruco_to_first_slot_pose = do_transform_pose(base_to_camera_pose, aruco_to_first_slot)
+                        # print("aruco_to_first_slot_pose: ")
+                        # print(aruco_to_first_slot_pose)
+
+                        # # # Transform pose from first slot to wanted slot frame
+                        # # first_slot_to_wanted_slot_pose = do_transform_pose(aruco_to_first_slot_pose, first_slot_to_wanted_slot)
+
+                        # # Publish the transformed pose
+                        # grab_pose_msg = PoseStamped()
+                        # grab_pose_msg.header.stamp = aruco.header.stamp
+                        # grab_pose_msg.header.frame_id = 'panda_link0'
+
+                        # grab_pose_msg.pose = aruco_to_first_slot_pose #first_slot_to_wanted_slot_pose # Use the pose from the transformed pose
+                        # self.pose_pub.publish(grab_pose_msg)
+
             
                         # # qm1 = tf_transformations.quaternion_matrix(aruco.transform.rotation)
                         # # qm2 = tf_transformations.quaternion_matrix(t.transform.rotation)
