@@ -247,9 +247,8 @@ class ArucoMarkerDetector(Node):
                         
                         try:
                             t = self.tf_buffer.lookup_transform(
-                                # ("aruco_marker_" + str(goal_handle.request.id)),
-                                self.camera_frame,
                                 "panda_link0",
+                                aruco.child_frame_id,
                                 rclpy.time.Time())
                         except TransformException as ex:
                             self.get_logger().info(
@@ -266,7 +265,7 @@ class ArucoMarkerDetector(Node):
                         # dot_product = np.dot(rt.as_matrix, r.as_matrix())
                         grab_pose_msg = PoseStamped()
                         grab_pose_msg.header.stamp = aruco.header.stamp
-                        grab_pose_msg.header.frame_id = aruco.child_frame_id
+                        grab_pose_msg.header.frame_id = 'panda_link0' #aruco.child_frame_id
                         grab_pose_msg.pose.position.x = t.transform.translation.x + goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
                         grab_pose_msg.pose.position.y = t.transform.translation.y + goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
                         grab_pose_msg.pose.position.z = t.transform.translation.z + goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
