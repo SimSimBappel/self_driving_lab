@@ -245,7 +245,7 @@ class ArucoMarkerDetector(Node):
                         aruco.transform.rotation.y = markers.poses[index].orientation.y
                         aruco.transform.rotation.z = markers.poses[index].orientation.z
                         aruco.transform.rotation.w = markers.poses[index].orientation.w
-                        aruco = self.tf_turn_around_x_axis(aruco)
+                        aruco = self.tf_turn_around_axis(aruco, x=np.pi)
 
                         # self.tf_broadcaster.sendTransform(aruco)
 
@@ -262,7 +262,8 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
                         grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
-                        
+                        grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
+
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
                         # rclpy.spin_once(self, timeout_sec=1.0) #get the newest tf tree
@@ -366,7 +367,7 @@ class ArucoMarkerDetector(Node):
         elif self.camera_subscriber.runonce:
             print("No image received")
 
-    def tf_turn_around_x_axis(self, tf_msg: TransformStamped, angle=np.pi) -> TransformStamped:
+    def tf_turn_around_axis(self, tf_msg: TransformStamped, x=0.0, y=0.0, z=0.0) -> TransformStamped:
         euler_angles = tf_transformations.euler_from_quaternion([
             tf_msg.transform.rotation.x,
             tf_msg.transform.rotation.y,
@@ -374,7 +375,7 @@ class ArucoMarkerDetector(Node):
             tf_msg.transform.rotation.w
         ])
         # Edit the Euler angles as needed
-        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
+        edited_euler_angles = (euler_angles[0] + x, euler_angles[1] + y, euler_angles[2] + z)
 
         # Convert the Euler angles back to quaternion
         quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
