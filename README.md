@@ -1,6 +1,9 @@
 # SDL
 AAU Robotics 8 semester project
 
+## 3D models
+[onshape link](https://cad.onshape.com/documents/302d39dc0d22175e2aaec147/w/40df758372de53e0b679b2a3/e/3cc2fa0ae1f39eaf5d8ddebc?renderMode=0&uiState=660e6a81d440c26a82b7aa22)
+
 ## Dependencies
 install libfranka from [here](https://frankaemika.github.io/docs/installation_linux.html)
 get the 0.9.2 version during the git checkout command

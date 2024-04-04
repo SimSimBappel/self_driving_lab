@@ -303,20 +303,6 @@ class ArucoMarkerDetector(Node):
                         grab_pose_msg.pose.orientation.w = slot1_to_wanted_slot[3]#goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
                         self.pose_pub.publish(grab_pose_msg)
 
-                        # grab_pose_msg = PoseStamped()
-                        # grab_pose_msg.header.stamp = aruco.header.stamp
-                        # grab_pose_msg.header.frame_id = aruco.child_frame_id
-                        # grab_pose_msg.pose.position.x = 0.0
-                        # grab_pose_msg.pose.position.y = -0.09813 
-                        # grab_pose_msg.pose.position.z = -0.06520 
-                        # grab_pose_msg.pose.orientation.x = 0.0  
-                        # grab_pose_msg.pose.orientation.y = 0.0
-                        # grab_pose_msg.pose.orientation.z = 0.0
-                        # grab_pose_msg.pose.orientation.w = 0.0
-                        # grab_pose_msg.pose = self.turn_around_x_axis(marker_pose_msg.pose, 0.8272861)
-                        # self.pose_pub.publish(grab_pose_msg)
-
-
                         # self.found_object = True
                         result = FindArucoTag.Result()
                         result.grab_pose_msg = grab_pose_msg
