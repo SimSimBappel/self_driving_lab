@@ -2,4 +2,4 @@ string source
 string target
 ---
 bool result
-geometry_msgs/TransformStamped transform
+geometry_msgs/PoseStamped transform

@@ -353,6 +353,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     const auto goal = goal_handle->get_goal();
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     move_group_->setNamedTarget("ready");
+    move_group_->setPlanningPipelineId("ompl");
     move_group_->setStartStateToCurrentState();
     move_group_->setMaxVelocityScalingFactor(0.1);
     move_group_->setMaxAccelerationScalingFactor(0.1);

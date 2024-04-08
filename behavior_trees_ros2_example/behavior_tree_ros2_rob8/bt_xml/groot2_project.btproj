@@ -145,6 +145,13 @@
         <Action ID="HomeArmAction">
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
+        <Action ID="LookupTransformNode">
+            <output_port name="result" type="bool"/>
+            <output_port name="transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="source" type="std::string"/>
+            <input_port name="target" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="PlaceVesselNode">
             <output_port name="message" type="std::string"/>
             <output_port name="workstation_name" type="std::string"/>
