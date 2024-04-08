@@ -97,6 +97,12 @@ int main(int argc, char **argv)
 
   factory.registerNodeType<PrintValue>("PrintValue");
 
+  RosNodeParams params_aruco_lookup_transform;
+  params_aruco_lookup_transform.nh = nh;
+  params_aruco_lookup_transform.server_timeout = std::chrono::milliseconds(2000);
+  params_aruco_lookup_transform.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_aruco_lookup_transform.default_port_value = "lookup_transform";
+  factory.registerNodeType<LookupTransformNode>("LookupTransformNode",params_aruco_lookup_transform);
 
   //////////////////DATABASE/////////////////
   // RosNodeParams params_database_add_chemical;

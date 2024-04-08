@@ -1,5 +1,6 @@
 #include "behaviortree_ros2/bt_action_node.hpp"
 #include "behaviortree_ros2/plugins.hpp"
+#include <behaviortree_ros2/bt_service_node.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "behavior_tree_ros2_actions/action/find_aruco_tag.hpp"
 #include "behavior_tree_ros2_actions/srv/lookup_transform.hpp"
@@ -52,7 +53,7 @@ public:
 
 
 
-
+using LookupTransform = behavior_tree_ros2_actions::srv::LookupTransform;
 
 class LookupTransformNode: public RosServiceNode<LookupTransform>
 {
@@ -75,7 +76,7 @@ class LookupTransformNode: public RosServiceNode<LookupTransform>
         // OutputPort<int8_t>("aruco_id"),
         // OutputPort<bool>("empty"),
         OutputPort<bool>("result"),
-        OutputPort<geometry_msgs::msg::PoseStamped>("pose"),
+        OutputPort<geometry_msgs::msg::PoseStamped>("transform"),
         // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
         // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
         InputPort<std::string>("source"),
@@ -103,7 +104,7 @@ class LookupTransformNode: public RosServiceNode<LookupTransform>
   {
     RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->result);
     
-    setOutput("pose",response->pose);
+    setOutput("transform",response->transform);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
     // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
     return NodeStatus::SUCCESS;

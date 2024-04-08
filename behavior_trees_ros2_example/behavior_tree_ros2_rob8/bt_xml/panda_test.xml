@@ -255,6 +255,13 @@
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
     </SubTree>
+    <Action ID="LookupTransformNode">
+            <output_port name="result" type="bool"/>
+            <output_port name="transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="source" type="std::string"/>
+            <input_port name="target" type="std::string"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
   </TreeNodesModel>
 
 </root>

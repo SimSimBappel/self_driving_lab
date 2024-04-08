@@ -79,6 +79,12 @@ class BehaviorServer : public rclcpp::Node
         
 
         factory.registerNodeType<PrintValue>("PrintValue");
+      RosNodeParams params_aruco_lookup_transform;
+  params_aruco_lookup_transform.nh = this->node_;
+  params_aruco_lookup_transform.server_timeout = std::chrono::milliseconds(2000);
+  params_aruco_lookup_transform.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_aruco_lookup_transform.default_port_value = "lookup_transform";
+  factory.registerNodeType<LookupTransformNode>("LookupTransformNode",params_aruco_lookup_transform);
 
         RosNodeParams params_database_get_chemicals;
   // params_database_get_chemicals.nh = shared_from_this();
@@ -269,10 +275,10 @@ class BehaviorServer : public rclcpp::Node
     void test(){
         tree_ = factory.createTree("node_test_tree");
 
-        //   std::string xml_models = BT::writeTreeNodesModelXML(factory);
-        //     std::cout << "----------- XML file  ----------\n"
-        //     << xml_models
-        //     << "--------------------------------\n";
+          std::string xml_models = BT::writeTreeNodesModelXML(factory);
+            std::cout << "----------- XML file  ----------\n"
+            << xml_models
+            << "--------------------------------\n";
 
 
 
