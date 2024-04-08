@@ -50,6 +50,7 @@ set(action_files
 
   set(srv_files
     "srv/Xdl.srv"
+    "srv/LookupTransform.srv"
   )
   
   rosidl_generate_interfaces(${PROJECT_NAME}
