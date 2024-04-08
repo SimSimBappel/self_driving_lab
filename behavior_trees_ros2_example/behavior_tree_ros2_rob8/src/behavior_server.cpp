@@ -22,6 +22,9 @@
 #include "behaviortree_cpp/xml_parsing.h"
 #include "behaviortree_cpp/json_export.h"
 
+#include <chrono>
+#include <random>
+
 #include "behavior_tree_ros2_actions/srv/xdl.hpp"
 
 #ifndef USE_SLEEP_PLUGIN
@@ -29,6 +32,7 @@
 #endif
 
 using namespace BT;
+using namespace std::chrono_literals;
 
 //-------------------------------------------------------------
 // Simple Action to print a number
@@ -61,9 +65,11 @@ public:
 class BehaviorServer : public rclcpp::Node 
 {
   public:
-    BehaviorServer(const rclcpp::NodeOptions &options)
-    : Node("behavior_services_node", options), node_(std::make_shared<rclcpp::Node>("behavior_exe_services_node"))
-          ,executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
+    // BehaviorServer(const rclcpp::NodeOptions &options)
+    // : Node("behavior_services_node", options), node_(std::make_shared<rclcpp::Node>("behavior_exe_services_node"))
+    //       ,executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
+    BehaviorServer()
+    : Node("behavior_services_node")
     {
     
       this->service_ = create_service<behavior_tree_ros2_actions::srv::Xdl>("xdl_service", std::bind(&BehaviorServer::Xdl_service, this,
@@ -75,6 +81,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<PrintValue>("PrintValue");
 
         RosNodeParams params_database_get_chemicals;
+  // params_database_get_chemicals.nh = shared_from_this();
   params_database_get_chemicals.nh = this->node_;
   params_database_get_chemicals.server_timeout = std::chrono::milliseconds(2000);
   params_database_get_chemicals.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -82,6 +89,7 @@ class BehaviorServer : public rclcpp::Node
   factory.registerNodeType<GetChemicalNode>("GetChemicalNode",params_database_get_chemicals);
 
   RosNodeParams params_database_get_vessel;
+  // params_database_get_vessel.nh = shared_from_this();
   params_database_get_vessel.nh = this->node_;
   params_database_get_vessel.server_timeout = std::chrono::milliseconds(2000);
   params_database_get_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -89,72 +97,15 @@ class BehaviorServer : public rclcpp::Node
   factory.registerNodeType<GetVesselNode>("GetVesselNode",params_database_get_vessel);
 
   RosNodeParams params_database_place_vessel;
+  // params_database_place_vessel.nh = shared_from_this();
   params_database_place_vessel.nh = this->node_;
   params_database_place_vessel.server_timeout = std::chrono::milliseconds(2000);
   params_database_place_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
   params_database_place_vessel.default_port_value = "place_vessel";
   factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
-
-        //////////////////DATABASE/////////////////
-        // RosNodeParams params_database_add_chemical;
-        // params_database_add_chemical.nh = this->node_;
-        // params_database_add_chemical.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_add_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_add_chemical.default_port_value = "add_chemical_service";
-        // factory.registerNodeType<AddChemicalNode>("AddChemicalNode",params_database_add_chemical);
-
-        // RosNodeParams params_database_add_workstation;
-        // params_database_add_workstation.nh = this->node_;
-        // params_database_add_workstation.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_add_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_add_workstation.default_port_value = "add_workstation_service";
-        // factory.registerNodeType<AddWorkstationNode>("AddWorkstationNode",params_database_add_workstation);
-
-        // RosNodeParams params_database_upsert_chemical_location;
-        // params_database_upsert_chemical_location.nh = this->node_;
-        // params_database_upsert_chemical_location.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_upsert_chemical_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_upsert_chemical_location.default_port_value = "upsert_chemical_location_service";
-        // factory.registerNodeType<UpsertChemicalLocationNode>("UpsertChemicalLocationNode",params_database_upsert_chemical_location);
-
-        // RosNodeParams params_database_upsert_workstation_location;
-        // params_database_upsert_workstation_location.nh = this->node_;
-        // params_database_upsert_workstation_location.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_upsert_workstation_location.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_upsert_workstation_location.default_port_value = "upsert_workstation_location_service";
-        // factory.registerNodeType<UpsertWorkstationLocationNode>("UpsertWorkstationLocationNode",params_database_upsert_workstation_location);
-
-        // RosNodeParams params_database_get_all_chemical_locations;
-        // params_database_get_all_chemical_locations.nh = this->node_;
-        // params_database_get_all_chemical_locations.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_get_all_chemical_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_get_all_chemical_locations.default_port_value = "get_all_chemical_locations_service";
-        // factory.registerNodeType<GetAllChemicalLocationsNode>("GetAllChemicalLocationsNode",params_database_get_all_chemical_locations);
-
-        // RosNodeParams params_database_get_all_workstaion_locations;
-        // params_database_get_all_workstaion_locations.nh = this->node_;
-        // params_database_get_all_workstaion_locations.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_get_all_workstaion_locations.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_get_all_workstaion_locations.default_port_value = "get_all_workstation_locations_service";
-        // factory.registerNodeType<GetAllWorkstationLocationsNode>("GetAllWorkstationLocationsNode",params_database_get_all_workstaion_locations);
-
-        // RosNodeParams params_database_remove_chemical;
-        // params_database_remove_chemical.nh = this->node_;
-        // params_database_remove_chemical.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_remove_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_remove_chemical.default_port_value = "remove_chemical_service";
-        // factory.registerNodeType<RemoveChemicalNode>("RemoveChemicalNode",params_database_remove_chemical);
-
-        // RosNodeParams params_database_remove_workstation;
-        // params_database_remove_workstation.nh = this->node_;
-        // params_database_remove_workstation.server_timeout = std::chrono::milliseconds(2000);
-        // params_database_remove_workstation.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        // params_database_remove_workstation.default_port_value = "remove_workstation_service";
-        // factory.registerNodeType<RemoveWorkstationNode>("RemoveWorkstationNode",params_database_remove_workstation);
-
-        ///////////////////////////////////
         
         RosNodeParams params_gripper;
+        // params_gripper.nh = shared_from_this();
         params_gripper.nh = this->node_;
         params_gripper.server_timeout = std::chrono::milliseconds(2000);
         params_gripper.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -162,6 +113,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<GripperAction>("GripperAction",params_gripper);
         //////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_grasp;
+        // params_gripper_franka_grasp.nh = shared_from_this();
         params_gripper_franka_grasp.nh = this->node_;
         params_gripper_franka_grasp.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_grasp.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -169,6 +121,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<FrankaGraspGripperAction>("FrankaGraspGripperAction",params_gripper_franka_grasp);
         //////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_homing;
+        // params_gripper_franka_homing.nh = shared_from_this();
         params_gripper_franka_homing.nh = this->node_;
         params_gripper_franka_homing.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_homing.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -176,6 +129,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<FrankaHomeGripperAction>("FrankaHomeGripperAction",params_gripper_franka_homing);
         ////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_gripper_franka_move;
+        // params_gripper_franka_move.nh = shared_from_this();
         params_gripper_franka_move.nh = this->node_;
         params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
         params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -183,6 +137,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
         ////////////////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_aruco;
+        // params_aruco.nh = shared_from_this();
         params_aruco.nh = this->node_;
         params_aruco.server_timeout = std::chrono::milliseconds(2000);
         params_aruco.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -190,6 +145,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<FindArucoTagAction>("ArucoAction",params_aruco);
         ////////////////////////////////////////////////////////////////////////////////////////
         RosNodeParams params_arm_mode_pose;
+        // params_arm_mode_pose.nh = shared_from_this();
         params_arm_mode_pose.nh = this->node_;
         params_arm_mode_pose.server_timeout = std::chrono::milliseconds(2000);
         params_arm_mode_pose.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -197,6 +153,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmMovePoseAction>("ArmMovePoseAction",params_arm_mode_pose);
 
         RosNodeParams params_arm_mode_joints;
+        // params_arm_mode_joints.nh = shared_from_this();
         params_arm_mode_joints.nh = this->node_;
         params_arm_mode_joints.server_timeout = std::chrono::milliseconds(2000);
         params_arm_mode_joints.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -204,6 +161,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmMoveJointsAction>("ArmMoveJointsAction",params_arm_mode_joints);
 
         RosNodeParams params_gripper_joint;
+        // params_gripper_joint.nh = shared_from_this();
         params_gripper_joint.nh = this->node_;
 
         params_gripper_joint.default_port_value = "gripper_joint_service";
@@ -213,6 +171,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmPoseMsgOffsetCalculation>("ArmPoseMsgOffsetCalculation");
 
         RosNodeParams params_arm_move_pose_msg;
+        // params_arm_move_pose_msg.nh = shared_from_this();
         params_arm_move_pose_msg.nh = this->node_;
         params_arm_move_pose_msg.default_port_value = "arm_move_pose_msg_service";
         params_arm_move_pose_msg.server_timeout = std::chrono::milliseconds(2000);
@@ -220,6 +179,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
 
         RosNodeParams params_arm_move_pose_msg_tcp;
+        // params_arm_move_pose_msg_tcp.nh = shared_from_this();
         params_arm_move_pose_msg_tcp.nh = this->node_;
         params_arm_move_pose_msg_tcp.default_port_value = "arm_move_pose_msg_tcp_service";
         params_arm_move_pose_msg_tcp.server_timeout = std::chrono::milliseconds(2000);
@@ -227,6 +187,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmMovePoseMsgTcpAction>("ArmMovePoseMsgTcpAction",params_arm_move_pose_msg_tcp);
 
         RosNodeParams params_arm_move_pliz_ptp_pose_msg;
+        // params_arm_move_pliz_ptp_pose_msg.nh = shared_from_this();
         params_arm_move_pliz_ptp_pose_msg.nh = this->node_;
         params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";
         params_arm_move_pliz_ptp_pose_msg.server_timeout = std::chrono::milliseconds(2000);
@@ -235,6 +196,7 @@ class BehaviorServer : public rclcpp::Node
 
 
         RosNodeParams params_arm_move_pliz_lin_pose_msg;
+        // params_arm_move_pliz_lin_pose_msg.nh = shared_from_this();
         params_arm_move_pliz_lin_pose_msg.nh = this->node_;
         params_arm_move_pliz_lin_pose_msg.default_port_value = "arm_move_pliz_lin_pose_msg_service";
         params_arm_move_pliz_lin_pose_msg.server_timeout = std::chrono::milliseconds(2000);
@@ -243,6 +205,7 @@ class BehaviorServer : public rclcpp::Node
 
 
         RosNodeParams params;
+        // params.nh = shared_from_this();
         params.nh = this->node_;
         params.server_timeout = std::chrono::milliseconds(2000);
         params.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -251,6 +214,7 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<ArmPoseOffsetCalculation>("ArmPoseOffsetCalculation");
 
         RosNodeParams params_home_arm;
+        // params_home_arm.nh = shared_from_this();
         params_home_arm.nh = this->node_;
         params_home_arm.server_timeout = std::chrono::milliseconds(2000);
         params_home_arm.wait_for_server_timeout = std::chrono::milliseconds(1000);
@@ -264,16 +228,6 @@ class BehaviorServer : public rclcpp::Node
         factory.registerNodeType<SleepAction>("SleepAction", params);
         #endif
 
-  // using std::filesystem::directory_iterator;
-  // for (auto const& entry : directory_iterator(default_bt_xml_foler)) 
-  // {
-  //   if( entry.path().extension() == ".xml")
-  //   {
-  //     factory.registerBehaviorTreeFromFile(entry.path().string());
-  //   }
-  // }
-  // nh->declare_parameter<std::string>("tree_xml_file", default_bt_xml_file);
-  // std::string tree_xml_file_ = nh->get_parameter("tree_xml_file").as_string();
 
   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml");
   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/stirring.xml");
@@ -291,12 +245,29 @@ class BehaviorServer : public rclcpp::Node
         factory.registerBehaviorTreeFromFile(request->xdl);
         auto tree = factory.createTree("MainTree");
         publisher_ptr_ = std::make_unique<BT::Groot2Publisher>(tree_, 5555);
-        tree.tickWhileRunning();
+        // tree.tickWhileRunning();
 
     }
+    void update_behavior_tree() {
+            // Tick the behavior tree.
+            BT::NodeStatus tree_status = tree_.tickOnce();
+            if (tree_status == BT::NodeStatus::RUNNING) {
+                return;
+            }
+            // Cancel the timer if we hit a terminal state.
+            if (tree_status == BT::NodeStatus::SUCCESS) {
+                RCLCPP_INFO(this->get_logger(), "Finished with status SUCCESS");
+                timer_->cancel();
+                rclcpp::shutdown(); // remove this when using the service
+            } else if (tree_status == BT::NodeStatus::FAILURE) {
+                RCLCPP_INFO(this->get_logger(), "Finished with status FAILURE");
+                timer_->cancel();
+                rclcpp::shutdown(); // remove this when using the service
+            }
+        }
 
     void test(){
-        auto tree = factory.createTree("MainTree");
+        tree_ = factory.createTree("node_test_tree");
 
         //   std::string xml_models = BT::writeTreeNodesModelXML(factory);
         //     std::cout << "----------- XML file  ----------\n"
@@ -306,13 +277,20 @@ class BehaviorServer : public rclcpp::Node
 
 
 
-        // // std::cout << BT::writeTreeToXML(tree);
-        // std::cout << "----------- XML file  ----------\n"
-        //     << BT::WriteTreeToXML(tree, false, false)
-        //     << "--------------------------------\n";
+        // std::cout << BT::writeTreeToXML(tree);
+        std::cout << "----------- XML file  ----------\n"
+            << BT::WriteTreeToXML(tree_, false, false)
+            << "--------------------------------\n";
         
         publisher_ptr_ = std::make_unique<BT::Groot2Publisher>(tree_, 5555);
-        tree.tickWhileRunning();
+        const auto timer_period = 100ms;
+            timer_ = this->create_wall_timer(
+                timer_period,
+                std::bind(&BehaviorServer::update_behavior_tree, this));
+
+        // rclcpp::spin();
+        // rclcpp::spin(this->node_);
+        // rclcpp::shutdown();
     }
     // void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
     // {
@@ -326,6 +304,7 @@ class BehaviorServer : public rclcpp::Node
     BehaviorTreeFactory factory;
     rclcpp::Executor::SharedPtr executor_;
     std::thread executor_thread_;
+    rclcpp::TimerBase::SharedPtr timer_;
 };
 
 
@@ -365,9 +344,11 @@ const std::string default_bt_xml_file =
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::NodeOptions node_options;
-    node_options.automatically_declare_parameters_from_overrides(true);
-    auto behavior_node = std::make_shared<BehaviorServer>(node_options);
+    // rclcpp::NodeOptions node_options;
+    // node_options.automatically_declare_parameters_from_overrides(true);
+    // auto behavior_node = std::make_shared<BehaviorServer>(node_options);
+    
+    auto behavior_node = std::make_shared<BehaviorServer>();
     rclcpp::spin(behavior_node);
 
     rclcpp::shutdown();

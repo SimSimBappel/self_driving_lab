@@ -135,6 +135,13 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="node_test_tree">
+    <Sequence>
+      <PrintValue message="hej"/>
+      <Sleep msec="1000"/>
+    </Sequence>
+  </BehaviorTree>
+
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
     <Action ID="ArmArrayToPoseAction">
