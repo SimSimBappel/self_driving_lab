@@ -2,7 +2,8 @@ import cv2
 import time
 import rclpy
 import numpy as np
-import tf_transformations
+import rclpy.duration
+import tf_transformations as tf
 from rclpy.node import Node
 from cv_bridge import CvBridge
 from rclpy.qos import qos_profile_sensor_data
@@ -16,10 +17,12 @@ from aruco_pose_estimation.pose_estimation import pose_estimation
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
 import tf2_ros
+from tf2_ros import TransformException
 import scipy
 # from tf2_ros import BufferClient
 # from tf2_ros.buffer_interface import BUFFER_CLIENT_DEFAULT_OPTIONS_ASYNC
 from tf2_ros.buffer import Buffer
+
 from tf2_ros.transform_listener import TransformListener
 from scipy.spatial.transform import Rotation as R
 from tf2_geometry_msgs import do_transform_pose
@@ -58,12 +61,12 @@ class CameraSubscriber(Node):
 
         # self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
         _qos = QoSProfile(
-                depth=1000,
+                depth=100,
                 durability=DurabilityPolicy.VOLATILE,
                 history=HistoryPolicy.KEEP_LAST,
                 )
         self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self, qos=_qos)
+        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
 
         
     def info_callback(self, info_msg):
@@ -110,19 +113,57 @@ class CameraSubscriber(Node):
         if not self.debug:
             self.streaming = False
 
-    def ass(self, grab_trans_msg):
+    def ass(self, grab_trans_msg: TransformStamped, tid):
+        when = tid - rclpy.time.Duration(seconds=0.1)
         try:
-            if self.tf_buffer.can_transform("panda_link0",
-                        grab_trans_msg.child_frame_id,
-                        rclpy.time.Time(),
+            # if self.tf_buffer.can_transform("panda_link0",
+            #             grab_trans_msg.child_frame_id,
+            #             rclpy.time.Time(),
+            #             timeout=rclpy.time.Duration(seconds=1)
+            #         ):
+            #     base_to_aruco = self.tf_buffer.lookup_transform(
+            #         "panda_link0",
+            #         grab_trans_msg.child_frame_id,
+            #         rclpy.time.Time(),
+            #         timeout=rclpy.time.Duration(seconds=1)
+            #     )
+
+            if self.tf_buffer.can_transform(
+                        "panda_link0",
+                        "panda_link7",
+                        # grab_trans_msg.child_frame_id,
+                        # rclpy.time.Time(),
+                        when,
                         timeout=rclpy.time.Duration(seconds=1)
                     ):
                 base_to_aruco = self.tf_buffer.lookup_transform(
                     "panda_link0",
-                    grab_trans_msg.child_frame_id,
-                    rclpy.time.Time(),
+                    "panda_link7",
+                    # grab_trans_msg.child_frame_id,
+                    # rclpy.time.Time(),
+                    when,
                     timeout=rclpy.time.Duration(seconds=1)
                 )
+
+
+
+            # when = self.get_clock().now() - rclpy.time.Duration(seconds=0.1)
+            # if self.tf_buffer.can_transform_full(
+            #             target_frame = 'panda_link0',
+            #             target_time = 0, #rclpy.time.Time(),
+            #             source_frame = grab_trans_msg.child_frame_id,
+            #             source_time = when,
+            #             fixed_frame = "panda_link0",
+            #             timeout = rclpy.time.Duration(seconds=1.0),
+            #         ):
+            #     base_to_aruco = self.tf_buffer.lookup_transform_full(
+            #         target_frame ='panda_link0',
+            #         target_time = 0, #rclpy.time.Time(),
+            #         source_frame =grab_trans_msg.child_frame_id,
+            #         source_time =when,
+            #         fixed_frame ='panda_link0',
+            #         timeout =rclpy.duration.Duration(seconds=1.0))
+                
                 return base_to_aruco
             else:
                 print("transform not possible")
@@ -131,6 +172,55 @@ class CameraSubscriber(Node):
             print("Exception occurred: ", e)
 
         return None
+    
+
+
+class FrameListener(Node):
+
+    def __init__(self):
+        super().__init__('_tf2_frame_listener')
+
+        # Declare and acquire `target_frame` parameter
+        self.target_frame = self.declare_parameter(
+          'target_frame', 'turtle1').get_parameter_value().string_value
+
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
+        # Create a client to spawn a turtle
+        # self.spawner = self.create_client(Spawn, 'spawn')
+        # Boolean values to store the information
+        # if the service for spawning turtle is available
+        # self.turtle_spawning_service_ready = False
+        # if the turtle was successfully spawned
+        # self.turtle_spawned = False
+
+        # Create turtle2 velocity publisher
+        # self.publisher = self.create_publisher(Twist, 'turtle2/cmd_vel', 1)
+
+        # Call on_timer function every second
+        # self.timer = self.create_timer(5.0, self.on_timer)
+
+    def on_timer(self):
+        # Store frame names in variables that will be used to
+        # compute transformations
+        from_frame_rel = "panda_link0" #self.target_frame
+        to_frame_rel = 'camera_color_optical_frame'
+
+        # Look up for the transformation between target_frame and turtle2 frames
+        # and send velocity commands for turtle2 to reach target_frame
+        try:
+            t = self.tf_buffer.lookup_transform(
+                to_frame_rel,
+                from_frame_rel,
+                rclpy.time.Time())
+            # print(f"time: {rclpy.time.Time()}")
+            # print(f"header of t: {t.header.stamp}")
+        except TransformException as ex:
+            self.get_logger().info(
+                f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
+            return
+        return t
 
 
 class ArucoMarkerDetector(Node):
@@ -140,6 +230,9 @@ class ArucoMarkerDetector(Node):
         self.logger.info('Initializing aruco_marker_detector')
         self.initialize_parameters()
         self.camera_subscriber = CameraSubscriber(self.image_topic, self.info_topic, self.debug)
+        self.frame_listener = FrameListener()
+        # self.timer2 = self.create_timer(5.0, self.on_timer)
+        # rclpy.spin(self.frame_listener)
         
         self.timeout = 5 # Secounds
         self.found_object = False
@@ -224,6 +317,7 @@ class ArucoMarkerDetector(Node):
                         index = markers.marker_ids.index(goal_handle.request.id)
                         aruco = TransformStamped()
                         aruco.header.stamp = self.get_clock().now().to_msg()
+                        # zime = self.get_clock().now()
                         aruco.header.frame_id = self.camera_frame
                         aruco.child_frame_id = "aruco_marker_" + str(goal_handle.request.id)
                         aruco.transform.translation.x = markers.poses[index].position.x
@@ -248,20 +342,28 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
                         grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
 
-                        
+                        self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
-                        rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1) #get the newest tf tree
+                        # rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1) #get the newest tf tree
                         base_to_aruco = None
-
+                        # der er noget galt med hvordan vi publisher panda_link8 dens delay er KÆMPE brug: ros2 run tf2_ros tf2_monitor panda_link0 panda_link8 
+                        # for at se hvordan det ser ud
                         try:
-                            count = 0
-                            while base_to_aruco is None and count < 5:
-                                # aruco.header.stamp = self.get_clock().now().to_msg()
-                                # grab_trans_msg.header.stamp = aruco.header.stamp
-                                self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
-                                base_to_aruco = self.camera_subscriber.ass(grab_trans_msg)
-                                rclpy.spin_once(self.camera_subscriber, timeout_sec=1.0)
-                                count += 1
+                            rclpy.spin_once(self.frame_listener, timeout_sec=0.1)
+                            base_to_aruco = self.frame_listener.on_timer()
+                            # count = 0
+                            # while base_to_aruco is None and count < 5:
+                            #     aruco.header.stamp = self.get_clock().now().to_msg()
+                            #     zime = self.get_clock().now()
+                            #     # print(f"zime: {zime}")
+                            #     # print(f"tid: {aruco.header.stamp}")
+                            #     # print(f"differnce: {aruco.header.stamp.nanosec - zime}")
+
+                            #     grab_trans_msg.header.stamp = aruco.header.stamp
+                            #     self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
+                            #     base_to_aruco = self.camera_subscriber.ass(grab_trans_msg, zime)
+                            #     rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1)
+                            #     count += 1
                         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
                             print("Exception occurred: ", e)
                         
@@ -362,7 +464,7 @@ class ArucoMarkerDetector(Node):
     #         print("No image received")
 
     def tf_turn_around_axis(self, tf_msg: TransformStamped, x=0.0, y=0.0, z=0.0) -> TransformStamped:
-        euler_angles = tf_transformations.euler_from_quaternion([
+        euler_angles = tf.euler_from_quaternion([
             tf_msg.transform.rotation.x,
             tf_msg.transform.rotation.y,
             tf_msg.transform.rotation.z,
@@ -372,7 +474,7 @@ class ArucoMarkerDetector(Node):
         edited_euler_angles = (euler_angles[0] + x, euler_angles[1] + y, euler_angles[2] + z)
 
         # Convert the Euler angles back to quaternion
-        quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
+        quat = tf.quaternion_from_euler(*edited_euler_angles)
 
         tf_msg.transform.rotation.x = quat[0]
         tf_msg.transform.rotation.y = quat[1]
@@ -427,6 +529,11 @@ class ArucoMarkerDetector(Node):
     def reset(self):
         """Delete image after using"""
         self.camera_subscriber.img_raw = None 
+
+    def spinme(self):
+        while rclpy.ok():
+            rclpy.spin(self)
+           
 
 
     def initialize_parameters(self):
@@ -590,7 +697,8 @@ def main(args=None):
     rclpy.init(args=args)
     aruco_marker_detector = ArucoMarkerDetector()
     try:
-        rclpy.spin(aruco_marker_detector)
+        # rclpy.spin(aruco_marker_detector)
+        aruco_marker_detector.spinme()
     except Exception as e: 
         print(e)
     aruco_marker_detector.destroy()

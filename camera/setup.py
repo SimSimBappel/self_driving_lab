@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'aruco_pose_estimator = camera.aruco_pose_estimator:main',
+            'lookup = camera.lookup_transform:main'
         ],
     },
 )
