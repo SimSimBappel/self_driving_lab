@@ -242,15 +242,33 @@ class BehaviorServer : public rclcpp::Node
   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/liquid_handling.xml");
   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/database_trees.xml");
 
-    BehaviorServer::test();
+    // BehaviorServer::test();
     }
 
   private:
     void Xdl_service(const std::shared_ptr<behavior_tree_ros2_actions::srv::Xdl::Request> request, const std::shared_ptr<behavior_tree_ros2_actions::srv::Xdl::Response> response)
     {
         factory.registerBehaviorTreeFromFile(request->xdl);
-        auto tree = factory.createTree("MainTree");
+        tree_ = factory.createTree("node_test_tree");
+
+          std::string xml_models = BT::writeTreeNodesModelXML(factory);
+            std::cout << "----------- XML file  ----------\n"
+            << xml_models
+            << "--------------------------------\n";
+
+
+
+
+        // std::cout << BT::writeTreeToXML(tree);
+        std::cout << "----------- XML file  ----------\n"
+            << BT::WriteTreeToXML(tree_, false, false)
+            << "--------------------------------\n";
+        
         publisher_ptr_ = std::make_unique<BT::Groot2Publisher>(tree_, 5555);
+        const auto timer_period = 100ms;
+            timer_ = this->create_wall_timer(
+                timer_period,
+                std::bind(&BehaviorServer::update_behavior_tree, this));
         // tree.tickWhileRunning();
 
     }
