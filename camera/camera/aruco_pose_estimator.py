@@ -239,7 +239,7 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
                         grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
-                        grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
+                        # grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
 
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
@@ -256,9 +256,9 @@ class ArucoMarkerDetector(Node):
                         #     print("fuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
                         #     break
 
-                        grab_pose_msg = PoseStamped()
-                        grab_pose_msg.header.stamp = aruco.header.stamp
-                        grab_pose_msg.header.frame_id = "panda_link0"
+                        # grab_pose_msg = PoseStamped()
+                        # grab_pose_msg.header.stamp = aruco.header.stamp
+                        # grab_pose_msg.header.frame_id = "panda_link0"
                         # grab_pose_msg.pose.position.x = base_to_aruco.transform.translation.x
                         # grab_pose_msg.pose.position.y = base_to_aruco.transform.translation.y
                         # grab_pose_msg.pose.position.z = base_to_aruco.transform.translation.z
@@ -279,7 +279,7 @@ class ArucoMarkerDetector(Node):
             
                 self.reset()
                 time.sleep(0.05)
-                print("zzz")
+                # print("zzz")
 
         self.camera_subscriber.stop_streaming()
         if time.time() - start_time > self.timeout:
@@ -287,16 +287,17 @@ class ArucoMarkerDetector(Node):
         
         result = FindArucoTag.Result()
         
-        if grab_pose_msg is not None:
-            result.grab_pose_msg = grab_pose_msg
+        if self.found_object:
+            # result.grab_pose_msg = grab_pose_msg
             goal_handle.succeed()
+            self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
             
 
         else:
             goal_handle.abort()
 
 
-        print(result)
+        # print(result)
         return result
     
 
