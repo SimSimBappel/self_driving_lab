@@ -171,6 +171,14 @@ def generate_launch_description():
         'publish_transforms_updates': True,
     }
 
+    # camera_sensor = load_yaml(
+    #     'franka_moveit_config', 'config/sensors_depthmap.yaml'
+    # )
+
+    octomap_config = {'octomap_frame': 'camera_link', 
+                  'octomap_resolution': 0.02,
+                  'max_range': 1.0}
+
     # Start the actual move_group node/action server
     run_move_group_node = Node(
         package='moveit_ros_move_group',
@@ -186,6 +194,7 @@ def generate_launch_description():
             planning_scene_monitor_parameters,
             robot_description_planning,
             camera_sensor,
+            octomap_config,
         ],
     )
 
@@ -202,6 +211,7 @@ def generate_launch_description():
             trajectory_execution,
             moveit_controllers,
             planning_scene_monitor_parameters,
+            octomap_config,
         ],
     )
 
@@ -221,6 +231,7 @@ def generate_launch_description():
             ompl_planning_pipeline_config,
             kinematics_yaml,
             camera_sensor,
+            octomap_config,
         ],
     )
 
@@ -283,11 +294,11 @@ def generate_launch_description():
         condition=IfCondition(db_config)
     )
 
-    # pgsql_node = Node(
-    #     package='pgsql_services',
-    #     executable='database_service',
-    #     output='screen'
-    # )
+    pgsql_node = Node(
+        package='pgsql_services',
+        executable='database_service',
+        output='screen'
+    )
 
 
     joint_state_publisher = Node(
@@ -347,8 +358,8 @@ def generate_launch_description():
          gripper_launch_file,
          move_server,
          included_launch_description,
-        #  robot_lookup_t,
-        #  pgsql_node,
+         robot_lookup_t,
+         pgsql_node,
          ]
         + load_controllers
     )
