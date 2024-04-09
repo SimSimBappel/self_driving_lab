@@ -762,7 +762,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
     move_group_->setStartStateToCurrentState();
     // move_group_->setPoseReferenceFrame("");
     move_group_->setPoseReferenceFrame(base_link);
-    pose.header.frame_id = "";
+    // pose.header.frame_id = "";
     move_group_->setPoseTarget(pose);
     bool success = static_cast<bool>(move_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");

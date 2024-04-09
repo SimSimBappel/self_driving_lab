@@ -25,7 +25,7 @@
       <SubTree ID="gripping"
                width="0.02"
                speed="0.03"
-               force="5"
+               force="3"
                epsilon="0.02"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"

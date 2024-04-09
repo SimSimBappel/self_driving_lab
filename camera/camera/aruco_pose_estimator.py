@@ -21,7 +21,7 @@ import tf2_ros
 from tf2_ros.buffer import Buffer
 
 from tf2_ros.transform_listener import TransformListener
-
+import tf_transformations as tf
 
 import numpy as np
 from rclpy.qos import DurabilityPolicy, QoSProfile, HistoryPolicy
@@ -235,11 +235,12 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
                         grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
                         grab_trans_msg.transform.translation.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
-                        grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x + goal_handle.request.slot_to_slot_transform.transform.rotation.x
-                        grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y + goal_handle.request.slot_to_slot_transform.transform.rotation.y
-                        grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z + goal_handle.request.slot_to_slot_transform.transform.rotation.z
-                        grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w + goal_handle.request.slot_to_slot_transform.transform.rotation.w
-                        grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
+                        grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x# + goal_handle.request.slot_to_slot_transform.transform.rotation.x
+                        grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y# + goal_handle.request.slot_to_slot_transform.transform.rotation.y
+                        grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z# + goal_handle.request.slot_to_slot_transform.transform.rotation.z
+                        grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w# + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        
+                        # grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
 
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
