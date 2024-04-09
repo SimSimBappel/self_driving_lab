@@ -1,0 +1,7 @@
+Chemicals:
+chlorine
+sulfuric_acid
+natrium_chloride
+
+Vessels:
+beaker_250ml 
