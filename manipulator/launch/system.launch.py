@@ -224,6 +224,14 @@ def generate_launch_description():
         ],
     )
 
+    robot_lookup_t = Node(
+        package='camera',
+        executable='lookup',
+        name='lookup',
+        output='both',
+        parameters=[robot_description],
+    )
+
     # Publish TF
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -330,7 +338,8 @@ def generate_launch_description():
          joint_state_publisher,
          gripper_launch_file,
          move_server,
-         included_launch_description
+         included_launch_description,
+        #  robot_lookup_t,
          ]
         + load_controllers
     )

@@ -19,7 +19,7 @@ class FrameListener(Node):
         # self.tf_listener = TransformListener(self.tf_buffer, self)
 
         _qos = QoSProfile(
-                depth=10000,#1000000
+                depth=100000,#1000000
                 durability=DurabilityPolicy.VOLATILE,
                 history=HistoryPolicy.KEEP_LAST,
                 )
@@ -34,8 +34,7 @@ class FrameListener(Node):
             t = self.tf_buffer.lookup_transform(
                 to_frame_rel,
                 from_frame_rel,
-                rclpy.time.Time(),
-                rclpy.time.Duration(seconds=5.0))
+                rclpy.time.Time())
             print(t)
             response.result = True
             # response.transform = t

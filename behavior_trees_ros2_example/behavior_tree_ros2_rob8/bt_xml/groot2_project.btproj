@@ -27,6 +27,12 @@
             <input_port name="array" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
             <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
         </Action>
+        <Action ID="ArmMoveJointsAction">
+            <input_port name="joints" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
         <Action ID="ArmMovePlizLinPoseMsgAction">
             <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="speed" type="double"/>
@@ -205,6 +211,12 @@
         <SubTree ID="grasp_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
             <input_port name="approch_offset"/>
+        </SubTree>
+        <SubTree ID="gripping" editable="true">
+            <input_port name="width" default="0.02"/>
+            <input_port name="speed" default="0.03"/>
+            <input_port name="force" default="5"/>
+            <input_port name="epsilon" default="0.02"/>
         </SubTree>
         <SubTree ID="place_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>

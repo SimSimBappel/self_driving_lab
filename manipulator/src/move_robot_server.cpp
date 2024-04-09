@@ -168,6 +168,8 @@ bool MoveRobotServer::ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg){
               }
 }
 
+
+
 bool MoveRobotServer::ArmMoveL(const geometry_msgs::msg::PoseStamped & msg){
   std::vector<geometry_msgs::msg::Pose> waypoints;
   move_group_->setPoseReferenceFrame(base_link);
@@ -1124,7 +1126,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
       else{
           result->done = false;
           goal_handle->abort(result);
-          RCLCPP_INFO(this->get_logger(), "Goal canceled");
+          RCLCPP_INFO(this->get_logger(), "Goal abort");
       }
   }
 

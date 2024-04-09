@@ -22,17 +22,32 @@
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <FrankaGraspGripperAction width="0.02"
-                                speed="0.03"
-                                force="10"
-                                epsilon="0.01"
-                                action_name="__default__placeholder__"/>
+      <SubTree ID="gripping"
+               width="0.02"
+               speed="0.03"
+               force="5"
+               epsilon="0.02"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
                                    speed="0.025"
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
     </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="gripping">
+    <Fallback>
+      <FrankaGraspGripperAction width="{width}"
+                                speed="{speed}"
+                                force="{force}"
+                                epsilon="{epsilon}"
+                                action_name="__default__placeholder__"/>
+      <FrankaGraspGripperAction width="{width}"
+                                speed="{speed}"
+                                force="{force}"
+                                epsilon="{epsilon}"
+                                action_name="__default__placeholder__"/>
+    </Fallback>
   </BehaviorTree>
 
   <BehaviorTree ID="haptic_calibration">
@@ -233,6 +248,17 @@
              editable="true">
       <input_port name="target_pose_msg"/>
       <input_port name="approch_offset"/>
+    </SubTree>
+    <SubTree ID="gripping"
+             editable="true">
+      <input_port name="width"
+                  default="0.02"/>
+      <input_port name="speed"
+                  default="0.03"/>
+      <input_port name="force"
+                  default="5"/>
+      <input_port name="epsilon"
+                  default="0.02"/>
     </SubTree>
   </TreeNodesModel>
 
