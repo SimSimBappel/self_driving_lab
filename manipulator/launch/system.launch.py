@@ -362,16 +362,10 @@ def generate_launch_description():
          joint_state_publisher,
          gripper_launch_file,
          move_server,
-<<<<<<< HEAD
-         included_launch_description,
          robot_lookup_t,
          pgsql_node,
-=======
         #  launch_moveit,
          launch_pose_estimation,
-        #  robot_lookup_t,
-        #  pgsql_node,
->>>>>>> 9a9430cb8c96b9b551180040d5c0cede3baad132
          ]
         + load_controllers
     )
