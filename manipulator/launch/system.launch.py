@@ -326,10 +326,15 @@ def generate_launch_description():
         condition=IfCondition(load_gripper)
     )
 
-    included_launch_description = IncludeLaunchDescription(
+    launch_pose_estimation = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(get_package_share_directory("camera"), 'launch', 'pose_estimation.launch.py')),
         launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time')}.items()
     )
+
+    # launch_moveit = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(os.path.join(get_package_share_directory("franka_moveit_config"), 'launch', 'moveit.launch.py')),
+    #     launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time')}.items()
+    # )
 
     return LaunchDescription(
         [robot_arg,
@@ -346,7 +351,8 @@ def generate_launch_description():
          joint_state_publisher,
          gripper_launch_file,
          move_server,
-         included_launch_description,
+        #  launch_moveit,
+         launch_pose_estimation,
         #  robot_lookup_t,
         #  pgsql_node,
          ]
