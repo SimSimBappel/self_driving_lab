@@ -283,6 +283,13 @@ def generate_launch_description():
         condition=IfCondition(db_config)
     )
 
+    # pgsql_node = Node(
+    #     package='pgsql_services',
+    #     executable='database_service',
+    #     output='screen'
+    # )
+
+
     joint_state_publisher = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
@@ -299,6 +306,7 @@ def generate_launch_description():
         use_fake_hardware_parameter_name,
         default_value='false',
         description='Use fake hardware')
+    
     load_gripper_arg = DeclareLaunchArgument(
             load_gripper_parameter_name,
             default_value='true',
@@ -340,6 +348,8 @@ def generate_launch_description():
          move_server,
          included_launch_description,
         #  robot_lookup_t,
+        #  pgsql_node,
+         included_launch_description
          ]
         + load_controllers
     )
