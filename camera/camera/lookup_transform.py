@@ -24,7 +24,9 @@ class FrameListener(Node):
                 history=HistoryPolicy.KEEP_LAST,
                 )
         self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
+        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True)
+
+        # self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
 
     def lookup_transform(self, request, response):
         from_frame_rel = request.source 
@@ -48,6 +50,10 @@ class FrameListener(Node):
             response.transform.pose.orientation.y = t.transform.rotation.y
             response.transform.pose.orientation.z = t.transform.rotation.z
             response.transform.pose.orientation.w = t.transform.rotation.w
+            frames = self.tf_buffer.all_frames_as_string()
+            self.get_logger().info('Current frames in tf2 tree:')
+            for frame in frames.split('\n'):
+                self.get_logger().info(f'- {frame.strip()}')
         except TransformException as ex:
             self.get_logger().info(
                 f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')

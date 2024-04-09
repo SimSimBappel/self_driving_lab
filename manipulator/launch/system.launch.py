@@ -349,7 +349,6 @@ def generate_launch_description():
          included_launch_description,
         #  robot_lookup_t,
         #  pgsql_node,
-         included_launch_description
          ]
         + load_controllers
     )
