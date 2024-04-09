@@ -119,6 +119,8 @@ def generate_launch_description():
             "enable_color": "true",
             "rgb_camera.profile": "1920,1080,6",
             "align_depth.enable": "true",
+            "clip_distance": "2.0",
+            "allow_no_texture_points": "true",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
     )
