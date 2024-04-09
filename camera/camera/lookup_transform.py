@@ -54,6 +54,11 @@ class FrameListener(Node):
             response.result = False
             # response.transform = TransformStamped()
             response.transform = PoseStamped()
+              # Output all frames in the tf2 tree
+            frames = self.tf_buffer.all_frames_as_string()
+            self.get_logger().info('Current frames in tf2 tree:')
+            for frame in frames.split('\n'):
+                self.get_logger().info(f'- {frame.strip()}')
         
         
         return response
