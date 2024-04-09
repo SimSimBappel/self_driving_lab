@@ -118,6 +118,7 @@ def generate_launch_description():
             "pointcloud.enable": "true",
             "enable_color": "true",
             "rgb_camera.profile": "1920,1080,6",
+            "align_depth.enable": "true",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
     )
