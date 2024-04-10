@@ -15,6 +15,7 @@
       <ArmMovePoseMsgAction pose="{approch_pose}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation="false"
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
@@ -73,6 +74,7 @@
       <ArmMovePoseMsgAction pose="{approch_pose}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation=""
                             action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
@@ -102,6 +104,7 @@
       <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation="{keep_orientation}"
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{aruco_id}"
                    aruco_to_slot_transform="{aruco_to_slot}"
@@ -124,6 +127,7 @@
       <ArmMovePoseMsgAction pose="{vessel_lookout}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation=""
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{workstation_id}"
                    aruco_to_slot_transform=""
@@ -133,10 +137,12 @@
       <ArmMovePoseMsgAction pose="{aruco_pose}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation=""
                             action_name="__default__placeholder__"/>
       <ArmMovePoseMsgAction pose="{pour_pose}"
                             speed="0.2"
                             accel="0.2"
+                            keep_orientation=""
                             action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -161,6 +167,8 @@
                   type="double"/>
       <input_port name="accel"
                   type="double"/>
+      <input_port name="keep_orientation"
+                  type="bool"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>

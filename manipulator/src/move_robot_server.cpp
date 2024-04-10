@@ -298,11 +298,13 @@ bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
     // move_group_->move();
     move_group_->setStartStateToCurrentState();
     move_group_->setPoseTarget(pose_goal);
+    RCLCPP_INFO(this->get_logger(), "set pose goal");
     bool success = static_cast<bool>(move_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
               if(success == true){
                   //move_group.move();
                   // move_group_->setStartStateToCurrentState();
+                  RCLCPP_INFO(this->get_logger(), "about to exec");
                   if(move_group_->execute(my_plan).val == 1){
                     return true;
                   }
@@ -834,19 +836,55 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
   void MoveRobotServer::arm_move_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle){
       auto result = std::make_shared<ArmMovePoseMsg::Result>();
-      
       const auto goal = goal_handle->get_goal();
+      bool keep_orientation = goal->keep_orientation;
       auto pose = goal->pose;
       move_group_->setPlanningPipelineId("ompl");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
-      // move_group_->setMaxAccelerationScalingFactor(0.6);
-      // move_group_->setMaxVelocityScalingFactor(0.6);
-      moveit_msgs::msg::JointConstraint jcm;
-      jcm.joint_name = "panda_joint2";
-      jcm.position = 0.0;
-      jcm.tolerance_below = -1.7028;
-      jcm.tolerance_above = 1.7028;
+
+      if(keep_orientation){
+        moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        orientation_constraint.orientation = goal->pose.pose.orientation;
+        orientation_constraint.absolute_x_axis_tolerance = 0.2;
+        orientation_constraint.absolute_y_axis_tolerance = 0.2;
+        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.weight = 1.0;
+
+        moveit_msgs::msg::Constraints orientation_constraints;
+        orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        move_group_->setPathConstraints(orientation_constraints);
+
+        move_group_->setPlanningTime(10.0);
+      }
+      else{
+        // moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        // orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        // orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        // orientation_constraint.orientation = goal->pose.pose.orientation;
+        // orientation_constraint.absolute_x_axis_tolerance = 6.28;
+        // orientation_constraint.absolute_y_axis_tolerance = 6.28;
+        // orientation_constraint.absolute_z_axis_tolerance = 6.28;
+        // orientation_constraint.weight = 0.0;
+
+        // moveit_msgs::msg::Constraints orientation_constraints;
+        // orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        // move_group_->setPathConstraints(orientation_constraints);
+        moveit_msgs::msg::Constraints empty_constraints;
+        move_group_->setPathConstraints(empty_constraints);
+
+      }
+      
+      move_group_->setPoseTarget(goal->pose);
+      move_group_->setPlanningTime(10.0);
+      // move_group_->plan(plan);
+
       if(goal->pose.header.frame_id != ""){
         move_group_->setPoseReferenceFrame(goal->pose.header.frame_id);
       }
@@ -865,41 +903,16 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
           goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
-      // if(open == true)
-      // {
-      //   joints.data = {-0.628318531, 0.628318531};
-      //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
-      //   if(MoveRobotServer::MoveGripper(joints)){
-          
-      //     result->done = true;
-      //     goal_handle->succeed(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      //   }
-      //   else{
-      //     result->done = false;
-      //     goal_handle->canceled(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
-      //   }
-
-      // }
-      // if(open == false)
-      // {
-        
-      //   joints.data = {0.0, 0.0};
-      //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
-      //   if(MoveRobotServer::MoveGripper(joints)){
-      //     result->done = true;
-      //     goal_handle->succeed(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      //   }
-      //   else{
-      //     result->done = false;
-      //     goal_handle->canceled(result);
-      //     RCLCPP_INFO(this->get_logger(), "Goal canceled");
-      //   }
-
-      // }
+      
   }
+
+
+
+
+
+
+
+
 
 
 
@@ -998,6 +1011,13 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
  
     //   std::stringstream ss(pose);
       std::vector<double> pos;
+
+      bool keep_orientation = goal->keep_orientation;
+
+      
+      
+      // move_group_->setPoseTarget(goal->pose);
+      // move_group_->setPlanningTime(10.0);
     // while (ss.good()) {
     //     std::string substr;
     //     getline(ss, substr, ',');
@@ -1024,12 +1044,54 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       pose_goal.pose.orientation.z = q_new.z();
       pose_goal.pose.orientation.w = q_new.w();
 
+      if(keep_orientation){
+        RCLCPP_INFO(this->get_logger(), "keep orientation true");
+        moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        orientation_constraint.orientation.x = q_new.x();
+        orientation_constraint.orientation.y = q_new.y();
+        orientation_constraint.orientation.z = q_new.z();
+        orientation_constraint.orientation.w = q_new.w();
+        orientation_constraint.absolute_x_axis_tolerance = 0.2;
+        orientation_constraint.absolute_y_axis_tolerance = 0.2;
+        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.weight = 1.0;
+
+        moveit_msgs::msg::Constraints orientation_constraints;
+        orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        move_group_->setPathConstraints(orientation_constraints);
+        move_group_->setPlanningTime(10.0);
+      }
+      else{
+        // moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        // orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        // orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        // orientation_constraint.orientation.x = pos[3];
+        // orientation_constraint.orientation.y = pos[4];
+        // orientation_constraint.orientation.z = pos[5];
+        // orientation_constraint.orientation.w = pos[6];
+        // orientation_constraint.absolute_x_axis_tolerance = 6.28;
+        // orientation_constraint.absolute_y_axis_tolerance = 6.28;
+        // orientation_constraint.absolute_z_axis_tolerance = 6.28;
+        // orientation_constraint.weight = 0.1;
+
+        // moveit_msgs::msg::Constraints orientation_constraints;
+        // orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        // move_group_->setPathConstraints(orientation_constraints);
+        moveit_msgs::msg::Constraints empty_constraints;
+        move_group_->setPathConstraints(empty_constraints);
+
+      }
       move_group_->setPlanningPipelineId("ompl");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
       // move_group_->setMaxAccelerationScalingFactor(0.6);
       // move_group_->setMaxVelocityScalingFactor(0.6);
-      
       if(MoveRobotServer::Move(pose_goal))
       {
           result->done = true;

@@ -177,7 +177,8 @@ def generate_launch_description():
 
     octomap_config = {'octomap_frame': 'camera_link', 
                   'octomap_resolution': 0.02,
-                  'max_range': 1.0}
+                  'max_range': 1.0,
+                  'min_range': 0.2}
 
     # Start the actual move_group node/action server
     run_move_group_node = Node(

@@ -2,6 +2,7 @@
 float64[] pose
 float64 speed
 float64 accel
+bool keep_orientation
 ---
 #result definition
 bool done

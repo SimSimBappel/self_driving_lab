@@ -10,6 +10,7 @@
       <ArmMovePoseAction pose="{in_name}"
                          speed="0.2"
                          accel="0.2"
+                         keep_orientation=""
                          action_name="__default__placeholder__"/>
       <GripperAction speed="0.02"
                      accel="0.02"
@@ -30,10 +31,12 @@
       <ArmMovePoseAction pose="{goal_w_offset}"
                          speed="0.2"
                          accel="0.2"
+                         keep_orientation=""
                          action_name="__default__placeholder__"/>
       <ArmMovePoseAction pose="{goal}"
                          speed="0.2"
                          accel="0.2"
+                         keep_orientation=""
                          action_name="__default__placeholder__"/>
       <GripperAction speed="0.02"
                      accel="0.02"
@@ -42,6 +45,7 @@
       <ArmMovePoseAction pose="{goal_w_offset}"
                          speed="0.2"
                          accel="0.2"
+                         keep_orientation=""
                          action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -49,10 +53,6 @@
   <BehaviorTree ID="MainTree">
     <Sequence>
       <SubTree ID="init"/>
-      <ArmMoveJointsAction joints="0.0;0.0;0.0;-1.57;0.0;1.57;0.0"
-                           speed="0.1"
-                           accel="0.1"
-                           action_name="__default__placeholder__"/>
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="sulfuric_acid"
@@ -68,7 +68,15 @@
                lookout_pose_msg="{lookout_pose_msg}"
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
+               keep_orientation="false"
                approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+      <Script code="posse:= &apos;0.401;0.069;0.474;-3.137;-0.008;0.005&apos;"/>
+      <ArmMovePoseAction name="arm"
+                         pose="{posse}"
+                         speed="0.2"
+                         accel="0.2"
+                         keep_orientation="true"
+                         action_name="__default__placeholder__"/>
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="natrium_chloride"
@@ -84,6 +92,7 @@
                lookout_pose_msg="{lookout_pose_msg}"
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
+               keep_orientation="false"
                approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <Fallback>
         <AlwaysSuccess/>
@@ -112,6 +121,7 @@
                              pose="{in_pose}"
                              speed="0.2"
                              accel="0.2"
+                             keep_orientation=""
                              action_name="__default__placeholder__"/>
           <Sleep msec="200"/>
           <GripperAction name="gripper_close"
@@ -124,6 +134,7 @@
                              pose="{object_pose}"
                              speed="0.2"
                              accel="0.2"
+                             keep_orientation=""
                              action_name="__default__placeholder__"/>
           <SleepAction name="sleepA"
                        msec="200"
@@ -170,17 +181,6 @@
       <output_port name="pose"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
     </Action>
-    <Action ID="ArmMoveJointsAction">
-      <input_port name="joints"
-                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-      <input_port name="speed"
-                  type="double"/>
-      <input_port name="accel"
-                  type="double"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
     <Action ID="ArmMovePoseAction">
       <input_port name="pose"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -188,6 +188,8 @@
                   type="double"/>
       <input_port name="accel"
                   type="double"/>
+      <input_port name="keep_orientation"
+                  type="bool"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
@@ -283,6 +285,8 @@
       <input_port name="lookout_pose_msg"/>
       <input_port name="aruco_to_slot"/>
       <input_port name="slot_to_slot"/>
+      <input_port name="keep_orientation"
+                  type="bool"/>
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
     </SubTree>

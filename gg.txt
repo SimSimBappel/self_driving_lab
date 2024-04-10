@@ -1,0 +1,43 @@
+move_robot_server-7] [INFO] [1712750333.447710382] [move_robot_server]: keep orientation true
+[move_robot_server-7] [INFO] [1712750333.447762836] [move_robot_server]: move function called
+[move_robot_server-7] [INFO] [1712750333.447780198] [move_robot_server]: Planned position x: 0.401000, y: 0.069000, z: 0.474000
+[move_robot_server-7] [INFO] [1712750333.447797951] [move_robot_server]: set pose goal
+[move_robot_server-7] [INFO] [1712750333.448109754] [move_group_interface]: MoveGroup action client/server ready
+[move_robot_server-7] [INFO] [1712750333.448441575] [move_group_interface]: Planning request accepted
+[move_group-3] [INFO] [1712750333.448305630] [moveit_move_group_default_capabilities.move_action_capability]: Received request
+[move_group-3] [INFO] [1712750333.448414440] [moveit_move_group_default_capabilities.move_action_capability]: executing..
+[move_group-3] [WARN] [1712750333.467571576] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Unable to transform object from frame 'aruco_marker_18' to planning frame'panda_link0' (Lookup would require extrapolation into the past.  Requested time 1712750312.923670 but the earliest data is at time 1712750323.466975, when looking up transform from frame [aruco_marker_18] to frame [panda_link0])
+[move_group-3] [WARN] [1712750333.467757873] [moveit_ros.planning_scene_monitor.planning_scene_monitor]: Unable to transform object from frame 'grab_pose' to planning frame'panda_link0' (Lookup would require extrapolation into the past.  Requested time 1712750312.923670 but the earliest data is at time 1712750323.466975, when looking up transform from frame [grab_pose] to frame [panda_link0])
+[move_group-3] [INFO] [1712750333.467782884] [moveit_move_group_default_capabilities.move_action_capability]: Planning request received for MoveGroup action. Forwarding to planning pipeline.
+[move_group-3] [INFO] [1712750333.467792607] [moveit_move_group_capabilities_base.move_group_capability]: Using planning pipeline 'ompl'
+[move_group-3] [INFO] [1712750333.469324476] [moveit.ompl_planning.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [ERROR] [1712750343.474334863] [ompl]: ./src/ompl/base/src/SpaceInformation.cpp:468 - Constraint Jacobian deviates from numerical approximation.
+[realsense2_camera_node-11] [WARN] [1712750344.504803851] [camera.camera]: No stream match for pointcloud chosen texture Process - Color
+[move_group-3] [INFO] [1712750345.569966848] [moveit_move_group_default_capabilities.move_action_capability]: Motion plan was computed successfully.
+[move_robot_server-7] [INFO] [1712750345.571589628] [move_group_interface]: Planning request complete!
+[move_robot_server-7] [INFO] [1712750345.571771256] [move_group_interface]: time taken to generate plan: 10.0253 seconds
+[move_robot_server-7] [INFO] [1712750345.571804944] [move_robot_server]:  (movement) 
+[move_robot_server-7] [INFO] [1712750345.571831797] [move_robot_server]: about to exec
+[move_group-3] [INFO] [1712750345.572294804] [moveit_move_group_default_capabilities.execute_trajectory_action_capability]: Received goal request
+[move_group-3] [INFO] [1712750345.572452748] [moveit_move_group_default_capabilities.execute_trajectory_action_capability]: Execution request received
+[move_group-3] [INFO] [1712750345.572494388] [moveit.plugins.moveit_simple_controller_manager]: Returned 2 controllers in list
+[move_group-3] [INFO] [1712750345.572520632] [moveit.plugins.moveit_simple_controller_manager]: Returned 2 controllers in list
+[move_group-3] [INFO] [1712750345.572614644] [moveit_ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_robot_server-7] [INFO] [1712750345.572607861] [move_group_interface]: Execute request accepted
+[move_group-3] [INFO] [1712750345.600709094] [moveit_ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1712750345.600762899] [moveit.plugins.moveit_simple_controller_manager]: Returned 2 controllers in list
+[move_group-3] [INFO] [1712750345.600788657] [moveit.plugins.moveit_simple_controller_manager]: Returned 2 controllers in list
+[move_group-3] [INFO] [1712750345.600988434] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1712750345.601197327] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1712750345.601249181] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1712750345.601397711] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1712750345.601412400] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1712750350.670776033] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1712750350.701714766] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1712750350.800716407] [moveit_ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1712750350.800798919] [moveit_move_group_default_capabilities.execute_trajectory_action_capability]: Execution completed: SUCCEEDED
+[move_group-3] [WARN] [1712750350.801221943] [move_group]: [image_transport] Topics '/camera/aligned_depth_to_color/image_raw' and '/camera/aligned_depth_to_color/camera_info' do not appear to be synchronized. In the last 10s:
+[move_group-3] 	Image messages received:      1
+[move_group-3] 	CameraInfo messages received: 1
+[move_group-3] 	Synchronized pairs:           0
+[move_robot_server-7] [INFO] [1712750350.803038252] [move_group_interface]: Execute request success!

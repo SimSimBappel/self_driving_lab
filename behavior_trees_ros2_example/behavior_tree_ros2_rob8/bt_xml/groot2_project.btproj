@@ -49,12 +49,14 @@
             <input_port name="pose" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
             <input_port name="speed" type="double"/>
             <input_port name="accel" type="double"/>
+            <input_port name="keep_orientation" type="bool"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="ArmMovePoseMsgAction">
             <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="speed" type="double"/>
             <input_port name="accel" type="double"/>
+            <input_port name="keep_orientation" type="bool"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="ArmMovePoseMsgTcpAction">
@@ -227,6 +229,7 @@
             <input_port name="lookout_pose_msg"/>
             <input_port name="aruco_to_slot"/>
             <input_port name="slot_to_slot"/>
+            <input_port name="keep_orientation" type="bool"/>
             <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
         </SubTree>
     </TreeNodesModel>

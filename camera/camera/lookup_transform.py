@@ -37,7 +37,7 @@ class FrameListener(Node):
                 to_frame_rel,
                 from_frame_rel,
                 rclpy.time.Time())
-            print(t)
+            # print(t)
             response.result = True
             # response.transform = t
             response.transform = PoseStamped()
@@ -51,9 +51,9 @@ class FrameListener(Node):
             response.transform.pose.orientation.z = t.transform.rotation.z
             response.transform.pose.orientation.w = t.transform.rotation.w
             frames = self.tf_buffer.all_frames_as_string()
-            self.get_logger().info('Current frames in tf2 tree:')
-            for frame in frames.split('\n'):
-                self.get_logger().info(f'- {frame.strip()}')
+            # self.get_logger().info('Current frames in tf2 tree:')
+            # for frame in frames.split('\n'):
+            #     self.get_logger().info(f'- {frame.strip()}')
         except TransformException as ex:
             self.get_logger().info(
                 f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
