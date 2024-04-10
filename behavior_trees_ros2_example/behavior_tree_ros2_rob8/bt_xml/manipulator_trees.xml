@@ -23,11 +23,21 @@
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <SubTree ID="gripping"
-               width="0.02"
-               speed="0.03"
-               force="3"
-               epsilon="0.02"/>
+      <Fallback>
+        <SubTree ID="gripping"
+                 width="0.02"
+                 speed="0.03"
+                 force="3"
+                 epsilon="0.02"/>
+        <Sequence>
+          <Sleep msec="1000"/>
+          <SubTree ID="gripping"
+                   width="0.02"
+                   speed="0.03"
+                   force="3"
+                   epsilon="0.02"/>
+        </Sequence>
+      </Fallback>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
                                    speed="0.025"

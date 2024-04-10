@@ -70,7 +70,7 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-      <Script code="posse:= &apos;0.401;0.069;0.474;-3.137;-0.008;0.005&apos;"/>
+      <Script code="posse:= &apos;-0.401;0.369;0.474;-3.137;-0.008;0.005&apos;"/>
       <ArmMovePoseAction name="arm"
                          pose="{posse}"
                          speed="0.2"

@@ -8,10 +8,12 @@
 #include <thread>
 #include <Eigen/Geometry>
 #include "rclcpp/rclcpp.hpp"
+
 #include "rclcpp_action/rclcpp_action.hpp"
 // #include "ar4_msgs/action/home.hpp"
 
 #include "behaviortree_ros2/bt_action_node.hpp"
+#include "std_srvs/srv/empty.hpp"
 
 static const double PLANNING_TIME_S = 5.0;
 static const double MAX_VELOCITY_SCALE = 0.8;
@@ -32,6 +34,8 @@ static const std::vector<std::string> arm_joint_names = {"panda_joint1", "panda_
 // static const std::string PLANNING_GROUP = "arm_group";
 
 // static const std::string PLANNING_GRIPPER_GROUP = "gripper";
+
+
 
 // using std::placeholders::_1;
 using namespace std::placeholders;
@@ -352,6 +356,32 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
   void MoveRobotServer::home_arm_handle_accepted(const std::shared_ptr<GoalHandleHome> goal_handle)
   {
     using namespace std::placeholders;
+
+    //this dont work!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    auto client = this->create_client<std_srvs::srv::Empty>("clear_octomap");
+    if (!client->wait_for_service(std::chrono::seconds(1))) {
+        RCLCPP_ERROR(this->get_logger(), "Service not available.");
+        return;
+    }
+    RCLCPP_INFO(this->get_logger(), "Service created");
+
+    auto request = std::make_shared<std_srvs::srv::Empty>();
+
+    // Send request
+    auto future = client->async_send_request(request);
+
+    // Wait for response
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future) ==
+        rclcpp::FutureReturnCode::SUCCESS)
+    {
+       RCLCPP_INFO(this->get_logger(), "Service call successful");
+    }
+    else
+    {
+        // Service call failed
+        RCLCPP_ERROR(this->get_logger(), "Service call failed.");
+    }
+
     // this needs to return quickly to avoid blocking the executor, so spin up a new thread
     // std::thread{std::bind(&SleepActionServer::execute, this, _1), goal_handle}.detach();
     const auto goal = goal_handle->get_goal();
@@ -1054,16 +1084,16 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
         orientation_constraint.orientation.y = q_new.y();
         orientation_constraint.orientation.z = q_new.z();
         orientation_constraint.orientation.w = q_new.w();
-        orientation_constraint.absolute_x_axis_tolerance = 0.2;
-        orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.absolute_x_axis_tolerance = 0.4;
+        orientation_constraint.absolute_y_axis_tolerance = 0.4;
+        orientation_constraint.absolute_z_axis_tolerance = 0.4;
         orientation_constraint.weight = 1.0;
 
         moveit_msgs::msg::Constraints orientation_constraints;
         orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
 
         move_group_->setPathConstraints(orientation_constraints);
-        move_group_->setPlanningTime(10.0);
+        move_group_->setPlanningTime(20.0);
       }
       else{
         // moveit_msgs::msg::OrientationConstraint orientation_constraint;
