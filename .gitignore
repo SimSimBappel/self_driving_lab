@@ -1,3 +1,4 @@
 *.jpg
 __pycache__/
 .vscode*
+mtc_pour/.pre-commit-config.yaml
