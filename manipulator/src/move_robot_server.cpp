@@ -152,7 +152,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_group_->setPlanningPipelineId("ompl");
     move_group_->setEndEffectorLink(tcp_frame); /// or move_group_->setEndEffector();
 
-    joint_model_group = move_group_->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
+    
     // move_group_->setPlannerId("PTP");
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
@@ -1240,6 +1240,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
       {
         joints_.data.push_back(joint_pose[i]);
        }
+      auto joint_model_group = move_group_->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
       auto current_state = move_group_->getCurrentState(10);
       std::vector<double> joint_group_positions;
       current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);

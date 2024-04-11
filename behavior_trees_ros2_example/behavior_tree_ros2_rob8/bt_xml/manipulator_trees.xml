@@ -88,10 +88,11 @@
                             accel="0.2"
                             keep_orientation=""
                             action_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.1"
-                                   accel="0.1"
+                                   speed="0.05"
+                                   accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <FrankaMoveGripperAction width="0.04"
@@ -129,6 +130,29 @@
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
+               target_pose_msg="{object_pose_msg2}"
+               approch_offset="{approach_offset}"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="visual_place">
+    <Sequence>
+      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                            speed="0.2"
+                            accel="0.2"
+                            keep_orientation="{keep_orientation}"
+                            action_name="__default__placeholder__"/>
+      <ArucoAction id="{aruco_id}"
+                   aruco_to_slot_transform="{aruco_to_slot}"
+                   slot_to_slot_transform="{slot_to_slot}"
+                   Transform="{object_pose_msg}"
+                   action_name="__default__placeholder__"/>
+      <LookupTransformNode result="{bool_result}"
+                           transform="{object_pose_msg2}"
+                           source="grab_pose"
+                           target="panda_link0"
+                           service_name="__default__placeholder__"/>
+      <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"/>
     </Sequence>
@@ -284,6 +308,11 @@
                   default="5"/>
       <input_port name="epsilon"
                   default="0.02"/>
+    </SubTree>
+    <SubTree ID="place_pose_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="approch_offset"/>
     </SubTree>
   </TreeNodesModel>
 

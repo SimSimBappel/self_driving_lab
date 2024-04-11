@@ -53,6 +53,11 @@
   <BehaviorTree ID="MainTree">
     <Sequence>
       <SubTree ID="init"/>
+      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;0.3&apos;"/>
+      <ArmMoveJointsRelativeAction joints="{relative_joint}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="sulfuric_acid"
@@ -181,6 +186,17 @@
       <output_port name="pose"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
     </Action>
+    <Action ID="ArmMoveJointsRelativeAction">
+      <input_port name="joints"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="ArmMovePoseAction">
       <input_port name="pose"
                   type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
@@ -290,17 +306,6 @@
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
     </SubTree>
-    <Action ID="ClearOctomapNode">
-            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
-        </Action>
-        <Action ID="ArmMoveJointsRelativeAction">
-            <input_port name="joints" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
-            <input_port name="speed" type="double"/>
-            <input_port name="accel" type="double"/>
-            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
-        </Action>
-
-
   </TreeNodesModel>
 
 </root>
