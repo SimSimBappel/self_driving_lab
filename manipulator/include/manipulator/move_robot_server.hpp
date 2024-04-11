@@ -24,6 +24,7 @@
 
 // arm actions
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_joints_relative.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg_tcp.hpp"
@@ -82,6 +83,14 @@ public:
     rclcpp_action::CancelResponse arm_move_joints_handle_cancel(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
     void arm_move_joints_handle_accepted(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
     void arm_move_joints_execute(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle);
+
+    using ArmMoveJointsRelative = behavior_tree_ros2_actions::action::ArmMoveJointsRelative;
+    using GoalHandleArmMoveJointsRelative = rclcpp_action::ServerGoalHandle<ArmMoveJointsRelative>;
+
+    rclcpp_action::GoalResponse arm_move_joints_relative_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMoveJointsRelative::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_joints_relative_handle_cancel(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle);
+    void arm_move_joints_relative_handle_accepted(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle);
+    void arm_move_joints_relative_execute(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle);
 
     using GoalHandleHome = rclcpp_action::ServerGoalHandle<Home>;
 
@@ -142,6 +151,8 @@ private:
 
     rclcpp_action::Server<ArmMoveJoints>::SharedPtr action_server_arm_move_joints_;
 
+    rclcpp_action::Server<ArmMoveJointsRelative>::SharedPtr action_server_arm_move_joints_relative_;
+
     rclcpp_action::Server<Home>::SharedPtr action_server_home_arm_;
 
     rclcpp_action::Server<Sleep>::SharedPtr action_server_sleep_;
@@ -149,6 +160,8 @@ private:
     std::string node_namespace_;
     moveit::planning_interface::MoveGroupInterfacePtr move_group_;
     moveit::planning_interface::MoveGroupInterfacePtr move_gripper_group_;
+    const moveit::core::JointModelGroup* joint_model_group;
+
     rclcpp::Node::SharedPtr node_;
     rclcpp::Executor::SharedPtr executor_;
     std::thread executor_thread_;

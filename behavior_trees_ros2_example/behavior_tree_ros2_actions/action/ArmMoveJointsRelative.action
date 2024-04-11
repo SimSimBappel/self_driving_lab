@@ -1,0 +1,10 @@
+#goal definition
+float64[] joints
+float64 speed
+float64 accel
+---
+#result definition
+bool done
+---
+#feedback
+int32 cycle
