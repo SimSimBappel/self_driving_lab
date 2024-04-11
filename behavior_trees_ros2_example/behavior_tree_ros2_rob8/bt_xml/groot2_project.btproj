@@ -83,6 +83,9 @@
             <output_port name="Transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
+        <Action ID="ClearOctomapNode">
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="FrankaGraspGripperAction">
             <input_port name="width" type="double"/>
             <input_port name="speed" type="double"/>

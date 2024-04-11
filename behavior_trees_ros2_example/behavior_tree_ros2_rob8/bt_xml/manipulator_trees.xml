@@ -17,6 +17,7 @@
                             accel="0.2"
                             keep_orientation="false"
                             action_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
                                    speed="0.025"
@@ -69,6 +70,7 @@
 
   <BehaviorTree ID="init">
     <Sequence>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
     </Sequence>
@@ -203,6 +205,11 @@
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ClearOctomapNode">
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
     </Action>
     <Action ID="FrankaGraspGripperAction">
       <input_port name="width"

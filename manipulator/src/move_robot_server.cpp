@@ -1062,7 +1062,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
         orientation_constraint.orientation.w = q_new.w();
         orientation_constraint.absolute_x_axis_tolerance = 0.2;
         orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        // orientation_constraint.absolute_z_axis_tolerance = 0.4;
+        orientation_constraint.absolute_z_axis_tolerance = 1.57;
         orientation_constraint.weight = 1.0;
 
         moveit_msgs::msg::Constraints orientation_constraints;
