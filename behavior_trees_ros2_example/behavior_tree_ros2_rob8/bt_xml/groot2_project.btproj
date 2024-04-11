@@ -16,6 +16,14 @@
             <input_port name="safety_level" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <Action ID="AddObjectNode">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="shape" type="std::string"/>
+            <input_port name="size_x" type="double"/>
+            <input_port name="size_y" type="double"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="AddWorkstationNode">
             <output_port name="message" type="std::string"/>
             <output_port name="id_" type="signed char"/>
@@ -89,7 +97,15 @@
             <output_port name="Transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
+        <Action ID="AttachObjectNode">
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="ClearOctomapNode">
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="DetachObjectNode">
+            <input_port name="object_id" type="std::string"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="FrankaGraspGripperAction">
@@ -188,6 +204,10 @@
             <output_port name="message" type="std::string"/>
             <input_port name="chemical_id" type="int"/>
             <input_port name="location_id" type="int"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="RemoveObjectNode">
+            <input_port name="object_id" type="std::string"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="RemoveWorkstationNode">

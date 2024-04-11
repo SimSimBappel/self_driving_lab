@@ -323,6 +323,26 @@
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
     </SubTree>
+    <Action ID="RemoveObjectNode">
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
+    <Action ID="DetachObjectNode">
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
+    <Action ID="AttachObjectNode">
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
+    <Action ID="AddObjectNode">
+            <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="object_id" type="std::string"/>
+            <input_port name="shape" type="std::string"/>
+            <input_port name="size_x" type="double"/>
+            <input_port name="size_y" type="double"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
   </TreeNodesModel>
 
 </root>

@@ -209,9 +209,9 @@ void MoveRobotServer::add_object_callback(
         object_to_attach.primitives.push_back(primitive);
         object_to_attach.primitive_poses.push_back(grab_pose);
         object_to_attach.operation = object_to_attach.ADD;
-        
+        planning_scene_interface.applyCollisionObject(object_to_attach);
 
-        response->result = planning_scene_interface.applyCollisionObject(object_to_attach);
+        response->result = true;
 
       }
 

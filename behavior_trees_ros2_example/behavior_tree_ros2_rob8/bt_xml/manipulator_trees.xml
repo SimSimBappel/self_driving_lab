@@ -129,9 +129,17 @@
                            source="grab_pose"
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
+      <AddObjectNode pose="{object_pose_msg2}"
+                     object_id="cylinder01"
+                     shape="cylinder"
+                     size_x="0.02"
+                     size_y="0.02"
+                     service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"/>
+      <AttachObjectNode object_id="cylinder01"
+                        service_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -185,6 +193,21 @@
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="AddObjectNode">
+      <input_port name="pose"
+                  type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="object_id"
+                  type="std::string"/>
+      <input_port name="shape"
+                  type="std::string"/>
+      <input_port name="size_x"
+                  type="double"/>
+      <input_port name="size_y"
+                  type="double"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
     <Action ID="ArmMovePlizLinPoseMsgAction">
       <input_port name="pose"
                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
@@ -229,6 +252,13 @@
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="AttachObjectNode">
+      <input_port name="object_id"
+                  type="std::string"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
     </Action>
     <Action ID="ClearOctomapNode">
       <input_port name="service_name"
