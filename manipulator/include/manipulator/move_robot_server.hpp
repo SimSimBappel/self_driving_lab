@@ -34,9 +34,16 @@
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
 #include "behavior_tree_ros2_actions/action/sleep.hpp"
 #include "behavior_tree_ros2_actions/action/home.hpp"
+
+#include "behavior_tree_ros2_actions/srv/add_object.hpp"
+#include "behavior_tree_ros2_actions/srv/remove_object.hpp"
+#include "behavior_tree_ros2_actions/srv/attach_object.hpp"
+#include "behavior_tree_ros2_actions/srv/detach_object.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-// #include "ar4_msgs/action/home.hpp"
+
+
 
 
 #include "behaviortree_ros2/bt_action_node.hpp"
@@ -46,6 +53,30 @@
 class MoveRobotServer : public rclcpp::Node {
 public:
     explicit MoveRobotServer(const rclcpp::NodeOptions &options);
+
+    using AddObject = behavior_tree_ros2_actions::srv::AddObject;
+    using RemoveObject = behavior_tree_ros2_actions::srv::RemoveObject;
+    using AttachObject = behavior_tree_ros2_actions::srv::AttachObject; 
+    using DetachObject = behavior_tree_ros2_actions::srv::DetachObject;
+
+    void add_object_callback(
+      const std::shared_ptr<AddObject::Request> request,
+      const std::shared_ptr<AddObject::Response> response);
+    
+    void remove_object_callback(
+      const std::shared_ptr<RemoveObject::Request> request,
+      const std::shared_ptr<RemoveObject::Response> response);
+
+    void attach_object_callback(
+      const std::shared_ptr<AttachObject::Request> request,
+      const std::shared_ptr<AttachObject::Response> response);
+    
+    void detach_object_callback(
+      const std::shared_ptr<DetachObject::Request> request,
+      const std::shared_ptr<DetachObject::Response> response);
+
+
+
     using Home = behavior_tree_ros2_actions::action::Home;
     
     using Gripper = behavior_tree_ros2_actions::action::Gripper;
@@ -137,6 +168,7 @@ public:
 
 private:
     // rclcpp::Service<your_service_msgs::srv::ExampleService>::SharedPtr service_example_server_;
+    
     rclcpp_action::Server<Gripper>::SharedPtr action_server_gripper_;
     rclcpp_action::Server<GripperJoint>::SharedPtr action_server_gripper_joint_;
     rclcpp_action::Server<ArmMovePose>::SharedPtr action_server_arm_move_pose_;
@@ -156,6 +188,14 @@ private:
     rclcpp_action::Server<Home>::SharedPtr action_server_home_arm_;
 
     rclcpp_action::Server<Sleep>::SharedPtr action_server_sleep_;
+
+    rclcpp::Service<AddObject>::SharedPtr add_object_srv_;
+
+    rclcpp::Service<RemoveObject>::SharedPtr remove_object_srv_;
+
+    rclcpp::Service<AttachObject>::SharedPtr attach_object_srv_;
+
+    rclcpp::Service<DetachObject>::SharedPtr detach_object_srv_;
     
     std::string node_namespace_;
     moveit::planning_interface::MoveGroupInterfacePtr move_group_;
@@ -178,6 +218,7 @@ private:
     bool ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg);
     bool Move(const geometry_msgs::msg::PoseStamped & msg);
     bool ArmMoveL(const geometry_msgs::msg::PoseStamped & msg);
+
     // void service_example_callback(const std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Request> request,
     //      std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Response>      response);
 };

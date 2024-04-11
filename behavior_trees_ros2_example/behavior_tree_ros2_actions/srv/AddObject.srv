@@ -1,0 +1,6 @@
+string object_id
+string shape
+float32 size_x # size_x is the diameter of the sphere
+float32 size_y # size_y is the height of the cylinder
+---
+bool result

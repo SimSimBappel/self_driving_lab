@@ -52,6 +52,10 @@ set(action_files
   set(srv_files
     "srv/Xdl.srv"
     "srv/LookupTransform.srv"
+    "srv/AddObject.srv"
+    "srv/RemoveObject.srv"
+    "srv/AttachObject.srv"
+    "srv/DetachObject.srv"
   )
   
   rosidl_generate_interfaces(${PROJECT_NAME}

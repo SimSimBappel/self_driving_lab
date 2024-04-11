@@ -79,14 +79,14 @@
   <BehaviorTree ID="place_pose_msg">
     <Sequence>
       <Sleep msec="200"/>
-      <ArmPoseMsgOffsetCalculation offset="{approch_offset}"
+      <ArmPoseMsgOffsetCalculation offset="{approach_offset}"
                                    pose="{target_pose_msg}"
-                                   pose_w_offset="{approch_pose}"/>
+                                   pose_w_offset="{approach_pose}"/>
       <Sleep msec="200"/>
-      <ArmMovePoseMsgAction pose="{approch_pose}"
+      <ArmMovePoseMsgAction pose="{approach_pose}"
                             speed="0.2"
                             accel="0.2"
-                            keep_orientation=""
+                            keep_orientation="false"
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
@@ -99,7 +99,7 @@
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+      <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
                                    speed="0.1"
                                    accel="0.1"
                                    action_name="__default__placeholder__"/>
@@ -154,7 +154,7 @@
                            service_name="__default__placeholder__"/>
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
-               approch_offset="{approach_offset}"/>
+               approach_offset="{approach_offset}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -312,7 +312,7 @@
     <SubTree ID="place_pose_msg"
              editable="true">
       <input_port name="target_pose_msg"/>
-      <input_port name="approch_offset"/>
+      <input_port name="approach_offset"/>
     </SubTree>
   </TreeNodesModel>
 

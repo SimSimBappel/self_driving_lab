@@ -54,6 +54,19 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     //         node_namespace_ + "_ur_manipulator",
     //         "/" + node_namespace_,
     //         "robot_description");
+    this->add_object_srv_ = create_service<AddObject>(
+        "add_object_service", std::bind(&MoveRobotServer::add_object_callback, this,
+                                _1, _2));
+    this->remove_object_srv_ = create_service<RemoveObject>(
+        "remove_object_service", std::bind(&MoveRobotServer::remove_object_callback, this,
+                                _1, _2));
+    this->attach_object_srv_ = create_service<AttachObject>(
+        "attach_object_service", std::bind(&MoveRobotServer::attach_object_callback, this,
+                                _1, _2));
+    this->detach_object_srv_ = create_service<DetachObject>(
+        "detach_object_service", std::bind(&MoveRobotServer::detach_object_callback, this,
+                                _1, _2));
+
     this->action_server_home_arm_ = rclcpp_action::create_server<Home>(
       this,
       "home_arm",
@@ -157,6 +170,37 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
 }
+
+
+void MoveRobotServer::add_object_callback(
+      const std::shared_ptr<AddObject::Request> request,
+      const std::shared_ptr<AddObject::Response> response){
+
+        
+
+      }
+
+
+void MoveRobotServer::remove_object_callback(
+      const std::shared_ptr<RemoveObject::Request> request,
+      const std::shared_ptr<RemoveObject::Response> response) {
+
+      }
+
+void MoveRobotServer::attach_object_callback(
+      const std::shared_ptr<AttachObject::Request> request,
+      const std::shared_ptr<AttachObject::Response> response) {
+
+      }
+
+void MoveRobotServer::detach_object_callback(
+      const std::shared_ptr<DetachObject::Request> request,
+      const std::shared_ptr<DetachObject::Response> response) {
+
+      }
+
+
+
 
 bool MoveRobotServer::ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg){
   std::vector<double> joints;
