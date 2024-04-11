@@ -293,6 +293,13 @@
     <Action ID="ClearOctomapNode">
             <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
         </Action>
+        <Action ID="ArmMoveJointsRelativeAction">
+            <input_port name="joints" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+            <input_port name="speed" type="double"/>
+            <input_port name="accel" type="double"/>
+            <input_port name="action_name" type="std::string" default="__default__placeholder__">Action server name</input_port>
+        </Action>
+
 
   </TreeNodesModel>
 

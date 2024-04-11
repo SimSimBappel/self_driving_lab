@@ -3,6 +3,7 @@
 #include <behaviortree_ros2/bt_service_node.hpp>
 #include "behaviortree_ros2/plugins.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_joints_relative.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg_tcp.hpp"
@@ -203,6 +204,47 @@ public:
   }
 };
 
+
+class ArmMoveJointsRelativeAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJointsRelative>
+{
+public:
+  ArmMoveJointsRelativeAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJointsRelative>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    return providedBasicPorts({InputPort<std::vector<double>>("joints"),InputPort<double>("speed"),InputPort<double>("accel")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    auto frame = getInput<std::vector<double>>("joints");
+    goal.joints = frame.value();
+    auto speed = getInput<double>("speed");
+    auto accel = getInput<double>("accel");
+    goal.speed = speed.value();
+    goal.accel = accel.value();
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
 
 
 class ArmMoveJointsAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveJoints>

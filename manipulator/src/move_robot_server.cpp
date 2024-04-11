@@ -109,6 +109,13 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_joints_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_joints_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_joints_handle_accepted, this, _1));
+
+    this->action_server_arm_move_joints_relative_ = rclcpp_action::create_server<ArmMoveJointsRelative>(
+      this,
+      "arm_move_joints_relative_service",
+      std::bind(&MoveRobotServer::arm_move_joints_relative_handle_goal, this, _1, _2),
+      std::bind(&MoveRobotServer::arm_move_joints_relative_handle_cancel, this, _1),
+      std::bind(&MoveRobotServer::arm_move_joints_relative_handle_accepted, this, _1));
     
     this->action_server_sleep_ = rclcpp_action::create_server<Sleep>(
       this,
@@ -133,6 +140,8 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     
     move_gripper_group_->setPlanningPipelineId("ompl");
 
+    
+
     move_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GROUP);
     move_group_->setPoseReferenceFrame(base_link);
     move_group_->setPlanningTime(PLANNING_TIME_S);
@@ -142,7 +151,8 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_group_->setMaxAccelerationScalingFactor(MAX_ACCELERATION_SCALE);
     move_group_->setPlanningPipelineId("ompl");
     move_group_->setEndEffectorLink(tcp_frame); /// or move_group_->setEndEffector();
-    
+
+    joint_model_group = move_group_->getCurrentState()->getJointModelGroup(PLANNING_GROUP);
     // move_group_->setPlannerId("PTP");
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
@@ -1179,6 +1189,65 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
         joints_.data.push_back(joint_pose[i]);
        }
       
+      move_group_->setPlanningPipelineId("ompl");
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      // move_group_->setMaxAccelerationScalingFactor(0.6);
+      // move_group_->setMaxVelocityScalingFactor(0.6);
+      
+      if(MoveRobotServer::ArmMoveJ(joints_))
+      {
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          result->done = false;
+          goal_handle->abort(result);
+          RCLCPP_INFO(this->get_logger(), "Goal abort");
+      }
+  }
+
+rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const ArmMoveJointsRelative::Goal> goal)
+  {
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse MoveRobotServer::arm_move_joints_relative_handle_cancel(
+    const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void MoveRobotServer::arm_move_joints_relative_handle_accepted(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&MoveRobotServer::arm_move_joints_relative_execute, this, _1), goal_handle}.detach();
+  
+  }
+
+  void MoveRobotServer::arm_move_joints_relative_execute(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle){
+      auto result = std::make_shared<ArmMoveJointsRelative::Result>();
+      std_msgs::msg::Float64MultiArray joints_;
+      const auto goal = goal_handle->get_goal();
+      auto joint_pose = goal->joints;
+      for(int i = 0; i<joint_pose.size();i++)
+      {
+        joints_.data.push_back(joint_pose[i]);
+       }
+      auto current_state = move_group_->getCurrentState(10);
+      std::vector<double> joint_group_positions;
+      current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
+
+      for(int j = 0; j < joints_.data.size();j++){
+        joints_.data[j] += joint_group_positions[j];
+      }
+
       move_group_->setPlanningPipelineId("ompl");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
