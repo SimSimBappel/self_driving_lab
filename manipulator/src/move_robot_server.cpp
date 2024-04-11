@@ -1331,6 +1331,41 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
     }
   }
+
+
+  void MoveRobotServer::arm_move_trajectory_pour(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle){
+      auto result = std::make_shared<ArmMovePoseMsg::Result>();
+      const auto goal = goal_handle->get_goal();
+      bool keep_orientation = goal->keep_orientation;
+      auto pose = goal->pose;
+      move_group_->setPlanningPipelineId("ompl");
+      move_group_->setMaxAccelerationScalingFactor(goal->accel);
+      move_group_->setMaxVelocityScalingFactor(goal->speed);
+      
+      move_group_->setPoseTarget(goal->pose);
+      move_group_->setPlanningTime(10.0);
+      // move_group_->plan(plan);
+
+      if(goal->pose.header.frame_id != ""){
+        move_group_->setPoseReferenceFrame(goal->pose.header.frame_id);
+      }
+      else{
+        move_group_->setPoseReferenceFrame(base_link);
+      }
+      
+      if(MoveRobotServer::Move(pose))
+      {
+          result->done = true;
+          goal_handle->succeed(result);
+          RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      }
+      else{
+          result->done = false;
+          goal_handle->abort(result);
+          RCLCPP_INFO(this->get_logger(), "Goal canceled");
+      }
+      
+  }
 // void MoveRobotServer::service_example_callback(const std::shared_ptr<ar4_moveit_config::srv::MoveRobotServer::Request> request,
 //          std::shared_ptr<ar4_moveit_config::srv::MoveRobotServer::Response>      response) {
 //     // move_group_->setStartStateToCurrentState();
