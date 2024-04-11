@@ -228,6 +228,13 @@ class BehaviorServer : public rclcpp::Node
 
         factory.registerNodeType<HomeArmAction>("HomeArmAction",params_home_arm);
 
+        RosNodeParams params_clear_octomap;
+        params_clear_octomap.nh = this->node_;
+        params_clear_octomap.server_timeout = std::chrono::milliseconds(2000);
+        params_clear_octomap.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_clear_octomap.default_port_value = "clear_octomap";
+        factory.registerNodeType<ClearOctomapNode>("ClearOctomapNode",params_clear_octomap);
+
         #ifdef USE_SLEEP_PLUGIN
         RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
         #else

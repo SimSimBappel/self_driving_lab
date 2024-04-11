@@ -290,6 +290,10 @@
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
     </SubTree>
+    <Action ID="ClearOctomapNode">
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
+
   </TreeNodesModel>
 
 </root>

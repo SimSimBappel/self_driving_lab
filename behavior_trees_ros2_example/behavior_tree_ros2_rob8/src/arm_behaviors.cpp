@@ -1,5 +1,6 @@
 // #include "home_action.hpp"
 #include "behaviortree_ros2/bt_action_node.hpp"
+#include <behaviortree_ros2/bt_service_node.hpp>
 #include "behaviortree_ros2/plugins.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_joints.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
@@ -18,8 +19,71 @@
 
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <std_srvs/srv/empty.hpp>
 
 using namespace BT;
+
+using Empty = std_srvs::srv::Empty;
+class ClearOctomapNode: public RosServiceNode<Empty>
+{
+  public:
+
+  ClearOctomapNode(const std::string& name,
+                  const NodeConfig& conf,
+                  const RosNodeParams& params)
+    : RosServiceNode<Empty>(name, conf, params)
+  {}
+
+  // The specific ports of this Derived class
+  // should be merged with the ports of the base class,
+  // using RosServiceNode::providedBasicPorts()
+  static PortsList providedPorts()
+  {
+    return providedBasicPorts({});
+  }
+
+  // This is called when the TreeNode is ticked and it should
+  // send the request to the service provider
+  bool setRequest(Request::SharedPtr& request) override
+  {
+    // use input ports to set A and B
+    
+    // getInput("name_", request->name);
+    // // auto name_ = getInput<std::string>("name_");
+    // // request->name = name_.value();
+    // RCLCPP_INFO(node_->get_logger(), "String chemical: %s", request->name.c_str());
+    // must return true if we are ready to send the request
+    return true;
+  }
+
+  // Callback invoked when the answer is received.
+  // It must return SUCCESS or FAILURE
+  NodeStatus onResponseReceived(const Response::SharedPtr& response) override
+  {
+    // RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->success);
+    // setOutput("aruco_id",response->aruco_id);
+    // setOutput("message",response->message);
+    // setOutput("success",response->success);
+    // setOutput("empty",response->empty);
+    // setOutput("workstation_name",response->workstation_name);
+    // setOutput("lookout_pose",response->lookout_pose);
+    // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
+    // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
+    return NodeStatus::SUCCESS;
+  }
+
+  // Callback invoked when there was an error at the level
+  // of the communication between client and server.
+  // This will set the status of the TreeNode to either SUCCESS or FAILURE,
+  // based on the return value.
+  // If not overridden, it will return FAILURE by default.
+  virtual NodeStatus onFailure(ServiceNodeErrorCode error) override
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: %d", error);
+    return NodeStatus::FAILURE;
+  }
+};
+
 
 class ArmArrayToPoseAction : public BT::SyncActionNode
 {
