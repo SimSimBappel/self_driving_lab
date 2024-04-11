@@ -176,7 +176,42 @@ void MoveRobotServer::add_object_callback(
       const std::shared_ptr<AddObject::Request> request,
       const std::shared_ptr<AddObject::Response> response){
 
+        moveit_msgs::msg::CollisionObject object_to_attach;
         
+        object_to_attach.id = request->object_id;
+        
+        shape_msgs::msg::SolidPrimitive primitive;
+
+        if(request->shape == "box"){
+          primitive.type = primitive.BOX;
+          primitive.dimensions.resize(3);
+          primitive.dimensions[primitive.BOX_X] = request->size_y;
+          primitive.dimensions[primitive.BOX_Y] = request->size_y;
+          primitive.dimensions[primitive.BOX_Z] = request->size_x;
+        }
+        else{
+          
+          primitive.type = primitive.CYLINDER;
+          primitive.dimensions.resize(2);
+          primitive.dimensions[primitive.CYLINDER_HEIGHT] = request->size_y;
+          primitive.dimensions[primitive.CYLINDER_RADIUS] = request->size_x / 2.0;
+        }
+        
+
+        // We define the frame/pose for this cylinder so that it appears in the gripper.
+        object_to_attach.header.frame_id = move_group_->getEndEffectorLink();
+        geometry_msgs::msg::Pose grab_pose;
+        // grab_pose.orientation.w = 1.0;
+        // grab_pose.position.z = 0.2;
+        grab_pose = request->pose.pose;
+
+        // First, we add the object to the world (without using a vector).
+        object_to_attach.primitives.push_back(primitive);
+        object_to_attach.primitive_poses.push_back(grab_pose);
+        object_to_attach.operation = object_to_attach.ADD;
+        
+
+        response->result = planning_scene_interface.applyCollisionObject(object_to_attach);
 
       }
 
@@ -184,18 +219,27 @@ void MoveRobotServer::add_object_callback(
 void MoveRobotServer::remove_object_callback(
       const std::shared_ptr<RemoveObject::Request> request,
       const std::shared_ptr<RemoveObject::Response> response) {
+        std::vector<std::string> object_ids;
+        object_ids.push_back(request->object_id);
+        planning_scene_interface.removeCollisionObjects(object_ids);
+        response->result = true;
 
       }
 
 void MoveRobotServer::attach_object_callback(
       const std::shared_ptr<AttachObject::Request> request,
       const std::shared_ptr<AttachObject::Response> response) {
+        std::vector<std::string> touch_links;
+        touch_links.push_back("panda_rightfinger");
+        touch_links.push_back("panda_leftfinger");
+        response->result = move_group_->attachObject(request->object_id, "panda_hand_tcp", touch_links);
 
       }
 
 void MoveRobotServer::detach_object_callback(
       const std::shared_ptr<DetachObject::Request> request,
       const std::shared_ptr<DetachObject::Response> response) {
+        response->result = move_group_->detachObject(request->object_id);
 
       }
 
