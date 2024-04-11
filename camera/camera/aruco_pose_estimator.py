@@ -55,13 +55,13 @@ class CameraSubscriber(Node):
         self.runonce = False
 
         # self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-        _qos = QoSProfile(
-                depth=100,
-                durability=DurabilityPolicy.VOLATILE,
-                history=HistoryPolicy.KEEP_LAST,
-                )
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
+        # _qos = QoSProfile(
+        #         depth=100,
+        #         durability=DurabilityPolicy.VOLATILE,
+        #         history=HistoryPolicy.KEEP_LAST,
+        #         )
+        # self.tf_buffer = Buffer()
+        # self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
 
         
     def info_callback(self, info_msg):

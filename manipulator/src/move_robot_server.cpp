@@ -357,30 +357,6 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
   {
     using namespace std::placeholders;
 
-    //this dont work!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    auto client = this->create_client<std_srvs::srv::Empty>("clear_octomap");
-    if (!client->wait_for_service(std::chrono::seconds(1))) {
-        RCLCPP_ERROR(this->get_logger(), "Service not available.");
-        return;
-    }
-    RCLCPP_INFO(this->get_logger(), "Service created");
-
-    auto request = std::make_shared<std_srvs::srv::Empty>();
-
-    // Send request
-    auto future = client->async_send_request(request);
-
-    // Wait for response
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future) ==
-        rclcpp::FutureReturnCode::SUCCESS)
-    {
-       RCLCPP_INFO(this->get_logger(), "Service call successful");
-    }
-    else
-    {
-        // Service call failed
-        RCLCPP_ERROR(this->get_logger(), "Service call failed.");
-    }
 
     // this needs to return quickly to avoid blocking the executor, so spin up a new thread
     // std::thread{std::bind(&SleepActionServer::execute, this, _1), goal_handle}.detach();
