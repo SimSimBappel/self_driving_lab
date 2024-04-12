@@ -18,7 +18,7 @@
         </Action>
         <Action ID="AddObjectNode">
             <input_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
-            <input_port name="object_id" type="std::string"/>
+            <input_port name="object_id" type="signed char"/>
             <input_port name="shape" type="std::string"/>
             <input_port name="size_x" type="double"/>
             <input_port name="size_y" type="double"/>
@@ -98,14 +98,14 @@
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="AttachObjectNode">
-            <input_port name="object_id" type="std::string"/>
+            <input_port name="object_id" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="ClearOctomapNode">
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="DetachObjectNode">
-            <input_port name="object_id" type="std::string"/>
+            <input_port name="object_id" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="FrankaGraspGripperAction">
@@ -207,7 +207,7 @@
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="RemoveObjectNode">
-            <input_port name="object_id" type="std::string"/>
+            <input_port name="object_id" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="RemoveWorkstationNode">
@@ -242,6 +242,7 @@
         <SubTree ID="grasp_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
             <input_port name="approch_offset"/>
+            <input_port name="object_id"/>
         </SubTree>
         <SubTree ID="gripping" editable="true">
             <input_port name="width" default="0.02"/>
@@ -252,6 +253,7 @@
         <SubTree ID="place_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
             <input_port name="approach_offset"/>
+            <input_port name="object_id"/>
         </SubTree>
         <SubTree ID="visual_grasp" editable="true">
             <input_port name="aruco_id"/>

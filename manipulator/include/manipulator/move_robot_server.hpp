@@ -200,7 +200,7 @@ private:
     std::string node_namespace_;
     moveit::planning_interface::MoveGroupInterfacePtr move_group_;
     moveit::planning_interface::MoveGroupInterfacePtr move_gripper_group_;
-    moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+    
     // const moveit::core::JointModelGroup* joint_model_group;
 
     rclcpp::Node::SharedPtr node_;

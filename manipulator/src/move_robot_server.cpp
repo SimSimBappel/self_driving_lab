@@ -153,7 +153,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     
     move_gripper_group_->setPlanningPipelineId("ompl");
 
-    
+    // planning_scene_interface = std::make_shared<moveit::planning_interface::PlanningSceneInterface>();
 
     move_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GROUP);
     move_group_->setPoseReferenceFrame(base_link);
@@ -175,7 +175,9 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
 void MoveRobotServer::add_object_callback(
       const std::shared_ptr<AddObject::Request> request,
       const std::shared_ptr<AddObject::Response> response){
+        RCLCPP_INFO(this->get_logger(), "add_object_callback called");
 
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
         moveit_msgs::msg::CollisionObject object_to_attach;
         
         object_to_attach.id = request->object_id;
@@ -199,18 +201,19 @@ void MoveRobotServer::add_object_callback(
         
 
         // We define the frame/pose for this cylinder so that it appears in the gripper.
-        object_to_attach.header.frame_id = move_group_->getEndEffectorLink();
+        object_to_attach.header.frame_id = move_group_->getPoseReferenceFrame();//move_group_->getEndEffectorLink();
         geometry_msgs::msg::Pose grab_pose;
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
+        grab_pose.position.z -= request->size_y/2;
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
         object_to_attach.primitive_poses.push_back(grab_pose);
         object_to_attach.operation = object_to_attach.ADD;
         planning_scene_interface.applyCollisionObject(object_to_attach);
-
+        RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
         response->result = true;
 
       }
@@ -221,6 +224,7 @@ void MoveRobotServer::remove_object_callback(
       const std::shared_ptr<RemoveObject::Response> response) {
         std::vector<std::string> object_ids;
         object_ids.push_back(request->object_id);
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
         planning_scene_interface.removeCollisionObjects(object_ids);
         response->result = true;
 

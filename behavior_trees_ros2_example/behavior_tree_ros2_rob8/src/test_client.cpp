@@ -108,28 +108,28 @@ int main(int argc, char **argv)
   params_add_object.nh = nh;
   params_add_object.server_timeout = std::chrono::milliseconds(2000);
   params_add_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_add_object.default_port_value = "add_object_servicce";
+  params_add_object.default_port_value = "add_object_service";
   factory.registerNodeType<AddObjectNode>("AddObjectNode",params_add_object);
 
   RosNodeParams params_remove_object;
   params_remove_object.nh = nh;
   params_remove_object.server_timeout = std::chrono::milliseconds(2000);
   params_remove_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_remove_object.default_port_value = "remove_object_servicce";
+  params_remove_object.default_port_value = "remove_object_service";
   factory.registerNodeType<RemoveObjectNode>("RemoveObjectNode",params_remove_object);
 
   RosNodeParams params_attach_object;
   params_attach_object.nh = nh;
   params_attach_object.server_timeout = std::chrono::milliseconds(2000);
   params_attach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_attach_object.default_port_value = "attach_object_servicce";
+  params_attach_object.default_port_value = "attach_object_service";
   factory.registerNodeType<AttachObjectNode>("AttachObjectNode",params_attach_object);
 
   RosNodeParams params_detach_object;
   params_detach_object.nh = nh;
   params_detach_object.server_timeout = std::chrono::milliseconds(2000);
   params_detach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-  params_detach_object.default_port_value = "detach_object_servicce";
+  params_detach_object.default_port_value = "detach_object_service";
   factory.registerNodeType<DetachObjectNode>("DetachObjectNode",params_detach_object);
 
   //////////////////DATABASE/////////////////
