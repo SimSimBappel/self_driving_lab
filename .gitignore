@@ -2,3 +2,6 @@
 __pycache__/
 .vscode*
 mtc_pour/.pre-commit-config.yaml
+gazebo_sim/realsense_gazebo_plugin
+manipulator/include/manipulator/move_robot_server copy.hpp
+manipulator/src/move_robot_server copy.cpp

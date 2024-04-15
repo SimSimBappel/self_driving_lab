@@ -6,6 +6,9 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/planning_scene/planning_scene.h>
+#include <moveit_visual_tools/moveit_visual_tools.h>
+
 
 #include <moveit_msgs/msg/display_robot_state.hpp>
 #include <moveit_msgs/msg/display_trajectory.hpp>
@@ -28,6 +31,7 @@
 #include "behavior_tree_ros2_actions/action/arm_move_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pose_msg_tcp.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_trajectory_pour.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_ptp_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
@@ -152,6 +156,13 @@ public:
     void arm_move_pose_msg_tcp_handle_accepted(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle);
     void arm_move_pose_msg_tcp_execute(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle);
 
+    using ArmMoveTrajectoryPour = behavior_tree_ros2_actions::action::ArmMoveTrajectoryPour;
+    using GoalHandleArmMoveTrajectoryPour= rclcpp_action::ServerGoalHandle<ArmMoveTrajectoryPour>;
+    rclcpp_action::GoalResponse arm_move_trajectory_pour_handle_goal(const rclcpp_action::GoalUUID &,std::shared_ptr<const ArmMoveTrajectoryPour::Goal> goal);
+    rclcpp_action::CancelResponse arm_move_trajectory_pour_handle_cancel(const std::shared_ptr<GoalHandleArmMoveTrajectoryPour> goal_handle);
+    void arm_move_trajectory_pour_handle_accepted(const std::shared_ptr<GoalHandleArmMoveTrajectoryPour> goal_handle);
+    void arm_move_trajectory_pour_execute(const std::shared_ptr<GoalHandleArmMoveTrajectoryPour> goal_handle);
+
     using Sleep = behavior_tree_ros2_actions::action::Sleep;
     using GoalHandleSleep = rclcpp_action::ServerGoalHandle<Sleep>;
 
@@ -189,6 +200,8 @@ private:
 
     rclcpp_action::Server<Sleep>::SharedPtr action_server_sleep_;
 
+    rclcpp_action::Server<ArmMoveTrajectoryPour>::SharedPtr action_server_arm_move_trajectory_pour_;
+
     rclcpp::Service<AddObject>::SharedPtr add_object_srv_;
 
     rclcpp::Service<RemoveObject>::SharedPtr remove_object_srv_;
@@ -201,6 +214,35 @@ private:
     moveit::planning_interface::MoveGroupInterfacePtr move_group_;
     moveit::planning_interface::MoveGroupInterfacePtr move_gripper_group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+
+    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools;
+    // moveit_visual_tools::MoveItVisualTools visual_tools;
+    std::shared_ptr<moveit_visual_tools::MoveItVisualTools> visual_tools;
+
+
+
+    std::shared_ptr<robot_model_loader::RobotModelLoader> robot_model_loader_;
+    moveit::core::RobotModelPtr robot_model_;
+    moveit::core::RobotStatePtr robot_state_;
+    const moveit::core::JointModelGroup* joint_model_group_;
+    std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
+
+    
+    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
+    // robot_model_loader::RobotModelLoader::SharedPtr robot_model_loader_;
+    // moveit::core::RobotModelPtr robot_model_;
+    // moveit::core::RobotStatePtr robot_state_;
+    // const moveit::core::JointModelGroup* joint_model_group_;
+    // planning_scene::PlanningScenePtr planning_scene_;
+    // std::unique_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader_;
+    // planning_interface::PlannerManagerPtr planner_instance_;
+    // std::vector<std::string> planner_plugin_names_;
+
+
+    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
+
+
     // const moveit::core::JointModelGroup* joint_model_group;
 
     rclcpp::Node::SharedPtr node_;
@@ -220,8 +262,13 @@ private:
     bool Move(const geometry_msgs::msg::PoseStamped & msg);
     bool ArmMoveL(const geometry_msgs::msg::PoseStamped & msg);
 
+    // bool arm_move_trajectory_pour(std::string container_name,std::string bottle_name, Eigen::Vector3d pour_offset, double tilt_angle, double min_path_fraction_, rclcpp::Duration pour_duration);
+
     // void service_example_callback(const std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Request> request,
     //      std::shared_ptr<ar4_moveit_config::srv::MoveRobot::Response>      response);
 };
 
 #endif //YOUR_PACKAGE_YOUR_HEADER_H
+
+
+
