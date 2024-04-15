@@ -1197,6 +1197,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
         // move_group_->setPathConstraints(orientation_constraints);
         moveit_msgs::msg::Constraints empty_constraints;
         move_group_->setPathConstraints(empty_constraints);
+        move_group_->clearPathConstraints();
 
       }
       move_group_->setPlanningPipelineId("ompl");

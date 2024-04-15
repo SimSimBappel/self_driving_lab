@@ -42,6 +42,7 @@
         </Sequence>
       </Fallback>
       <Sleep msec="200"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
                                    speed="0.025"
                                    accel="0.025"
@@ -105,6 +106,7 @@
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
                                    speed="0.1"
                                    accel="0.1"
