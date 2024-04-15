@@ -1612,7 +1612,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       pouring_axis.header.frame_id = "glass";
       pouring_axis.vector.x = 1.0;
 
-
       size_t waypoint_count = 10;
 
       // const planning_scene::PlanningScene &scene = *input.scene();
@@ -1753,23 +1752,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
         visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
       visual_tools->trigger();
 
-
-    // TODO: this has to use computeCartesianPath because
-    // there is currently no multi-waypoint callback in cartesian_planner
-      // double path_fraction =
-      //     moveit::core::CartesianInterpolator::computeCartesianPath(,,,,
-      //         &state, joint_model_group_, traj, state.getLinkModel(bottle.link_name), waypoints,
-      //         true /* global reference_frame */,
-      //         moveit::core::MaxEEFStep(.03) /* max step size */,
-      //         moveit::core::JumpThreshold(2.0) /* jump threshold */,
-      //         [&scene](moveit::core::RobotState *rs,
-      //                 const moveit::core::JointModelGroup *jmg,
-      //                 const double *joint_positions) {
-      //           rs->setJointGroupPositions(jmg, joint_positions);
-      //           rs->update();
-      //           return !planning_scene_->isStateColliding(*rs, jmg->getName());
-      //         });
-
     // ! Could be implemented if working. 
     //   /* build executable RobotTrajectory (downward and back up) */
     //   auto robot_trajectory =
@@ -1807,7 +1789,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
           RCLCPP_WARN_STREAM(rclcpp::get_logger("pouring_planner"), "PourInto only produced motion for "
                               << path_fraction << " of the way. Rendering invalid");
 
-          move_group_->setEndEffectorLink(tcp_frame);
+          // move_group_->setEndEffectorLink(tcp_frame);
           result->done = false;
           goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
