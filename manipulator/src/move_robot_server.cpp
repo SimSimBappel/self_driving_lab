@@ -1534,6 +1534,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
   }
 
   // ! ------------------------ PourInto ------------------------
+  // TODO:
+  // - Add grasping of cylinder sideways
+  // - Add generate pose above container
+  // - Spawn container object
+
   void computePouringWaypoints(const Eigen::Isometry3d &start_tip_pose,
                               double tilt_angle,
                               const Eigen::Translation3d &pouring_offset,
