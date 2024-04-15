@@ -756,7 +756,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
-      
+      move_group_->clearPathConstraints();
 
       move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
       move_group_->setPlannerId("PTP");
@@ -842,6 +842,9 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
+
+      move_group_->clearPathConstraints();
+
       // move_group_->setPlanningPipelineId("ompl");
       // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.pose.position.x, pose.pose.position.y,
       //         pose.pose.position.z);
@@ -986,6 +989,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         // move_group_->setPathConstraints(orientation_constraints);
         moveit_msgs::msg::Constraints empty_constraints;
         move_group_->setPathConstraints(empty_constraints);
+        move_group_->clearPathConstraints();
 
       }
       
