@@ -268,8 +268,46 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
 void MoveRobotServer::add_object_callback(
       const std::shared_ptr<AddObject::Request> request,
       const std::shared_ptr<AddObject::Response> response){
+        RCLCPP_INFO(this->get_logger(), "add_object_callback called");
 
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+        moveit_msgs::msg::CollisionObject object_to_attach;
         
+        object_to_attach.id = request->object_id;
+        
+        shape_msgs::msg::SolidPrimitive primitive;
+
+        if(request->shape == "box"){
+          primitive.type = primitive.BOX;
+          primitive.dimensions.resize(3);
+          primitive.dimensions[primitive.BOX_X] = request->size_y;
+          primitive.dimensions[primitive.BOX_Y] = request->size_y;
+          primitive.dimensions[primitive.BOX_Z] = request->size_x;
+        }
+        else{
+          
+          primitive.type = primitive.CYLINDER;
+          primitive.dimensions.resize(2);
+          primitive.dimensions[primitive.CYLINDER_HEIGHT] = request->size_y;
+          primitive.dimensions[primitive.CYLINDER_RADIUS] = request->size_x / 2.0;
+        }
+        
+
+        // We define the frame/pose for this cylinder so that it appears in the gripper.
+        object_to_attach.header.frame_id = move_group_->getPoseReferenceFrame();//move_group_->getEndEffectorLink();
+        geometry_msgs::msg::Pose grab_pose;
+        // grab_pose.orientation.w = 1.0;
+        // grab_pose.position.z = 0.2;
+        grab_pose = request->pose.pose;
+        grab_pose.position.z -= request->size_y/2;
+
+        // First, we add the object to the world (without using a vector).
+        object_to_attach.primitives.push_back(primitive);
+        object_to_attach.primitive_poses.push_back(grab_pose);
+        object_to_attach.operation = object_to_attach.ADD;
+        planning_scene_interface.applyCollisionObject(object_to_attach);
+        RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
+        response->result = true;
 
       }
 
@@ -277,6 +315,11 @@ void MoveRobotServer::add_object_callback(
 void MoveRobotServer::remove_object_callback(
       const std::shared_ptr<RemoveObject::Request> request,
       const std::shared_ptr<RemoveObject::Response> response) {
+        std::vector<std::string> object_ids;
+        object_ids.push_back(request->object_id);
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+        planning_scene_interface.removeCollisionObjects(object_ids);
+        response->result = true;
 
       }
 
@@ -800,7 +843,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
-      
+      move_group_->clearPathConstraints();
 
       move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
       move_group_->setPlannerId("PTP");
@@ -886,6 +929,9 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
+
+      move_group_->clearPathConstraints();
+
       // move_group_->setPlanningPipelineId("ompl");
       // RCLCPP_INFO(this->get_logger(), "Planned position x: %f, y: %f, z: %f", pose.pose.position.x, pose.pose.position.y,
       //         pose.pose.position.z);
@@ -1030,6 +1076,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         // move_group_->setPathConstraints(orientation_constraints);
         moveit_msgs::msg::Constraints empty_constraints;
         move_group_->setPathConstraints(empty_constraints);
+        move_group_->clearPathConstraints();
 
       }
       
