@@ -109,6 +109,10 @@
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
+      <DetachObjectNode object_id="{aruco_id}"
+                        service_name="__default__placeholder__"/>
+      <RemoveObjectNode object_id="{aruco_id}"
+                        service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
         <Sequence>
@@ -244,6 +248,13 @@
       <output_port name="pose_w_offset"
                    type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
     </Action>
+    <Action ID="DetachObjectNode">
+      <input_port name="object_id"
+                  type="signed char"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
     <Action ID="FrankaMoveGripperAction">
       <input_port name="width"
                   type="double"/>
@@ -305,6 +316,13 @@
     <Action ID="PrintValue">
       <input_port name="message"
                   type="std::string"/>
+    </Action>
+    <Action ID="RemoveObjectNode">
+      <input_port name="object_id"
+                  type="signed char"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
     </Action>
     <Action ID="SleepAction">
       <input_port name="msec"
