@@ -13,6 +13,7 @@ find_package(ament_cmake REQUIRED)
 find_package(behaviortree_ros2 REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # find dependencies
@@ -41,6 +42,7 @@ set(action_files
     "action/ArmMovePlizPtpPoseMsg.action"
     "action/ArmMoveRelativePose.action"
     "action/ArmMoveToFrame.action"
+    "action/ArmMoveTrajectoryPour.action"
     # "action/MoveGroupSequence.action"
     # "action/Pickup.action"
     # "action/Place.action"

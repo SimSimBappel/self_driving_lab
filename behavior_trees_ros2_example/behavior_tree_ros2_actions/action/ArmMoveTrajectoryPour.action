@@ -1,0 +1,13 @@
+#goal definition
+string container_name
+string bottle_name
+geometry_msgs/Vector3 pour_offset
+float32 tilt_angle
+float32 min_path_fraction
+builtin_interfaces/Duration pour_duration
+---
+#result definition
+bool done
+---
+#feedback
+int32 cycle
