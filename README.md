@@ -15,6 +15,7 @@ mkdir -p ros2_ws/src
 cd ros2_ws/src
 git clone -b humble https://github.com/BehaviorTree/BehaviorTree.ROS2
 git clone https://github.com/tenfoldpaper/panda_ros2
+git clone -b humble https://github.com/ros-planning/moveit_task_constructor.git
 git clone https://github.com/AIRLab-POLIMI/ros2-aruco-pose-estimation # may need to be with --symlink-install
 cd ..
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release -DFranka_DIR:PATH=/home/$USER/libfranka/build
