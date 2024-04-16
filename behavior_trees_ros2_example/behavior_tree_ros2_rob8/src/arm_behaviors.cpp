@@ -666,6 +666,8 @@ public:
     goal.pose = pos.value();
     auto ko =getInput<bool>("keep_orientation");
     goal.keep_orientation = ko.value();
+
+    
     
     
     return true;
@@ -700,7 +702,7 @@ public:
   static BT::PortsList providedPorts()
   {
     // return providedBasicPorts({InputPort<std::string>("pose")});
-    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel"),InputPort<bool>("keep_orientation")});
+    return providedBasicPorts({InputPort<geometry_msgs::msg::PoseStamped>("pose"),InputPort<double>("speed"),InputPort<double>("accel"),InputPort<bool>("keep_orientation"),InputPort<bool>("lin")});
   }
 
   bool setGoal(Goal& goal) override{
@@ -719,6 +721,8 @@ public:
     auto ko = getInput<bool>("keep_orientation");
     goal.keep_orientation = ko.value();
     
+    auto lin = getInput<bool>("Lin");
+    goal.lin = lin.value();
     
     return true;
   }

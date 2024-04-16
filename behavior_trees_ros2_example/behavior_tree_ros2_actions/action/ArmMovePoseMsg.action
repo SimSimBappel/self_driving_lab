@@ -3,6 +3,7 @@ geometry_msgs/PoseStamped pose
 float64 speed
 float64 accel
 bool keep_orientation
+bool lin
 ---
 #result definition
 bool done

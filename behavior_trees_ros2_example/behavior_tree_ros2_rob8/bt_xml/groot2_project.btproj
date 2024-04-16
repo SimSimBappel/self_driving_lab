@@ -71,6 +71,7 @@
             <input_port name="speed" type="double"/>
             <input_port name="accel" type="double"/>
             <input_port name="keep_orientation" type="bool"/>
+            <input_port name="lin" type="bool"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="ArmMovePoseMsgTcpAction">
