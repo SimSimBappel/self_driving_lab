@@ -1,0 +1,24 @@
+<Blueprint id='Grignard'>
+     <Hardware>
+         <Component id='reactor' type='reactor'/>
+     </Hardware>
+
+     <Parameters>
+         <Parameter id='reaction_time' type='time' value='12 h'/>
+         <Parameter id='reaction_temp' type='temp'/>
+     </Parameters>
+
+     <Reagents>
+         <Reagent id='grignard_reagent'/>
+         <Reagent id='carbonyl'/>
+         <Reagent id='reaction_solvent'/>
+     </Reagents>
+
+     <Procedure>
+         <Add reagent='carbonyl' vessel='reactor' amount='2 eq'/>
+         <Add reagent='solvent' vessel='reactor' amount='2 mL'/>
+         <Add reagent='grignard_reagent' vessel='reactor' amount='1 eq' time='5 min'/>
+
+         <!-- Parameter values used for temp and time -->
+    </Procedure>
+</Blueprint>

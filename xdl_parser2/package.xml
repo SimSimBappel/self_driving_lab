@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>xdl_parser2</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="rasmuslilholt@hotmail.dk">lilholt</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <depend>rcply</depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <exec_depend>xdl_parser_interface</exec_depend>
+  <exec_depend>behavior_tree_ros2_actions</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
