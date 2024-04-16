@@ -300,7 +300,7 @@ void MoveRobotServer::add_object_callback(
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
-        grab_pose.position.z -= request->size_y/2;
+        grab_pose.position.z -= request->size_y/2 - 0.01;
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
@@ -1050,6 +1050,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
       // TODO: Add constraint for holding side of tube
       if(keep_orientation){
+        move_group_->setPlannerId("geometric::RRTstar");
         moveit_msgs::msg::OrientationConstraint orientation_constraint;
         orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
         orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
