@@ -273,10 +273,12 @@ void MoveRobotServer::add_object_callback(
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
         moveit_msgs::msg::CollisionObject object_to_attach;
         
+        
         object_to_attach.id = request->object_id;
         
+        
         shape_msgs::msg::SolidPrimitive primitive;
-
+        
         if(request->shape == "box"){
           primitive.type = primitive.BOX;
           primitive.dimensions.resize(3);
@@ -285,13 +287,12 @@ void MoveRobotServer::add_object_callback(
           primitive.dimensions[primitive.BOX_Z] = request->size_x;
         }
         else{
-          
+
           primitive.type = primitive.CYLINDER;
           primitive.dimensions.resize(2);
           primitive.dimensions[primitive.CYLINDER_HEIGHT] = request->size_y;
           primitive.dimensions[primitive.CYLINDER_RADIUS] = request->size_x / 2.0;
         }
-        
 
         // We define the frame/pose for this cylinder so that it appears in the gripper.
         object_to_attach.header.frame_id = move_group_->getPoseReferenceFrame();//move_group_->getEndEffectorLink();
@@ -306,6 +307,7 @@ void MoveRobotServer::add_object_callback(
         object_to_attach.primitive_poses.push_back(grab_pose);
         object_to_attach.operation = object_to_attach.ADD;
         planning_scene_interface.applyCollisionObject(object_to_attach);
+
         RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
         response->result = true;
 
@@ -1041,6 +1043,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
 
+
+      // TODO: Add constraint for holding side of tube
       if(keep_orientation){
         moveit_msgs::msg::OrientationConstraint orientation_constraint;
         orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
