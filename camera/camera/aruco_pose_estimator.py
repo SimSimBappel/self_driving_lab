@@ -202,8 +202,8 @@ class ArucoMarkerDetector(Node):
                 pose_array = None
                 markers = ArucoMarkers()
                 pose_array = PoseArray()
-                markers.header.frame_id = 'camera_color_optical_frame'
-                pose_array.header.frame_id = 'camera_color_optical_frame'
+                markers.header.frame_id =  self.camera_frame 
+                pose_array.header.frame_id =  self.camera_frame 
                 markers.header.stamp = self.camera_subscriber.datastamp
 
                 _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
@@ -239,35 +239,8 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y# + goal_handle.request.slot_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z# + goal_handle.request.slot_to_slot_transform.transform.rotation.z
                         grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w# + goal_handle.request.slot_to_slot_transform.transform.rotation.w
-                        
-                        # grab_trans_msg = self.tf_turn_around_axis(grab_trans_msg, z=-np.pi)
-
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
-                        # base_to_aruco = None
-                        
-                        # result = self.send_request("panda_link0", "panda_link7", aruco)#grab_trans_msg.child_frame_id
-                        
-                        # base_to_aruco = result.transform
-
-                        # print(base_to_aruco)
-                        
-                        # if base_to_aruco is None:
-                        #     self.found_object = True
-                        #     print("fuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu")
-                        #     break
-
-                        # grab_pose_msg = PoseStamped()
-                        # grab_pose_msg.header.stamp = aruco.header.stamp
-                        # grab_pose_msg.header.frame_id = "panda_link0"
-                        # grab_pose_msg.pose.position.x = base_to_aruco.transform.translation.x
-                        # grab_pose_msg.pose.position.y = base_to_aruco.transform.translation.y
-                        # grab_pose_msg.pose.position.z = base_to_aruco.transform.translation.z
-                        # grab_pose_msg.pose.orientation.x = base_to_aruco.transform.rotation.x
-                        # grab_pose_msg.pose.orientation.y = base_to_aruco.transform.rotation.y
-                        # grab_pose_msg.pose.orientation.z = base_to_aruco.transform.rotation.z
-                        # grab_pose_msg.pose.orientation.w = base_to_aruco.transform.rotation.w
-                        # self.pose_pub.publish(grab_pose_msg)
                         self.found_object = True
                         self.logger.info("Found ID: " + str(goal_handle.request.id))
 
@@ -293,47 +266,47 @@ class ArucoMarkerDetector(Node):
             goal_handle.succeed()
             self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
             
-
         else:
             goal_handle.abort()
 
-
-        # print(result)
         return result
     
 
-    # def detector_callback(self):
-    #     """Callback function for the timer"""
-    #     rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1)
-    #     if self.camera_subscriber.img_copy is not None:
-    #         markers = ArucoMarkers()
-    #         pose_array = PoseArray()
-    #         markers.header.frame_id = 'camera_color_optical_frame'
-    #         pose_array.header.frame_id = 'camera_color_optical_frame'
-    #         markers.header.stamp = self.camera_subscriber.datastamp
-    #         pose_array.header.stamp = self.camera_subscriber.datastamp
+    def detector_callback(self):
+        """Callback function for the timer"""
+        self.logger.info("Detector callback")
+        self.camera_subscriber.start_streaming()
+        rclpy.spin_once(self.camera_subscriber, timeout_sec=0.1)
+        if self.camera_subscriber.img_copy is not None:
+            self.logger.info("Image received")
+            markers = ArucoMarkers()
+            pose_array = PoseArray()
+            markers.header.frame_id = self.camera_frame 
+            pose_array.header.frame_id = self.camera_frame 
+            markers.header.stamp = self.camera_subscriber.datastamp
+            pose_array.header.stamp = self.camera_subscriber.datastamp
 
-    #         frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=None,
-    #                 aruco_detector=self.aruco_detector,
-    #                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
-    #                 distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
+            frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=None,
+                    aruco_detector=self.aruco_detector,
+                    marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
+                    distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
 
-    #         if len(markers.marker_ids) > 0:
-                
-    #             for i, pose in enumerate(pose_array.poses):
-    #                 pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
+            if len(markers.marker_ids) > 0:
+                self.logger.info("Markers detected")
+                for i, pose in enumerate(pose_array.poses):
+                    pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
 
-    #             # Publish the results with the poses and markes positions    
-    #             self.poses_pub.publish(pose_array)
-    #             self.markers_pub.publish(markers)
-    #         else:
-    #             self.logger.info("No markers detected")
+                # Publish the results with the poses and markes positions    
+                self.poses_pub.publish(pose_array)
+                self.markers_pub.publish(markers)
+            else:
+                self.logger.info("No markers detected")
 
-    #         # publish the image frame with computed markers positions over the image
-    #         self.image_pub.publish(self.camera_subscriber.bridge.cv2_to_imgmsg(frame, "rgb8"))
-    #         self.camera_subscriber.img_copy = None
-    #     elif self.camera_subscriber.runonce:
-    #         print("No image received")
+            # publish the image frame with computed markers positions over the image
+            self.image_pub.publish(self.camera_subscriber.bridge.cv2_to_imgmsg(frame, "rgb8"))
+            self.camera_subscriber.img_copy = None
+        elif self.camera_subscriber.runonce:
+            print("No image received")
 
     def tf_turn_around_axis(self, tf_msg: TransformStamped, x=0.0, y=0.0, z=0.0) -> TransformStamped:
         euler_angles = tf.euler_from_quaternion([
@@ -356,25 +329,25 @@ class ArucoMarkerDetector(Node):
         return tf_msg 
 
 
-    # def turn_around_x_axis(self, pose_msg: PoseStamped, angle=np.pi) -> PoseStamped:
-    #     euler_angles = tf_transformations.euler_from_quaternion([
-    #         pose_msg.orientation.x,
-    #         pose_msg.orientation.y,
-    #         pose_msg.orientation.z,
-    #         pose_msg.orientation.w
-    #     ])
-    #     # Edit the Euler angles as needed
-    #     edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
+    def turn_around_x_axis(self, pose_msg: PoseStamped, angle=np.pi) -> PoseStamped:
+        euler_angles = tf.euler_from_quaternion([
+            pose_msg.orientation.x,
+            pose_msg.orientation.y,
+            pose_msg.orientation.z,
+            pose_msg.orientation.w
+        ])
+        # Edit the Euler angles as needed
+        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
 
-    #     # Convert the Euler angles back to quaternion
-    #     quat = tf_transformations.quaternion_from_euler(*edited_euler_angles)
+        # Convert the Euler angles back to quaternion
+        quat = tf.quaternion_from_euler(*edited_euler_angles)
 
-    #     pose_msg.orientation.x = quat[0]
-    #     pose_msg.orientation.y = quat[1]
-    #     pose_msg.orientation.z = quat[2]
-    #     pose_msg.orientation.w = quat[3]
+        pose_msg.orientation.x = quat[0]
+        pose_msg.orientation.y = quat[1]
+        pose_msg.orientation.z = quat[2]
+        pose_msg.orientation.w = quat[3]
         
-    #     return pose_msg 
+        return pose_msg 
     
 
     def destroy(self):
