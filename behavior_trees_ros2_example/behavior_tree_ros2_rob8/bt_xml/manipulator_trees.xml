@@ -16,6 +16,7 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation="false"
+                            lin="false"
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
@@ -90,6 +91,7 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation="false"
+                            lin="false"
                             action_name="__default__placeholder__"/>
       <DetachObjectNode object_id="{object_id}"
                         service_name="__default__placeholder__"/>
@@ -126,6 +128,7 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation="{keep_orientation}"
+                            lin="false"
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{aruco_id}"
                    aruco_to_slot_transform="{aruco_to_slot}"
@@ -156,6 +159,7 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation="{keep_orientation}"
+                            lin="false"
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{aruco_id}"
                    aruco_to_slot_transform="{aruco_to_slot}"
@@ -180,6 +184,7 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation=""
+                            lin=""
                             action_name="__default__placeholder__"/>
       <ArucoAction id="{workstation_id}"
                    aruco_to_slot_transform=""
@@ -190,11 +195,13 @@
                             speed="0.2"
                             accel="0.2"
                             keep_orientation=""
+                            lin=""
                             action_name="__default__placeholder__"/>
       <ArmMovePoseMsgAction pose="{pour_pose}"
                             speed="0.2"
                             accel="0.2"
                             keep_orientation=""
+                            lin=""
                             action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -235,6 +242,8 @@
       <input_port name="accel"
                   type="double"/>
       <input_port name="keep_orientation"
+                  type="bool"/>
+      <input_port name="lin"
                   type="bool"/>
       <input_port name="action_name"
                   default="__default__placeholder__"

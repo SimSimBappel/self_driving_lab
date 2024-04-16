@@ -1063,6 +1063,48 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
         move_group_->setPlanningTime(10.0);
       }
+      else if(goal->lin){
+
+        // LINE CONSTRAINTS
+        moveit_msgs::msg::PositionConstraint line_constraint;
+        line_constraint.header.frame_id = move_group_->getPoseReferenceFrame();
+        line_constraint.link_name = move_group_->getEndEffectorLink();
+        shape_msgs::msg::SolidPrimitive line;
+        line.type = shape_msgs::msg::SolidPrimitive::BOX;
+        line.dimensions = { 0.0005, 0.0005, 1.0 };
+        line_constraint.constraint_region.primitives.emplace_back(line);
+
+        geometry_msgs::msg::Pose line_pose;
+        line_pose.position.x = goal->pose.pose.position.x;
+        line_pose.position.y = goal->pose.pose.position.y;
+        line_pose.position.z = goal->pose.pose.position.z;
+        line_pose.orientation.x = goal->pose.pose.orientation.x;
+        line_pose.orientation.y = goal->pose.pose.orientation.x;
+        line_pose.orientation.z = goal->pose.pose.orientation.x;
+        line_pose.orientation.w = goal->pose.pose.orientation.x;
+        line_constraint.constraint_region.primitive_poses.emplace_back(line_pose);
+        line_constraint.weight = 1.0;
+
+
+        // ORIENTATION CONSTRAINTS
+        moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        orientation_constraint.orientation = goal->pose.pose.orientation;
+        orientation_constraint.absolute_x_axis_tolerance = 0.2;
+        orientation_constraint.absolute_y_axis_tolerance = 0.2;
+        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.weight = 1.0;
+
+
+        moveit_msgs::msg::Constraints line_constraints;
+        line_constraints.position_constraints.emplace_back(line_constraint);
+        line_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        line_constraints.name = "use_equality_constraints";
+        move_group_->setPathConstraints(line_constraints);
+      }
       else{
         // moveit_msgs::msg::OrientationConstraint orientation_constraint;
         // orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
