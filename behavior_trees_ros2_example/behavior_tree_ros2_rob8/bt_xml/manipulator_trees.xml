@@ -48,6 +48,12 @@
                                    speed="0.025"
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{approch_pose}"
+                            speed="0.25"
+                            accel="0.25"
+                            keep_orientation="false"
+                            lin="true"
+                            action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -144,7 +150,7 @@
                      object_id="{aruco_id}"
                      shape="cylinder"
                      size_x="0.02"
-                     size_y="0.16"
+                     size_y="0.15.5"
                      service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"

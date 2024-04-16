@@ -145,7 +145,7 @@ class AttachObjectNode: public RosServiceNode<AttachObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success add object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success attach object: %ld", response->result);
     return NodeStatus::SUCCESS;
   }
 
@@ -722,7 +722,7 @@ public:
     auto ko = getInput<bool>("keep_orientation");
     goal.keep_orientation = ko.value();
     
-    auto lin = getInput<bool>("Lin");
+    auto lin = getInput<bool>("lin");
     goal.lin = lin.value();
     
     return true;
