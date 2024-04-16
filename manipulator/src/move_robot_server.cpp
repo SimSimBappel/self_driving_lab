@@ -1541,8 +1541,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
   // ! ------------------------ PourInto ------------------------
   // TODO:
   // - Add grasping of cylinder sideways
-  // - Add generate pose above container
-  // - Spawn container object
+  // - Add constrained movement (container up)
+  // - Spawn container object when sideways
 
   void computePouringWaypoints(const Eigen::Isometry3d &start_tip_pose,
                               double tilt_angle,
@@ -1619,7 +1619,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       
 
       geometry_msgs::msg::Vector3Stamped pouring_axis;
-      pouring_axis.header.frame_id = "glass";
+      pouring_axis.header.frame_id = container_name;
       pouring_axis.vector.x = 1.0;
 
       size_t waypoint_count = 10;
@@ -1740,7 +1740,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       //     transform.rotation = pose.orientation;
       //     transform_waypoints.push_back(transform);
       // }
-
 
       std::vector<geometry_msgs::msg::Pose> pose_waypoints;
       for (const auto& waypoint : waypoints)
