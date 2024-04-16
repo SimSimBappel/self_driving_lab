@@ -43,6 +43,7 @@
 #include "behavior_tree_ros2_actions/srv/remove_object.hpp"
 #include "behavior_tree_ros2_actions/srv/attach_object.hpp"
 #include "behavior_tree_ros2_actions/srv/detach_object.hpp"
+#include "behavior_tree_ros2_actions/srv/get_pre_pour_pose.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -62,6 +63,7 @@ public:
     using RemoveObject = behavior_tree_ros2_actions::srv::RemoveObject;
     using AttachObject = behavior_tree_ros2_actions::srv::AttachObject; 
     using DetachObject = behavior_tree_ros2_actions::srv::DetachObject;
+    using GetPrePourPose = behavior_tree_ros2_actions::srv::GetPrePourPose;
 
     void add_object_callback(
       const std::shared_ptr<AddObject::Request> request,
@@ -79,6 +81,9 @@ public:
       const std::shared_ptr<DetachObject::Request> request,
       const std::shared_ptr<DetachObject::Response> response);
 
+    void get_pre_pour_pose_callback(
+      const std::shared_ptr<GetPrePourPose::Request> request,
+      const std::shared_ptr<GetPrePourPose::Response> response);
 
 
     using Home = behavior_tree_ros2_actions::action::Home;
@@ -209,6 +214,8 @@ private:
     rclcpp::Service<AttachObject>::SharedPtr attach_object_srv_;
 
     rclcpp::Service<DetachObject>::SharedPtr detach_object_srv_;
+
+    rclcpp::Service<GetPrePourPose>::SharedPtr get_pre_pour_pose_srv_;
     
     std::string node_namespace_;
     moveit::planning_interface::MoveGroupInterfacePtr move_group_;

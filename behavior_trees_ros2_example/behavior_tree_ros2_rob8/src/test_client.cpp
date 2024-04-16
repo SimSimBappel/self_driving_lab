@@ -132,6 +132,14 @@ int main(int argc, char **argv)
   params_detach_object.default_port_value = "detach_object_service";
   factory.registerNodeType<DetachObjectNode>("DetachObjectNode",params_detach_object);
 
+  RosNodeParams params_get_pre_pour_pose;
+  params_get_pre_pour_pose.nh = nh;
+  params_get_pre_pour_pose.server_timeout = std::chrono::milliseconds(2000);
+  params_get_pre_pour_pose.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_get_pre_pour_pose.default_port_value = "get_pre_pour_pose_service";
+  factory.registerNodeType<DetachObjectNode>("GetPrePourPoseNode",params_get_pre_pour_pose);
+
+
   //////////////////DATABASE/////////////////
   // RosNodeParams params_database_add_chemical;
   // params_database_add_chemical.nh = nh;

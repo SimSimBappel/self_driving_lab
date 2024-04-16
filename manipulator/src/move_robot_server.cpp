@@ -89,6 +89,9 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     this->detach_object_srv_ = create_service<DetachObject>(
         "detach_object_service", std::bind(&MoveRobotServer::detach_object_callback, this,
                                 _1, _2));
+    this->get_pre_pour_pose_srv_ = create_service<GetPrePourPose>(
+        "get_pre_pour_pose_service", std::bind(&MoveRobotServer::get_pre_pour_pose_callback, this,
+                                _1, _2));
 
     this->action_server_home_arm_ = rclcpp_action::create_server<Home>(
       this,
@@ -1559,7 +1562,21 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
   }
 
 
+//! get_pre_pour_pose
+void MoveRobotServer::get_pre_pour_pose_callback(
+      const std::shared_ptr<GetPrePourPose::Request> request,
+      const std::shared_ptr<GetPrePourPose::Response> response){
+        RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose called");
 
+        moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+        moveit_msgs::msg::CollisionObject object_to_attach;
+
+        RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
+        response->result = true;
+
+      }
+
+//! get_pre_pour_pose END
 
 rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goal(
     const rclcpp_action::GoalUUID &,
@@ -1586,9 +1603,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
   // ! ------------------------ PourInto ------------------------
   // TODO:
-  // - Add grasping of cylinder sideways
-  // - Add constrained movement (container up)
-  // - Spawn container object when sideways
+  // - [x] Add extra tray to database
+  // - [ ] Add grasping of cylinder sideways
+  // - [ ] Add constrained movement (container up)
+  // - [ ]aSpawn container object when sideways
 
   void computePouringWaypoints(const Eigen::Isometry3d &start_tip_pose,
                               double tilt_angle,

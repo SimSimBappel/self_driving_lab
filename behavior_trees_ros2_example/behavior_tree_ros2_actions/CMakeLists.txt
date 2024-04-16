@@ -58,6 +58,7 @@ set(action_files
     "srv/RemoveObject.srv"
     "srv/AttachObject.srv"
     "srv/DetachObject.srv"
+    "srv/GetPrePourPose.srv"
   )
   
   rosidl_generate_interfaces(${PROJECT_NAME}

@@ -161,6 +161,11 @@
             <output_port name="slot_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <Action ID="GetPrePourPoseNode">
+            <input_port name="object_id" type="signed char"/>
+            <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="GetVesselNode">
             <output_port name="message" type="std::string"/>
             <output_port name="workstation_name" type="std::string"/>
