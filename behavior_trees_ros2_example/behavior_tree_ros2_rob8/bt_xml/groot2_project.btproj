@@ -80,12 +80,12 @@
             <input_port name="tcp_frame" type="std::string"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
-        <Action ID="ArmMoveTrajectoryPour">
-            <input_port name="container_name" type="std::String"/>
-            <input_port name="bottle_name" type="std::string"/>
-            <input_port name="tilt_angle" type="double"/>
-            <input_port name="min_path_fraction" type="double"/>
-            <input_port name="pour_duration" type="builtin_interfaces/Duration"/>
+        <Action ID="ArmMoveTrajectoryPourAction">
+            <input_port name="container_name" type="signed char"/>
+            <input_port name="bottle_name" type="signed char"/>
+            <input_port name="tilt_angle" type="float"/>
+            <input_port name="min_path_fraction" type="float"/>
+            <input_port name="pour_duration" type="float"/>
             <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
         </Action>
         <Action ID="ArmPoseMsgOffsetCalculation">

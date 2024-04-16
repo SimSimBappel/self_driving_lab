@@ -287,21 +287,6 @@
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
     </Action>
-    <Action ID="ArmMoveTrajectoryPour">
-      <input_port name="container_name"
-                  type="std::String"/>
-      <input_port name="bottle_name"
-                  type="std::string"/>
-      <input_port name="tilt_angle"
-                  type="double"/>
-      <input_port name="min_path_fraction"
-                  type="double"/>
-      <input_port name="pour_duration"
-                  type="builtin_interfaces/Duration"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
     <Action ID="GripperAction">
       <input_port name="speed"
                   type="double"/>

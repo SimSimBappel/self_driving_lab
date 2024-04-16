@@ -270,6 +270,13 @@ int main(int argc, char **argv)
   params_arm_move_pose_msg_tcp.wait_for_server_timeout = std::chrono::milliseconds(1000);
   factory.registerNodeType<ArmMovePoseMsgTcpAction>("ArmMovePoseMsgTcpAction",params_arm_move_pose_msg_tcp);
 
+    RosNodeParams params_arm_move_trajectory_pour_msg;
+  params_arm_move_trajectory_pour_msg.nh = nh;
+  params_arm_move_trajectory_pour_msg.default_port_value = "arm_move_trajectory_pour_service";
+  params_arm_move_trajectory_pour_msg.server_timeout = std::chrono::milliseconds(3000);
+  params_arm_move_trajectory_pour_msg.wait_for_server_timeout = std::chrono::milliseconds(2000);
+  factory.registerNodeType<ArmMoveTrajectoryPourAction>("ArmMoveTrajectoryPourAction",params_arm_move_trajectory_pour_msg);
+
   RosNodeParams params_arm_move_pliz_ptp_pose_msg;
   params_arm_move_pliz_ptp_pose_msg.nh = nh;
   params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";

@@ -1606,17 +1606,22 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
   void MoveRobotServer::arm_move_trajectory_pour_execute(const std::shared_ptr<GoalHandleArmMoveTrajectoryPour> goal_handle){
       auto result = std::make_shared<ArmMoveTrajectoryPour::Result>();
 
+      RCLCPP_WARN(this->get_logger(), "IN POUR");
+
       const auto goal = goal_handle->get_goal();
 
-      auto container_name = goal->container_name;
-      auto bottle_name = goal->bottle_name;
+      int8_t container_name_i = goal->container_name;
+      int8_t bottle_name_i = goal->bottle_name;
       double tilt_angle = goal->tilt_angle;
       double min_path_fraction = goal->min_path_fraction;
       // Eigen::Vector3d pour_offset = Eigen::Vector3d(0, 0.03, 0.01);
-      rclcpp::Duration pour_duration = goal->pour_duration;
+      double pour_duration = goal->pour_duration;
+
+      auto container_name = std::to_string(container_name_i);
+      auto bottle_name = std::to_string(bottle_name_i);
+
 
       const Eigen::Translation3d pour_offset(Eigen::Vector3d(0, 0.03, 0.01));
-      
 
       geometry_msgs::msg::Vector3Stamped pouring_axis;
       pouring_axis.header.frame_id = container_name;

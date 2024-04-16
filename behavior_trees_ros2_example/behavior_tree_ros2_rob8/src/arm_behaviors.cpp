@@ -11,6 +11,7 @@
 #include "behavior_tree_ros2_actions/action/arm_move_pliz_lin_pose_msg.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_relative_pose.hpp"
 #include "behavior_tree_ros2_actions/action/arm_move_to_frame.hpp"
+#include "behavior_tree_ros2_actions/action/arm_move_trajectory_pour.hpp"
 #include "behavior_tree_ros2_actions/action/home.hpp"
 
 #include "behavior_tree_ros2_actions/srv/add_object.hpp"
@@ -739,6 +740,69 @@ public:
     return NodeStatus::FAILURE;
   }
 };
+
+//! 
+class ArmMoveTrajectoryPourAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMoveTrajectoryPour>
+{
+public:
+  ArmMoveTrajectoryPourAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::ArmMoveTrajectoryPour>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    // return providedBasicPorts({InputPort<std::string>("pose")});
+    return providedBasicPorts({InputPort<int8_t>("container_name"),InputPort<int8_t>("bottle_name"),InputPort<float>("tilt_angle"), InputPort<float>("min_path_fraction"), InputPort<float>("pour_duration")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    // auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
+    auto container_name = getInput<int8_t>("container_name");
+    auto bottle_name = getInput<int8_t>("bottle_name");
+    auto tilt_angle = getInput<float>("tilt_angle");
+    auto min_path_fraction = getInput<float>("min_path_fraction");
+    auto pour_duration = getInput<float>("pour_duration");
+
+    goal.container_name = container_name.value();
+    goal.bottle_name = bottle_name.value();
+    goal.tilt_angle = tilt_angle.value();
+    goal.min_path_fraction = min_path_fraction.value();
+    goal.pour_duration = pour_duration.value();
+    // // goal.pose = pose.value();
+    // //  auto pose = getInput<std::string>("pose");
+    // //  goal.pose = pose.value();
+    //  auto pose = getInput<std::string>("pose");
+    // goal.pose = pose.value();
+    // auto speed = getInput<double>("speed");
+    // auto accel = getInput<double>("accel");
+    // goal.speed = speed.value();
+    // goal.accel = accel.value();
+    // auto ko = getInput<bool>("keep_orientation");
+    // goal.keep_orientation = ko.value();
+    
+    
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+
+    return wr.result->done ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
+    return NodeStatus::FAILURE;
+  }
+};
+//!
 
 class ArmMovePoseMsgTcpAction: public RosActionNode<behavior_tree_ros2_actions::action::ArmMovePoseMsgTcp>
 {
