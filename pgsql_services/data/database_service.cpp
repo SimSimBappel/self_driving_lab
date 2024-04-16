@@ -189,7 +189,7 @@ private:
             }
 
 
-            if (request->type != "pick" && request->type != "pour") {
+            if (request.type != "pick" && request.type != "pour") {
                 response->success = false;
                 response->message = "Type should be 'pick' or 'pour'";
                 return;
@@ -223,8 +223,8 @@ private:
                             int aruco_id = tray_row["aruco_id"].as<int>();
 
                             std::string package_share_directory = ament_index_cpp::get_package_share_directory("pgsql_services");
-                            std::string aruco_to_first_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request->type + "_aruco_to_first_slot.csv";
-                            std::string first_slot_to_every_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request->type + "_first_slot_to_every_slot.csv";
+                            std::string aruco_to_first_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request.type + "_aruco_to_first_slot.csv";
+                            std::string first_slot_to_every_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request.type + "_first_slot_to_every_slot.csv";
 
                             geometry_msgs::msg::TransformStamped aruco_to_first_slot_transform = read_transform_from_csv(aruco_to_first_slot_csv);
                             aruco_to_first_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
