@@ -48,12 +48,6 @@
                                    speed="0.025"
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{approch_pose}"
-                            speed="0.25"
-                            accel="0.25"
-                            keep_orientation="false"
-                            lin="true"
-                            action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
