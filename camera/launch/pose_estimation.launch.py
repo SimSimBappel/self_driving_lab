@@ -118,7 +118,7 @@ def generate_launch_description():
             "pointcloud.enable": "true",
             "enable_color": "true",
             "rgb_camera.profile": "1920,1080,6",
-            "align_depth.enable": "true",
+            # "align_depth.enable": "true", #jeg dræber din mor hvis du kommenterer denne ind
             "clip_distance": "1.0",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))
