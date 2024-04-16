@@ -328,13 +328,17 @@ void MoveRobotServer::remove_object_callback(
 void MoveRobotServer::attach_object_callback(
       const std::shared_ptr<AttachObject::Request> request,
       const std::shared_ptr<AttachObject::Response> response) {
+        std::vector<std::string> touch_links;
+        touch_links.push_back("panda_rightfinger");
+        touch_links.push_back("panda_leftfinger");
+        response->result = move_group_->attachObject(request->object_id, "panda_hand_tcp", touch_links);
 
       }
 
 void MoveRobotServer::detach_object_callback(
       const std::shared_ptr<DetachObject::Request> request,
       const std::shared_ptr<DetachObject::Response> response) {
-
+        response->result = move_group_->detachObject(request->object_id);
       }
 
 
