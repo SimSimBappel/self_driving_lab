@@ -290,8 +290,9 @@ class BehaviorServer : public rclcpp::Node
   private:
     void Xdl_service(const std::shared_ptr<behavior_tree_ros2_actions::srv::Xdl::Request> request, const std::shared_ptr<behavior_tree_ros2_actions::srv::Xdl::Response> response)
     {
-        factory.registerBehaviorTreeFromFile(request->xdl);
-        tree_ = factory.createTree("node_test_tree");
+        //factory.registerBehaviorTreeFromFile(request->xdl);
+        factory.registerBehaviorTreeFromText(request->xdl);
+        tree_ = factory.createTree("MainTree");
 
           std::string xml_models = BT::writeTreeNodesModelXML(factory);
             std::cout << "----------- XML file  ----------\n"

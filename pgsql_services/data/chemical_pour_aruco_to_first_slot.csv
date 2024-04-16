@@ -1,0 +1,2 @@
+frame_id,child_frame_id,translation_x,translation_y,translation_z,rotation_x,rotation_y,rotation_z,rotation_w
+aruco_marker,slot_1,0.0,-0.12367,-0.0644,-0.2534044072834003,-0.25340440728340025,-0.6601410503592003,0.6601410503592007

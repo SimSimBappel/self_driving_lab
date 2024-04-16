@@ -62,7 +62,8 @@ class GetChemicalNode: public RosServiceNode<GetChemical>
         OutputPort<geometry_msgs::msg::PoseStamped>("lookout_pose"),
         OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
         OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
-        InputPort<std::string>("name_")});
+        InputPort<std::string>("name_"),
+        InputPort<std::string>("type_")});
   }
 
   // This is called when the TreeNode is ticked and it should
@@ -72,9 +73,11 @@ class GetChemicalNode: public RosServiceNode<GetChemical>
     // use input ports to set A and B
     
     getInput("name_", request->name);
+    getInput("type_", request->type);
     // auto name_ = getInput<std::string>("name_");
     // request->name = name_.value();
     RCLCPP_INFO(node_->get_logger(), "String chemical: %s", request->name.c_str());
+    RCLCPP_INFO(node_->get_logger(), "TF Type: %s", request->type.c_str());
     // must return true if we are ready to send the request
     return true;
   }

@@ -19,6 +19,8 @@
 #include "behavior_tree_ros2_actions/srv/attach_object.hpp"
 #include "behavior_tree_ros2_actions/srv/detach_object.hpp"
 
+#include "behavior_tree_ros2_actions/srv/get_pre_pour_pose.hpp"
+
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 
@@ -37,6 +39,73 @@ using AddObject = behavior_tree_ros2_actions::srv::AddObject;
 using RemoveObject = behavior_tree_ros2_actions::srv::RemoveObject;
 using AttachObject = behavior_tree_ros2_actions::srv::AttachObject;
 using DetachObject = behavior_tree_ros2_actions::srv::DetachObject;
+using GetPrePourPose = behavior_tree_ros2_actions::srv::GetPrePourPose;
+
+class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
+{
+  public:
+
+  GetPrePourPoseNode(const std::string& name,
+                  const NodeConfig& conf,
+                  const RosNodeParams& params)
+    : RosServiceNode<GetPrePourPose>(name, conf, params)
+  {}
+
+  // The specific ports of this Derived class
+  // should be merged with the ports of the base class,
+  // using RosServiceNode::providedBasicPorts()
+  static PortsList providedPorts()
+  {
+    return providedBasicPorts({
+        // OutputPort<std::string>("message"),
+        // OutputPort<std::string>("workstation_name"),
+        // OutputPort<int8_t>("aruco_id"),
+        // OutputPort<bool>("empty"),
+        OutputPort<bool>("result"),
+        OutputPort<geometry_msgs::msg::PoseStamped>("pose"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
+        InputPort<std::string>("object_id")});
+  }
+
+  // This is called when the TreeNode is ticked and it should
+  // send the request to the service provider
+  bool setRequest(Request::SharedPtr& request) override
+  {
+    // use input ports to set A and B
+    
+    getInput("object_id", request->object_id);
+    // auto name_ = getInput<std::string>("name_");
+    // request->name = name_.value();
+    RCLCPP_INFO(node_->get_logger(), "String name: %s", request->object_id.c_str());
+    // must return true if we are ready to send the request
+    return true;
+  }
+
+  // Callback invoked when the answer is received.
+  // It must return SUCCESS or FAILURE
+  NodeStatus onResponseReceived(const Response::SharedPtr& response) override
+  {
+    RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->result);
+    
+    setOutput("Pose: ",response->pose);
+    // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
+    // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
+    return NodeStatus::SUCCESS;
+  }
+
+  // Callback invoked when there was an error at the level
+  // of the communication between client and server.
+  // This will set the status of the TreeNode to either SUCCESS or FAILURE,
+  // based on the return value.
+  // If not overridden, it will return FAILURE by default.
+  virtual NodeStatus onFailure(ServiceNodeErrorCode error) override
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: %d", error);
+    return NodeStatus::FAILURE;
+  }
+};
+
 
 class DetachObjectNode: public RosServiceNode<DetachObject>
 {
@@ -56,6 +125,7 @@ class DetachObjectNode: public RosServiceNode<DetachObject>
     return providedBasicPorts({
       // InputPort<geometry_msgs::msg::PoseStamped>("pose"),
       InputPort<int8_t>("object_id"),
+      OutputPort<geometry_msgs::msg::PoseStamped>("pose"),
       // InputPort<std::string>("shape"),
       // InputPort<double>("size_x"),
       // InputPort<double>("size_y")

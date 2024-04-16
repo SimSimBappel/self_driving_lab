@@ -1,4 +1,5 @@
 string name
+string type # pick, pour
 ---
 # workstation
 string workstation_name

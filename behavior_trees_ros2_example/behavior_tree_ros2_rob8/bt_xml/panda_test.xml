@@ -61,6 +61,7 @@
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="sulfuric_acid"
+                       type_="pick"
                        aruco_id="{aruco_id}"
                        empty="{empty}"
                        success="{success}"
@@ -92,6 +93,7 @@
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="natrium_chloride"
+                       type_="pick"
                        aruco_id="{aruco_id}"
                        empty="{empty}"
                        success="{success}"
@@ -271,6 +273,8 @@
                    type="std::string"/>
       <input_port name="name_"
                   type="std::string"/>
+      <input_port name="type_"
+                  type="std::string"/>
       <output_port name="aruco_id"
                    type="signed char"/>
       <output_port name="empty"
@@ -348,6 +352,12 @@
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
     </SubTree>
+        <Action ID="GetPrePourPoseNode">
+            <input_port name="object_id" type="signed char"/>
+            <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
+        </Action>
+
   </TreeNodesModel>
 
 </root>
