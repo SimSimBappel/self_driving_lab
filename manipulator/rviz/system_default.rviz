@@ -71,43 +71,11 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        camera_color_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_color_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_depth_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_depth_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_left_ir_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_left_ir_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         camera_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        camera_right_ir_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        camera_right_ir_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         panda_hand:
           Alpha: 1
           Show Axes: false
@@ -215,43 +183,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          camera_color_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_color_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_depth_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_depth_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_left_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_left_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           camera_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          camera_right_ir_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          camera_right_ir_optical_frame:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
           panda_hand:
             Alpha: 1
             Show Axes: false
@@ -407,8 +343,6 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        aruco_marker_18:
-          Value: true
         base_plate_link:
           Value: false
         camera_bottom_screw_frame:
@@ -421,18 +355,8 @@ Visualization Manager:
           Value: false
         camera_depth_optical_frame:
           Value: false
-        camera_left_ir_frame:
-          Value: false
-        camera_left_ir_optical_frame:
-          Value: false
         camera_link:
           Value: false
-        camera_right_ir_frame:
-          Value: false
-        camera_right_ir_optical_frame:
-          Value: false
-        grab_pose:
-          Value: true
         panda_hand:
           Value: false
         panda_hand_tcp:
@@ -481,18 +405,10 @@ Visualization Manager:
                               camera_link:
                                 camera_color_frame:
                                   camera_color_optical_frame:
-                                    aruco_marker_18:
-                                      grab_pose:
-                                        {}
+                                    {}
                                 camera_depth_frame:
                                   camera_depth_optical_frame:
                                     {}
-                                  camera_left_ir_frame:
-                                    camera_left_ir_optical_frame:
-                                      {}
-                                  camera_right_ir_frame:
-                                    camera_right_ir_optical_frame:
-                                      {}
                             panda_hand_tcp:
                               {}
                             panda_leftfinger:
@@ -555,6 +471,27 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Arrow Length: 0.30000001192092896
+      Axes Length: 0.10000000149011612
+      Axes Radius: 0.009999999776482582
+      Class: rviz_default_plugins/PoseArray
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.07000000029802322
+      Head Radius: 0.029999999329447746
+      Name: debug array
+      Shaft Length: 0.23000000417232513
+      Shaft Radius: 0.009999999776482582
+      Shape: Axes
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /aruco/poses
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -616,10 +553,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.25479739904403687
+      Pitch: 0.27979734539985657
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.36539262533187866
+      Yaw: 0.27539271116256714
     Saved: ~
 Window Geometry:
   Displays:
