@@ -222,35 +222,14 @@ private:
     moveit::planning_interface::MoveGroupInterfacePtr move_gripper_group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-
     // moveit_visual_tools::MoveItVisualToolsPtr visual_tools;
     // moveit_visual_tools::MoveItVisualTools visual_tools;
-    std::shared_ptr<moveit_visual_tools::MoveItVisualTools> visual_tools;
 
-
-
-    std::shared_ptr<robot_model_loader::RobotModelLoader> robot_model_loader_;
-    moveit::core::RobotModelPtr robot_model_;
-    moveit::core::RobotStatePtr robot_state_;
-    const moveit::core::JointModelGroup* joint_model_group_;
-    std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
-
-    
-    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
-    // robot_model_loader::RobotModelLoader::SharedPtr robot_model_loader_;
-    // moveit::core::RobotModelPtr robot_model_;
-    // moveit::core::RobotStatePtr robot_state_;
-    // const moveit::core::JointModelGroup* joint_model_group_;
-    // planning_scene::PlanningScenePtr planning_scene_;
-    // std::unique_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader_;
-    // planning_interface::PlannerManagerPtr planner_instance_;
-    // std::vector<std::string> planner_plugin_names_;
-
-
-    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools_;
-
-
-    // const moveit::core::JointModelGroup* joint_model_group;
+    // std::shared_ptr<moveit_cpp::MoveItCpp> moveit_cpp_ptr_;
+    // std::shared_ptr<moveit_cpp::PlanningComponent> planning_components_;
+    // moveit::core::RobotModelPtr robot_model_ptr_;
+    // moveit::core::RobotStatePtr robot_start_state_;
+    // moveit::core::JointModelGroupPtr joint_model_group_ptr_;
 
     rclcpp::Node::SharedPtr node_;
     rclcpp::Executor::SharedPtr executor_;

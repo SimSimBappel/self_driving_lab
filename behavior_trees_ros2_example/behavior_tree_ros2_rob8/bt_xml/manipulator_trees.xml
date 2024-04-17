@@ -48,12 +48,6 @@
                                    speed="0.025"
                                    accel="0.025"
                                    action_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{approch_pose}"
-                            speed="0.25"
-                            accel="0.25"
-                            keep_orientation="false"
-                            lin="true"
-                            action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -188,7 +182,7 @@
     <Sequence>
       <GetChemicalNode message="{result_messages1}"
                        workstation_name="{workstation1}"
-                       name_="sulfuric_acid"
+                       name_="{chemical_name}"
                        type_="pour"
                        aruco_id="{aruco_id1}"
                        empty="{empty1}"
@@ -199,22 +193,22 @@
                        service_name="__default__placeholder__"/>
       <GetVesselNode message="{result_messages2}"
                      workstation_name="{workstation2}"
-                     name_="beaker"
+                     name_="{vessel_name}"
                      aruco_id="{aruco_id2}"
                      success="{empty2}"
-                     lookout_pose="{lookout_pose_msg}"
+                     lookout_pose="{lookout_pose_msg2}"
                      aruco_to_slot_transform="{aruco_to_slot2}"
                      slot_to_slot_transform="{slot_to_slot2}"
                      service_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{vessel_lookout}"
+      <ArmMovePoseMsgAction pose="{lookout_pose_msg2}"
                             speed="0.2"
                             accel="0.2"
                             keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{workstation_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
+      <ArucoAction id="{aruco_id1}"
+                   aruco_to_slot_transform="{aruco_to_slot1}"
+                   slot_to_slot_transform="{slot_to_slot1}"
                    Transform="{aruco_pose1}"
                    action_name="__default__placeholder__"/>
       <LookupTransformNode result="{bool_result1}"
@@ -222,9 +216,9 @@
                            source="grab_pose"
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
-      <ArucoAction id="{workstation_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
+      <ArucoAction id="{aruco_id2}"
+                   aruco_to_slot_transform="{aruco_to_slot2}"
+                   slot_to_slot_transform="{slot_to_slot2}"
                    Transform="{aruco_pose2}"
                    action_name="__default__placeholder__"/>
       <LookupTransformNode result="{bool_result2}"
@@ -245,7 +239,7 @@
                      size_y="0.10.5"
                      service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pose_msg"
-               target_pose_msg="{object_pose_msg2}"
+               target_pose_msg="{object_pose_msg1}"
                approch_offset="{approach_offset}"
                object_id="{aruco_id1}"/>
       <GetPrePourPoseNode object_id="{aruco_id2}"
@@ -254,15 +248,9 @@
       <ArmMovePoseMsgAction pose="{pose_above_vessel}"
                             speed="0.2"
                             accel="0.2"
-                            keep_orientation="true"
+                            keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArmMoveTrajectoryPourAction container_name="{aruco_id2}"
-                                   bottle_name="{aruco_id1}"
-                                   tilt_angle="0.2"
-                                   min_path_fraction="0.9"
-                                   pour_duration="2.0"
-                                   action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -305,21 +293,6 @@
                   type="bool"/>
       <input_port name="lin"
                   type="bool"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="ArmMoveTrajectoryPourAction">
-      <input_port name="container_name"
-                  type="signed char"/>
-      <input_port name="bottle_name"
-                  type="signed char"/>
-      <input_port name="tilt_angle"
-                  type="float"/>
-      <input_port name="min_path_fraction"
-                  type="float"/>
-      <input_port name="pour_duration"
-                  type="float"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
