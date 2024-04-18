@@ -208,54 +208,13 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
 
-    // auto moveit_cpp_ptr = std::make_shared<moveit_cpp::MoveItCpp>(node_);
-    // moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
+    auto robot_model_ = move_group_->getRobotModel();
 
-    // auto planning_components = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr);
-    // auto robot_model_ptr = moveit_cpp_ptr->getRobotModel();
-    // auto robot_start_state = planning_components->getStartState();
-    // auto joint_model_group_ptr = robot_model_ptr->getJointModelGroup(PLANNING_GROUP);
+    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "/cartesian_path", robot_model_);
 
-    // // Visualization
-    // // ^^^^^^^^^^^^^
-    // //
-    // // The package MoveItVisualTools provides many capabilities for visualizing objects, robots,
-    // // and trajectories in RViz as well as debugging tools such as step-by-step introspection of a script
-    // moveit_visual_tools::MoveItVisualTools visual_tools(node_, "panda_link0", "moveit_cpp_tutorial",
-    //                                                     moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
-    // visual_tools.deleteAllMarkers();
-    // visual_tools.loadRemoteControl();
-
-    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-    // text_pose.translation().z() = 1.75;
-    // visual_tools.publishText(text_pose, "MoveItCpp_Demo", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-    // visual_tools.trigger();
-
-
-
-    // moveit_cpp_ptr_ = std::make_shared<moveit_cpp::MoveItCpp>(node_);
-    // moveit_cpp_ptr_->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
-    // planning_components_ = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr_);
-    // robot_model_ptr_ = moveit_cpp_ptr_->getRobotModel();
-    // robot_start_state_ = planning_components_->getStartState();
-    // joint_model_group_ptr_ = robot_model_ptr_->getJointModelGroup(PLANNING_GROUP);
-
-    // auto moveit_cpp_ptr = std::make_shared<moveit_cpp::MoveItCpp>(node_);
-    // moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
-
-    // auto planning_components = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr);
-    // auto robot_model_ptr = moveit_cpp_ptr->getRobotModel();
-    // auto robot_start_state = planning_components->getStartState();
-    // auto joint_model_group_ptr = robot_model_ptr->getJointModelGroup(PLANNING_GROUP);
-
-
-    moveit::planning_interface::MoveGroupInterface move_group(node_, PLANNING_GROUP);
-
-    // visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "/cartesian_path", robot_model_);
-
-    // visual_tools->enableBatchPublishing();
-    // visual_tools->deleteAllMarkers();  // clear all old markers
-    // visual_tools->trigger();
+    visual_tools->enableBatchPublishing();
+    visual_tools->deleteAllMarkers();  // clear all old markers
+    visual_tools->trigger();
 
 
 
@@ -324,15 +283,35 @@ void MoveRobotServer::remove_object_callback(
         std::vector<std::string> object_ids;
         object_ids.push_back(request->object_id);
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+        std::vector<std::string> object_ids;
+        object_ids.push_back(request->object_id);
         planning_scene_interface.removeCollisionObjects(object_ids);
         response->result = true;
-
       }
+      //   //* Remove object until actually removed.
+      //   const int max_attempts = 15;
+      //   int attempts = 0;
+      //   bool object_removed = false;
+
+      //   while (!object_removed) {
+      //       auto object_result = planning_scene_interface.getObjects(object_ids);
+      //       planning_scene_interface.removeCollisionObjects(object_ids);
+      //       auto object_it = object_result.find(request->object_id);
+
+      //       if (object_it == object_result.end()) {
+      //           object_removed = true;
+      //           response->result = true;
+      //       }
+      //       attempts++;
+      //   }
+      //   response->result = false;
+      // }
 
 void MoveRobotServer::attach_object_callback(
       const std::shared_ptr<AttachObject::Request> request,
       const std::shared_ptr<AttachObject::Response> response) {
-        std::vector<std::string> touch_links;
+        std::vector<std::string> touch_links; 
         touch_links.push_back("panda_rightfinger");
         touch_links.push_back("panda_leftfinger");
         response->result = move_group_->attachObject(request->object_id, "panda_hand_tcp", touch_links);
@@ -1589,76 +1568,69 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
   }
 // TODO: Move above to header file
 
-
 //! get_pre_pour_pose
 void MoveRobotServer::get_pre_pour_pose_callback(
       const std::shared_ptr<GetPrePourPose::Request> request,
       const std::shared_ptr<GetPrePourPose::Response> response){
         RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose_callback called");
 
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        std::cout << "..." << std::endl;
-        // moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-        // moveit_msgs::msg::CollisionObject object_to_attach;
-
-        moveit_msgs::msg::CollisionObject container;
-
-        // int8_t container_name = request->object_id;
-
         const std::string container_name = std::to_string(request->object_id);
-
-        std::cout << "trolo..." << std::endl;
-        std::cout << "..." << std::endl;
 
         std::vector<std::string> object_ids;
         object_ids.push_back(container_name);
 
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-        // Get the poses from the objects identified by the given object ids list
-        auto result = planning_scene_interface.getObjectPoses(object_ids);
 
-        // Iterate over the result map to access each pose
-        for (const auto& pair : result) {
-            const std::string& object_id = pair.first;
-            const geometry_msgs::msg::Pose& pose = pair.second;
+        // ? Get the poses from the objects identified by the given object ids list
+        // ? Assert that the object id is in the list of objects and is a valid object
 
-            // Now you can use object_id and pose as needed
-            std::cout << "Object ID: " << object_id << std::endl;
-            // std::cout << "Pose: " << pose << std::endl;
 
-            // For example, to access individual components of the pose:
-            std::cout << "Position (x, y, z): " << pose.position.x << ", "
-                                                << pose.position.y << ", "
-                                                << pose.position.z << std::endl;
-            std::cout << "Orientation (x, y, z, w): " << pose.orientation.x << ", "
-                                                      << pose.orientation.y << ", "
-                                                      << pose.orientation.z << ", "
-                                                      << pose.orientation.w << std::endl;
+        //? Def:
+        //? std::map< std::string, geometry_msgs::Pose > moveit::planning_interface::PlanningSceneInterface::getObjectPoses	(	const std::vector< std::string > & 	object_ids	)	
+
+        auto pose_result = planning_scene_interface.getObjectPoses(object_ids);
+        auto pose_it = pose_result.find(container_name);
+
+        if (pose_it == pose_result.end()) {
+            throw std::runtime_error("Object ID '" + container_name + "' not found");
         }
-    
- 	      //Get the poses from the objects identified by the given object ids list
-        
-        // auto container_name = std::to_string(container_name_i);
 
-        // // planning_scene_->getCollisionObjectMsg()
-        // if (!planning_scene_->getCollisionObjectMsg(container, container_name))
-        //   throw std::runtime_error("container object '" + container_name +
-        //                           "' is not specified in input planning scene");
-        // if (!isValidObject(container))
-        //   throw std::runtime_error(
-        //       "PourInto: container is neither a valid cylinder nor mesh.");
+        geometry_msgs::msg::Pose& pose = pose_it->second;
+      
+        std::cout << "Object ID: " << pose_it->first << std::endl;
+        std::cout << "Position (x, y, z): " << pose.position.x << ", "
+                                            << pose.position.y << ", "
+                                            << pose.position.z << std::endl;
+        std::cout << "Orientation (x, y, z, w): " << pose.orientation.x << ", "
+                                                  << pose.orientation.y << ", "
+                                                  << pose.orientation.z << ", "
+                                                  << pose.orientation.w << std::endl;
+        //? Def:
+        //? std::map< std::string, moveit_msgs::CollisionObject > moveit::planning_interface::PlanningSceneInterface::getObjects	(	const std::vector< std::string > & 	object_ids = std::vector<std::string>()	)	
 
-        // std::cout << "..." << std::endl;
-        // std::cout << "..." << std::endl;
+        moveit_msgs::msg::CollisionObject container;
 
-        // const Eigen::Isometry3d &bottle_frame = planning_scene_->getFrameTransform(container_name);
+
+        auto object_result = planning_scene_interface.getObjects(object_ids);
+
+        auto object_it = object_result.find(container_name);
+
+        if (object_it == object_result.end()) {
+            throw std::runtime_error("Object ID '" + container_name + "' not found");
+        }
+
+        // std::string id = object_it->second.id;
+        // geometry_msgs::msg::Pose pose = object_it->second.pose;
+        // object_recognition_msgs::msg::ObjectType type = object_it->second.type;
+
+        container = object_it->second;
+
+        if (!isValidObject(container))
+          throw std::runtime_error(
+              "PourInto: container is neither a valid cylinder nor mesh.");
+
+        // TODO: Find up direction, and hardcode a translation in that direction
 
         // bottle_frame.translation().z() += 0.15;
 
@@ -1713,9 +1685,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
   // ! ------------------------ PourInto ------------------------
   // TODO:
   // - [x] Add extra tray to database
-  // - [ ] Add grasping of cylinder sideways
-  // - [ ] Add constrained movement (container up)
-  // - [ ]aSpawn container object when sideways
+  // - [x] Get vessel position from cylinder
+  // - [ ] Add grasping of cylinder sideways (added db call "pour", transforms should be added)
+  // - [ ] Add constrained movement (container up) -> already implemented "keep_orientation"
+  // - [ ] Spawn container object when sideways
 
   void computePouringWaypoints(const Eigen::Isometry3d &start_tip_pose,
                               double tilt_angle,
@@ -1769,7 +1742,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       auto container_name = std::to_string(container_name_i);
       auto bottle_name = std::to_string(bottle_name_i);
 
-
       const Eigen::Translation3d pour_offset(Eigen::Vector3d(0, 0.03, 0.01));
 
       geometry_msgs::msg::Vector3Stamped pouring_axis;
@@ -1778,142 +1750,176 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       size_t waypoint_count = 10;
 
-      // const planning_scene::PlanningScene &scene = *input.scene();
+      //! Get container object
 
-      // std::string container_name,std::string bottle_name, Eigen::Vector3d pour_offset, double tilt_angle, double min_path_fraction, rclcpp::Duration pour_duration
-      // const moveit::core::RobotModelConstPtr& robot_model = move_group_.getRobotModel();
-      // const moveit::core::RobotModelConstPtr& robot_model = planning_scene_interface.getRobotModel();
+      std::vector<std::string> object_ids;
+      object_ids.push_back(container_name);
 
-      // const moveit::core::JointModelGroup *group = robot_model->getJointModelGroup(PLANNING_GROUP);
+      moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+
+      // ? Get the poses from the objects identified by the given object ids list
+      // ? Assert that the object id is in the list of objects and is a valid object
 
       moveit_msgs::msg::CollisionObject container;
+      auto object_result = planning_scene_interface.getObjects(object_ids);
 
-      // // // planning_scene_->getCollisionObjectMsg()
-      // // if (!planning_scene_->getCollisionObjectMsg(container, container_name))
-      // //   throw std::runtime_error("container object '" + container_name +
-      // //                           "' is not specified in input planning scene");
-      // // if (!isValidObject(container))
-      // //   throw std::runtime_error(
-      // //       "PourInto: container is neither a valid cylinder nor mesh.");
+      auto object_it = object_result.find(container_name);
 
-      // // moveit_msgs::msg::AttachedCollisionObject bottle;
-      // // if (!planning_scene_->getAttachedCollisionObjectMsg(bottle, bottle_name))
-      // //   throw std::runtime_error(
-      // //       "bottle '" + bottle_name +
-      // //       "' is not an attached collision object in input planning scene");
-      // // if (!isValidObject(bottle.object))
-      // //   throw std::runtime_error(
-      // //       "PourInto: bottle is neither a valid cylinder nor mesh.");
+      if (object_it == object_result.end()) {
+          throw std::runtime_error("Object ID '" + container_name + "' not found");
+      }
 
-      // // moveit::core::RobotState state(planning_scene_->getCurrentState());
+      std::string id = object_it->second.id;
+      geometry_msgs::msg::Pose pose = object_it->second.pose;
+      object_recognition_msgs::msg::ObjectType type = object_it->second.type;
 
-      // // // container frame:
-      // // // - top-center of container object
-      // // // - rotation should coincide with the planning frame
-      // // Eigen::Isometry3d container_frame =
-      // //     planning_scene_->getFrameTransform(container_name) *
-      // //     Eigen::Translation3d(
-      // //         Eigen::Vector3d(0, 0, getObjectHeight(container) / 2));
-      // // container_frame.linear().setIdentity();
+      container = object_it->second;
 
-      // // /* compute pouring axis as one angle (tilt_axis_angle) in x-y plane */
-      // // //// TODO: spawn many axis if this is not set
-      // // // const auto &pouring_axis =
-      // // //     props.get<geometry_msgs::msg::Vector3Stamped>("pouring_axis");
-      // // Eigen::Vector3d tilt_axis;
-      // // tf2::fromMsg(pouring_axis.vector, tilt_axis);
-      // // tilt_axis = container_frame.inverse() *
-      // //             planning_scene_->getFrameTransform(pouring_axis.header.frame_id) * tilt_axis;
-      // // // always tilt around axis in x-y plane
-      // // tilt_axis.z() = 0.0;
-      // // double tilt_axis_angle = std::atan2(tilt_axis.y(), tilt_axis.x());
+      if (!isValidObject(container))
+        throw std::runtime_error(
+            "PourInto: container is neither a valid cylinder nor mesh.");
 
-      // // const Eigen::Isometry3d &bottle_frame = planning_scene_->getFrameTransform(bottle_name);
+      //! Get bottle object
 
-      // // //! assume bottle tip as top-center of cylinder/mesh
+      //? Def: std::map< std::string, moveit_msgs::AttachedCollisionObject > moveit::planning_interface::PlanningSceneInterface::getAttachedObjects	(	const std::vector< std::string > & 	object_ids = std::vector<std::string>()	)	
 
-      // //  auto &attached_bottle_tfs =
-      // // state.getAttachedBody(bottle_name)->getShapePosesInLinkFrame();
+      std::vector<std::string> attached_object_ids;
+      attached_object_ids.push_back(bottle_name);
 
-      // // assert(attached_bottle_tfs.size() > 0 &&
-      // //       "impossible: attached body does not know transform to its link");
+      moveit_msgs::msg::AttachedCollisionObject bottle;
+      moveit_msgs::msg::CollisionObject bottle_object;
 
-      // // const Eigen::Translation3d bottle_tip(
-      // //     Eigen::Vector3d(0, 0, getObjectHeight(bottle.object) / 2));
-      // // const Eigen::Isometry3d bottle_tip_in_tool_link(attached_bottle_tfs[0] *
-      // //                                                 bottle_tip);
+      auto attached_object_result = planning_scene_interface.getAttachedObjects(attached_object_ids);
 
-      // // const Eigen::Isometry3d bottle_tip_in_container_frame =
-      // //     container_frame.inverse() * bottle_frame * bottle_tip;
+      auto attached_object_it = attached_object_result.find(bottle_name);
 
-      // // /* Cartesian waypoints for pouring motion */
-      // // EigenSTL::vector_Isometry3d waypoints;
+      if (attached_object_it == attached_object_result.end()) {
+          throw std::runtime_error("Object ID '" + container_name + "' not found");
+      }
 
-      // // /* generate waypoints in y-z plane */
-      // // computePouringWaypoints(bottle_tip_in_container_frame, tilt_angle,
-      // //                         pour_offset, waypoints,
-      // //                         waypoint_count);
+      // AttachedObject -> Collisionobject 
+      bottle_object = attached_object_it->second.object;
 
-      // // /* rotate y-z plane so tilt motion is along the specified tilt_axis */
-      // // for (auto &waypoint : waypoints)
-      // //   waypoint = Eigen::AngleAxisd(tilt_axis_angle, Eigen::Vector3d::UnitZ()) *
-      // //             waypoint *
-      // //             Eigen::AngleAxisd(-tilt_axis_angle, Eigen::Vector3d::UnitZ());
+      if (!isValidObject(bottle_object))
+        throw std::runtime_error(
+            "PourInto: container is neither a valid cylinder nor mesh.");
 
-      // // /* transform waypoints to planning frame */
-      // // for (auto &waypoint : waypoints)
-      // //   waypoint = container_frame * waypoint;
-
-      // // for (auto waypoint : waypoints) {
-      // //   geometry_msgs::msg::PoseStamped p;
-      // //   p.header.frame_id = planning_scene_->getPlanningFrame();
-      // //   p.pose = tf2::toMsg(waypoint);
-
-      // //   // rviz_marker_tools::appendFrame(trajectory.markers(), p, 0.1, markerNS());
-      // // }
-
-      // //     /* specify waypoints for tool link, not for bottle tip */
-      // // for (auto &waypoint : waypoints)
-      // //   waypoint = waypoint * bottle_tip_in_tool_link.inverse();
-
-      // // std::vector<moveit::core::RobotStatePtr> traj;
-
-      // // const double jump_threshold = 0.0;
-      // // const double eef_step = 0.01;
       
-      // // moveit_msgs::msg::RobotTrajectory trajectory;
+      //! We got objects, do shit with them. 
 
-      // // // std::vector<geometry_msgs::msg::Transform> transform_waypoints;
-      // // // for (const auto& waypoint : waypoints)
-      // // // {
-      // // //     geometry_msgs::msg::Pose pose = tf2::toMsg(waypoint);
-      // // //     geometry_msgs::msg::Transform transform;
-      // // //     transform.translation.x = pose.position.x;
-      // // //     transform.translation.y = pose.position.y;
-      // // //     transform.translation.z = pose.position.z;
-      // // //     transform.rotation = pose.orientation;
-      // // //     transform_waypoints.push_back(transform);
-      // // // }
-
-      // // std::vector<geometry_msgs::msg::Pose> pose_waypoints;
-      // // for (const auto& waypoint : waypoints)
-      // // {
-      // //     geometry_msgs::msg::Pose pose;
-      // //     tf2::convert(waypoint, pose);
-      // //     pose_waypoints.push_back(pose);
-      // // }
-      // // double path_fraction = move_group_->computeCartesianPath(pose_waypoints, eef_step, jump_threshold, trajectory);
+      // const moveit::core::JointModelGroup* joint_model_group =
+      //     move_group_.getCurrentState()->getJointModelGroup(PLANNING_GROUP);
 
 
-      // // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+      moveit::core::RobotStatePtr state(move_group_->getCurrentState());
+
+      // container frame:
+      // - top-center of container object
+      // - rotation should coincide with the planning frame
+      Eigen::Isometry3d container_frame =
+          state->getFrameTransform(container_name) *
+          Eigen::Translation3d(
+              Eigen::Vector3d(0, 0, getObjectHeight(container) / 2));
+      container_frame.linear().setIdentity();
+
+      /* compute pouring axis as one angle (tilt_axis_angle) in x-y plane */
+      //// TODO: spawn many axis if this is not set
+      // const auto &pouring_axis =
+      //     props.get<geometry_msgs::msg::Vector3Stamped>("pouring_axis");
+      Eigen::Vector3d tilt_axis;
+      tf2::fromMsg(pouring_axis.vector, tilt_axis);
+      tilt_axis = container_frame.inverse() *
+                  state->getFrameTransform(pouring_axis.header.frame_id) * tilt_axis;
+      // always tilt around axis in x-y plane
+      tilt_axis.z() = 0.0;
+      double tilt_axis_angle = std::atan2(tilt_axis.y(), tilt_axis.x());
+
+      const Eigen::Isometry3d &bottle_frame = state->getFrameTransform(bottle_name);
+
+      //! assume bottle tip as top-center of cylinder/mesh
+
+       auto &attached_bottle_tfs =
+      state->getAttachedBody(bottle_name)->getShapePosesInLinkFrame();
+
+      assert(attached_bottle_tfs.size() > 0 &&
+            "impossible: attached body does not know transform to its link");
+
+      const Eigen::Translation3d bottle_tip(
+          Eigen::Vector3d(0, 0, getObjectHeight(bottle.object) / 2));
+      const Eigen::Isometry3d bottle_tip_in_tool_link(attached_bottle_tfs[0] *
+                                                      bottle_tip);
+
+      const Eigen::Isometry3d bottle_tip_in_container_frame =
+          container_frame.inverse() * bottle_frame * bottle_tip;
+
+      /* Cartesian waypoints for pouring motion */
+      EigenSTL::vector_Isometry3d waypoints;
+
+      /* generate waypoints in y-z plane */
+      computePouringWaypoints(bottle_tip_in_container_frame, tilt_angle,
+                              pour_offset, waypoints,
+                              waypoint_count);
+
+      /* rotate y-z plane so tilt motion is along the specified tilt_axis */
+      for (auto &waypoint : waypoints)
+        waypoint = Eigen::AngleAxisd(tilt_axis_angle, Eigen::Vector3d::UnitZ()) *
+                  waypoint *
+                  Eigen::AngleAxisd(-tilt_axis_angle, Eigen::Vector3d::UnitZ());
+
+      /* transform waypoints to planning frame */
+      for (auto &waypoint : waypoints)
+        waypoint = container_frame * waypoint;
+
+      for (auto waypoint : waypoints) {
+        geometry_msgs::msg::PoseStamped p;
+        p.header.frame_id = move_group_->getPlanningFrame();
+        p.pose = tf2::toMsg(waypoint);
+
+        // rviz_marker_tools::appendFrame(trajectory.markers(), p, 0.1, markerNS());
+      }
+
+          /* specify waypoints for tool link, not for bottle tip */
+      for (auto &waypoint : waypoints)
+        waypoint = waypoint * bottle_tip_in_tool_link.inverse();
+
+      std::vector<moveit::core::RobotStatePtr> traj;
+
+      const double jump_threshold = 0.0;
+      const double eef_step = 0.01;
+      
+      moveit_msgs::msg::RobotTrajectory trajectory;
+
+      // std::vector<geometry_msgs::msg::Transform> transform_waypoints;
+      // for (const auto& waypoint : waypoints)
+      // {
+      //     geometry_msgs::msg::Pose pose = tf2::toMsg(waypoint);
+      //     geometry_msgs::msg::Transform transform;
+      //     transform.translation.x = pose.position.x;
+      //     transform.translation.y = pose.position.y;
+      //     transform.translation.z = pose.position.z;
+      //     transform.rotation = pose.orientation;
+      //     transform_waypoints.push_back(transform);
+      // }
+
+      std::vector<geometry_msgs::msg::Pose> pose_waypoints;
+      for (const auto& waypoint : waypoints)
+      {
+          geometry_msgs::msg::Pose pose;
+          tf2::convert(waypoint, pose);
+          pose_waypoints.push_back(pose);
+      }
+      double path_fraction = move_group_->computeCartesianPath(pose_waypoints, eef_step, jump_threshold, trajectory);
 
 
-      // // visual_tools->deleteAllMarkers();
-      // // visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-      // // visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
-      // // for (std::size_t i = 0; i < waypoints.size(); ++i)
-      // //   visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
-      // // visual_tools->trigger();
+      Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+
+
+      visual_tools->deleteAllMarkers();
+      visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+      visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
+      for (std::size_t i = 0; i < waypoints.size(); ++i)
+        visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
+      visual_tools->trigger();
 
     // ! Could be implemented if working. 
     //   /* build executable RobotTrajectory (downward and back up) */
@@ -1946,8 +1952,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
     //       const auto& waypoint = robot_trajectory->getWayPoint(i);
     //       std::cout << "Waypoint " << i << ": " << waypoint << std::endl;
     //   }
+
         // TODO: If statement for success or failure
-      double path_fraction = 0.5; 
        // Not good traj
       if (path_fraction < min_path_fraction) {
           RCLCPP_WARN_STREAM(rclcpp::get_logger("pouring_planner"), "PourInto only produced motion for "
