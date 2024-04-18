@@ -61,11 +61,12 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
         // OutputPort<std::string>("workstation_name"),
         // OutputPort<int8_t>("aruco_id"),
         // OutputPort<bool>("empty"),
+        InputPort<int8_t>("object_id"),
         OutputPort<bool>("result"),
-        OutputPort<geometry_msgs::msg::PoseStamped>("pose"),
+        OutputPort<geometry_msgs::msg::PoseStamped>("pose")
         // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
         // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
-        InputPort<std::string>("object_id")});
+        });
   }
 
   // This is called when the TreeNode is ticked and it should
@@ -77,7 +78,7 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
     getInput("object_id", request->object_id);
     // auto name_ = getInput<std::string>("name_");
     // request->name = name_.value();
-    RCLCPP_INFO(node_->get_logger(), "String name: %s", request->object_id.c_str());
+    // RCLCPP_INFO(node_->get_logger(), "String name: %s", request->object_id);
     // must return true if we are ready to send the request
     return true;
   }
@@ -88,7 +89,7 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
   {
     RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->result);
     
-    setOutput("Pose: ",response->pose);
+    setOutput("pose",response->pose);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
     // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
     return NodeStatus::SUCCESS;

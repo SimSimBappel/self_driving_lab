@@ -1,4 +1,4 @@
-string object_id
+int8 object_id
 ---
 bool result
 geometry_msgs/PoseStamped pose

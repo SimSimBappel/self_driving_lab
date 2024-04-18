@@ -10,7 +10,6 @@
 #include <Eigen/Geometry>
 #include "rclcpp/rclcpp.hpp"
 
-
 // #include "mtc_pour/pour_into.h"
 // #include <moveit/task_constructor/moveit_compat.h>
 
@@ -209,58 +208,54 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     executor_->add_node(node_);
     executor_thread_ = std::thread([this]() { this->executor_->spin(); });
 
-    // ! Not tested)
+    // auto moveit_cpp_ptr = std::make_shared<moveit_cpp::MoveItCpp>(node_);
+    // moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
 
-    // make shared?
-    // robot_model_loader::RobotModelLoader robot_model_loader(node_, "robot_description");
-    // const moveit::core::RobotModelPtr& robot_model = robot_model_loader.getModel();
-    // /* Create a RobotState and JointModelGroup to keep track of the current robot pose and planning group*/
-    // moveit::core::RobotStatePtr robot_state(new moveit::core::RobotState(robot_model));
-    // const moveit::core::JointModelGroup* joint_model_group = robot_state->getJointModelGroup(PLANNING_GROUP);
+    // auto planning_components = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr);
+    // auto robot_model_ptr = moveit_cpp_ptr->getRobotModel();
+    // auto robot_start_state = planning_components->getStartState();
+    // auto joint_model_group_ptr = robot_model_ptr->getJointModelGroup(PLANNING_GROUP);
 
-    // planning_scene::PlanningScenePtr planning_scene(new planning_scene::PlanningScene(robot_model));
+    // // Visualization
+    // // ^^^^^^^^^^^^^
+    // //
+    // // The package MoveItVisualTools provides many capabilities for visualizing objects, robots,
+    // // and trajectories in RViz as well as debugging tools such as step-by-step introspection of a script
+    // moveit_visual_tools::MoveItVisualTools visual_tools(node_, "panda_link0", "moveit_cpp_tutorial",
+    //                                                     moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
+    // visual_tools.deleteAllMarkers();
+    // visual_tools.loadRemoteControl();
 
-    //? Shared
-    robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(node_, "robot_description");
-    robot_model_ = robot_model_loader_->getModel();
-    robot_state_ = std::make_shared<moveit::core::RobotState>(robot_model_);
-    joint_model_group_ = robot_state_->getJointModelGroup(PLANNING_GROUP);
-
-    planning_scene_ = std::make_shared<planning_scene::PlanningScene>(robot_model_);
-
-    // We will now construct a loader to load a planner, by name.
-    // Note that we are using the ROS pluginlib library here.
-    // std::unique_ptr<pluginlib::ClassLoader<planning_interface::PlannerManager>> planner_plugin_loader;
-    // planning_interface::PlannerManagerPtr planner_instance;
-    // std::vector<std::string> planner_plugin_names;
+    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+    // text_pose.translation().z() = 1.75;
+    // visual_tools.publishText(text_pose, "MoveItCpp_Demo", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+    // visual_tools.trigger();
 
 
-    // const auto& planner_name = planner_plugin_names.at(0);
-    // try
-    // {
-    //   planner_instance.reset(planner_plugin_loader->createUnmanagedInstance(planner_name));
-    //   if (!planner_instance->initialize(robot_model, node_,
-    //                                     motion_planning_api_tutorial_node->get_namespace()))
-    //     RCLCPP_FATAL(LOGGER, "Could not initialize planner instance");
-    //   RCLCPP_INFO(LOGGER, "Using planning interface '%s'", planner_instance->getDescription().c_str());
-    // }
-    // catch (pluginlib::PluginlibException& ex)
-    // {
-    //   const std::vector<std::string>& classes = planner_plugin_loader->getDeclaredClasses();
-    //   std::stringstream ss;
-    //   for (const auto& cls : classes)
-    //     ss << cls << " ";
-    //   RCLCPP_ERROR(LOGGER, "Exception while loading planner '%s': %s\nAvailable plugins: %s", planner_name.c_str(),
-    //               ex.what(), ss.str().c_str());
-    // }
+
+    // moveit_cpp_ptr_ = std::make_shared<moveit_cpp::MoveItCpp>(node_);
+    // moveit_cpp_ptr_->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
+    // planning_components_ = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr_);
+    // robot_model_ptr_ = moveit_cpp_ptr_->getRobotModel();
+    // robot_start_state_ = planning_components_->getStartState();
+    // joint_model_group_ptr_ = robot_model_ptr_->getJointModelGroup(PLANNING_GROUP);
+
+    // auto moveit_cpp_ptr = std::make_shared<moveit_cpp::MoveItCpp>(node_);
+    // moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->providePlanningSceneService();
+
+    // auto planning_components = std::make_shared<moveit_cpp::PlanningComponent>(PLANNING_GROUP, moveit_cpp_ptr);
+    // auto robot_model_ptr = moveit_cpp_ptr->getRobotModel();
+    // auto robot_start_state = planning_components->getStartState();
+    // auto joint_model_group_ptr = robot_model_ptr->getJointModelGroup(PLANNING_GROUP);
+
 
     moveit::planning_interface::MoveGroupInterface move_group(node_, PLANNING_GROUP);
 
-    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "/cartesian_path", robot_model_);
+    // visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "/cartesian_path", robot_model_);
 
-    visual_tools->enableBatchPublishing();
-    visual_tools->deleteAllMarkers();  // clear all old markers
-    visual_tools->trigger();
+    // visual_tools->enableBatchPublishing();
+    // visual_tools->deleteAllMarkers();  // clear all old markers
+    // visual_tools->trigger();
 
 
 
@@ -309,6 +304,12 @@ void MoveRobotServer::add_object_callback(
         object_to_attach.primitives.push_back(primitive);
         object_to_attach.primitive_poses.push_back(grab_pose);
         object_to_attach.operation = object_to_attach.ADD;
+
+        // {  // Lock PlanningScene
+        //   planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
+        //   scene->processCollisionObjectMsg(object_to_attach);
+        // }  // Unlock PlanningScene
+        
         planning_scene_interface.applyCollisionObject(object_to_attach);
 
         RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
@@ -1563,17 +1564,124 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
   }
 
 
+// TODO: Move below to header file
+  // check the CollisionObject types this stage can handle
+  inline bool isValidObject(const moveit_msgs::msg::CollisionObject &o) {
+    return (o.meshes.size() == 1 && o.mesh_poses.size() == 1 &&
+            o.primitives.empty()) ||
+          (o.meshes.empty() && o.primitives.size() == 1 &&
+            o.primitive_poses.size() == 1 &&
+            o.primitives[0].type == shape_msgs::msg::SolidPrimitive::CYLINDER);
+  }
+
+  /* compute height of the CollisionObject
+    This is only useful for meshes, when they are centered */
+  inline double getObjectHeight(const moveit_msgs::msg::CollisionObject &o) {
+    if (!o.meshes.empty()) {
+      double x, y, z;
+      geometric_shapes::getShapeExtents(o.meshes[0], x, y, z);
+      return z;
+    } else {
+      // validations guarantees this is a cylinder
+      return o.primitives[0]
+          .dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT];
+    }
+  }
+// TODO: Move above to header file
+
+
 //! get_pre_pour_pose
 void MoveRobotServer::get_pre_pour_pose_callback(
       const std::shared_ptr<GetPrePourPose::Request> request,
       const std::shared_ptr<GetPrePourPose::Response> response){
-        RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose called");
+        RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose_callback called");
+
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        std::cout << "..." << std::endl;
+        // moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
+        // moveit_msgs::msg::CollisionObject object_to_attach;
+
+        moveit_msgs::msg::CollisionObject container;
+
+        // int8_t container_name = request->object_id;
+
+        const std::string container_name = std::to_string(request->object_id);
+
+        std::cout << "trolo..." << std::endl;
+        std::cout << "..." << std::endl;
+
+        std::vector<std::string> object_ids;
+        object_ids.push_back(container_name);
 
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-        moveit_msgs::msg::CollisionObject object_to_attach;
 
-        RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
+        // Get the poses from the objects identified by the given object ids list
+        auto result = planning_scene_interface.getObjectPoses(object_ids);
+
+        // Iterate over the result map to access each pose
+        for (const auto& pair : result) {
+            const std::string& object_id = pair.first;
+            const geometry_msgs::msg::Pose& pose = pair.second;
+
+            // Now you can use object_id and pose as needed
+            std::cout << "Object ID: " << object_id << std::endl;
+            // std::cout << "Pose: " << pose << std::endl;
+
+            // For example, to access individual components of the pose:
+            std::cout << "Position (x, y, z): " << pose.position.x << ", "
+                                                << pose.position.y << ", "
+                                                << pose.position.z << std::endl;
+            std::cout << "Orientation (x, y, z, w): " << pose.orientation.x << ", "
+                                                      << pose.orientation.y << ", "
+                                                      << pose.orientation.z << ", "
+                                                      << pose.orientation.w << std::endl;
+        }
+    
+ 	      //Get the poses from the objects identified by the given object ids list
+        
+        // auto container_name = std::to_string(container_name_i);
+
+        // // planning_scene_->getCollisionObjectMsg()
+        // if (!planning_scene_->getCollisionObjectMsg(container, container_name))
+        //   throw std::runtime_error("container object '" + container_name +
+        //                           "' is not specified in input planning scene");
+        // if (!isValidObject(container))
+        //   throw std::runtime_error(
+        //       "PourInto: container is neither a valid cylinder nor mesh.");
+
+        // std::cout << "..." << std::endl;
+        // std::cout << "..." << std::endl;
+
+        // const Eigen::Isometry3d &bottle_frame = planning_scene_->getFrameTransform(container_name);
+
+        // bottle_frame.translation().z() += 0.15;
+
+        geometry_msgs::msg::PoseStamped p;
+        // p.header.frame_id = planning_scene_->getPlanningFrame();
+        // p.pose.position.x = bottle_frame.translation().x();
+        // p.pose.position.y = bottle_frame.translation().y();
+        // p.pose.position.z = bottle_frame.translation().z();
+
+        // p.pose.position.z += 0.6;
+
+        // // Log the computed pose
+        // RCLCPP_INFO(this->get_logger(), "Computed Pre-Pour Pose: Position (x: %.2f, y: %.2f, z: %.2f)",
+        //             p.pose.position.x, p.pose.position.y, p.pose.position.z);
+
+        // // Publish the pose
+        // visual_tools->publishAxisLabeled(p.pose, "pre_pour_pose");
+        // visual_tools->publishText(p.pose, "Pre-Pour Pose", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+        // visual_tools->trigger();  // Ensure all markers are sent immediately
+
+        RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose_callback ended");
         response->result = true;
+        response->pose = p; 
 
       }
 
@@ -1644,30 +1752,6 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
     }
   }
 
-  // check the CollisionObject types this stage can handle
-  inline bool isValidObject(const moveit_msgs::msg::CollisionObject &o) {
-    return (o.meshes.size() == 1 && o.mesh_poses.size() == 1 &&
-            o.primitives.empty()) ||
-          (o.meshes.empty() && o.primitives.size() == 1 &&
-            o.primitive_poses.size() == 1 &&
-            o.primitives[0].type == shape_msgs::msg::SolidPrimitive::CYLINDER);
-  }
-
-  /* compute height of the CollisionObject
-    This is only useful for meshes, when they are centered */
-  inline double getObjectHeight(const moveit_msgs::msg::CollisionObject &o) {
-    if (!o.meshes.empty()) {
-      double x, y, z;
-      geometric_shapes::getShapeExtents(o.meshes[0], x, y, z);
-      return z;
-    } else {
-      // validations guarantees this is a cylinder
-      return o.primitives[0]
-          .dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT];
-    }
-  }
-
-
   void MoveRobotServer::arm_move_trajectory_pour_execute(const std::shared_ptr<GoalHandleArmMoveTrajectoryPour> goal_handle){
       auto result = std::make_shared<ArmMoveTrajectoryPour::Result>();
 
@@ -1704,132 +1788,132 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       moveit_msgs::msg::CollisionObject container;
 
-      // planning_scene_->getCollisionObjectMsg()
-      if (!planning_scene_->getCollisionObjectMsg(container, container_name))
-        throw std::runtime_error("container object '" + container_name +
-                                "' is not specified in input planning scene");
-      if (!isValidObject(container))
-        throw std::runtime_error(
-            "PourInto: container is neither a valid cylinder nor mesh.");
+      // // // planning_scene_->getCollisionObjectMsg()
+      // // if (!planning_scene_->getCollisionObjectMsg(container, container_name))
+      // //   throw std::runtime_error("container object '" + container_name +
+      // //                           "' is not specified in input planning scene");
+      // // if (!isValidObject(container))
+      // //   throw std::runtime_error(
+      // //       "PourInto: container is neither a valid cylinder nor mesh.");
 
-      moveit_msgs::msg::AttachedCollisionObject bottle;
-      if (!planning_scene_->getAttachedCollisionObjectMsg(bottle, bottle_name))
-        throw std::runtime_error(
-            "bottle '" + bottle_name +
-            "' is not an attached collision object in input planning scene");
-      if (!isValidObject(bottle.object))
-        throw std::runtime_error(
-            "PourInto: bottle is neither a valid cylinder nor mesh.");
+      // // moveit_msgs::msg::AttachedCollisionObject bottle;
+      // // if (!planning_scene_->getAttachedCollisionObjectMsg(bottle, bottle_name))
+      // //   throw std::runtime_error(
+      // //       "bottle '" + bottle_name +
+      // //       "' is not an attached collision object in input planning scene");
+      // // if (!isValidObject(bottle.object))
+      // //   throw std::runtime_error(
+      // //       "PourInto: bottle is neither a valid cylinder nor mesh.");
 
-      moveit::core::RobotState state(planning_scene_->getCurrentState());
+      // // moveit::core::RobotState state(planning_scene_->getCurrentState());
 
-      // container frame:
-      // - top-center of container object
-      // - rotation should coincide with the planning frame
-      Eigen::Isometry3d container_frame =
-          planning_scene_->getFrameTransform(container_name) *
-          Eigen::Translation3d(
-              Eigen::Vector3d(0, 0, getObjectHeight(container) / 2));
-      container_frame.linear().setIdentity();
+      // // // container frame:
+      // // // - top-center of container object
+      // // // - rotation should coincide with the planning frame
+      // // Eigen::Isometry3d container_frame =
+      // //     planning_scene_->getFrameTransform(container_name) *
+      // //     Eigen::Translation3d(
+      // //         Eigen::Vector3d(0, 0, getObjectHeight(container) / 2));
+      // // container_frame.linear().setIdentity();
 
-      /* compute pouring axis as one angle (tilt_axis_angle) in x-y plane */
-      //// TODO: spawn many axis if this is not set
-      // const auto &pouring_axis =
-      //     props.get<geometry_msgs::msg::Vector3Stamped>("pouring_axis");
-      Eigen::Vector3d tilt_axis;
-      tf2::fromMsg(pouring_axis.vector, tilt_axis);
-      tilt_axis = container_frame.inverse() *
-                  planning_scene_->getFrameTransform(pouring_axis.header.frame_id) * tilt_axis;
-      // always tilt around axis in x-y plane
-      tilt_axis.z() = 0.0;
-      double tilt_axis_angle = std::atan2(tilt_axis.y(), tilt_axis.x());
+      // // /* compute pouring axis as one angle (tilt_axis_angle) in x-y plane */
+      // // //// TODO: spawn many axis if this is not set
+      // // // const auto &pouring_axis =
+      // // //     props.get<geometry_msgs::msg::Vector3Stamped>("pouring_axis");
+      // // Eigen::Vector3d tilt_axis;
+      // // tf2::fromMsg(pouring_axis.vector, tilt_axis);
+      // // tilt_axis = container_frame.inverse() *
+      // //             planning_scene_->getFrameTransform(pouring_axis.header.frame_id) * tilt_axis;
+      // // // always tilt around axis in x-y plane
+      // // tilt_axis.z() = 0.0;
+      // // double tilt_axis_angle = std::atan2(tilt_axis.y(), tilt_axis.x());
 
-      const Eigen::Isometry3d &bottle_frame = planning_scene_->getFrameTransform(bottle_name);
+      // // const Eigen::Isometry3d &bottle_frame = planning_scene_->getFrameTransform(bottle_name);
 
-      //! assume bottle tip as top-center of cylinder/mesh
+      // // //! assume bottle tip as top-center of cylinder/mesh
 
-       auto &attached_bottle_tfs =
-      state.getAttachedBody(bottle_name)->getShapePosesInLinkFrame();
+      // //  auto &attached_bottle_tfs =
+      // // state.getAttachedBody(bottle_name)->getShapePosesInLinkFrame();
 
-      assert(attached_bottle_tfs.size() > 0 &&
-            "impossible: attached body does not know transform to its link");
+      // // assert(attached_bottle_tfs.size() > 0 &&
+      // //       "impossible: attached body does not know transform to its link");
 
-      const Eigen::Translation3d bottle_tip(
-          Eigen::Vector3d(0, 0, getObjectHeight(bottle.object) / 2));
-      const Eigen::Isometry3d bottle_tip_in_tool_link(attached_bottle_tfs[0] *
-                                                      bottle_tip);
+      // // const Eigen::Translation3d bottle_tip(
+      // //     Eigen::Vector3d(0, 0, getObjectHeight(bottle.object) / 2));
+      // // const Eigen::Isometry3d bottle_tip_in_tool_link(attached_bottle_tfs[0] *
+      // //                                                 bottle_tip);
 
-      const Eigen::Isometry3d bottle_tip_in_container_frame =
-          container_frame.inverse() * bottle_frame * bottle_tip;
+      // // const Eigen::Isometry3d bottle_tip_in_container_frame =
+      // //     container_frame.inverse() * bottle_frame * bottle_tip;
 
-      /* Cartesian waypoints for pouring motion */
-      EigenSTL::vector_Isometry3d waypoints;
+      // // /* Cartesian waypoints for pouring motion */
+      // // EigenSTL::vector_Isometry3d waypoints;
 
-      /* generate waypoints in y-z plane */
-      computePouringWaypoints(bottle_tip_in_container_frame, tilt_angle,
-                              pour_offset, waypoints,
-                              waypoint_count);
+      // // /* generate waypoints in y-z plane */
+      // // computePouringWaypoints(bottle_tip_in_container_frame, tilt_angle,
+      // //                         pour_offset, waypoints,
+      // //                         waypoint_count);
 
-      /* rotate y-z plane so tilt motion is along the specified tilt_axis */
-      for (auto &waypoint : waypoints)
-        waypoint = Eigen::AngleAxisd(tilt_axis_angle, Eigen::Vector3d::UnitZ()) *
-                  waypoint *
-                  Eigen::AngleAxisd(-tilt_axis_angle, Eigen::Vector3d::UnitZ());
+      // // /* rotate y-z plane so tilt motion is along the specified tilt_axis */
+      // // for (auto &waypoint : waypoints)
+      // //   waypoint = Eigen::AngleAxisd(tilt_axis_angle, Eigen::Vector3d::UnitZ()) *
+      // //             waypoint *
+      // //             Eigen::AngleAxisd(-tilt_axis_angle, Eigen::Vector3d::UnitZ());
 
-      /* transform waypoints to planning frame */
-      for (auto &waypoint : waypoints)
-        waypoint = container_frame * waypoint;
+      // // /* transform waypoints to planning frame */
+      // // for (auto &waypoint : waypoints)
+      // //   waypoint = container_frame * waypoint;
 
-      for (auto waypoint : waypoints) {
-        geometry_msgs::msg::PoseStamped p;
-        p.header.frame_id = planning_scene_->getPlanningFrame();
-        p.pose = tf2::toMsg(waypoint);
+      // // for (auto waypoint : waypoints) {
+      // //   geometry_msgs::msg::PoseStamped p;
+      // //   p.header.frame_id = planning_scene_->getPlanningFrame();
+      // //   p.pose = tf2::toMsg(waypoint);
 
-        // rviz_marker_tools::appendFrame(trajectory.markers(), p, 0.1, markerNS());
-      }
+      // //   // rviz_marker_tools::appendFrame(trajectory.markers(), p, 0.1, markerNS());
+      // // }
 
-          /* specify waypoints for tool link, not for bottle tip */
-      for (auto &waypoint : waypoints)
-        waypoint = waypoint * bottle_tip_in_tool_link.inverse();
+      // //     /* specify waypoints for tool link, not for bottle tip */
+      // // for (auto &waypoint : waypoints)
+      // //   waypoint = waypoint * bottle_tip_in_tool_link.inverse();
 
-      std::vector<moveit::core::RobotStatePtr> traj;
+      // // std::vector<moveit::core::RobotStatePtr> traj;
 
-      const double jump_threshold = 0.0;
-      const double eef_step = 0.01;
+      // // const double jump_threshold = 0.0;
+      // // const double eef_step = 0.01;
       
-      moveit_msgs::msg::RobotTrajectory trajectory;
+      // // moveit_msgs::msg::RobotTrajectory trajectory;
 
-      // std::vector<geometry_msgs::msg::Transform> transform_waypoints;
-      // for (const auto& waypoint : waypoints)
-      // {
-      //     geometry_msgs::msg::Pose pose = tf2::toMsg(waypoint);
-      //     geometry_msgs::msg::Transform transform;
-      //     transform.translation.x = pose.position.x;
-      //     transform.translation.y = pose.position.y;
-      //     transform.translation.z = pose.position.z;
-      //     transform.rotation = pose.orientation;
-      //     transform_waypoints.push_back(transform);
-      // }
+      // // // std::vector<geometry_msgs::msg::Transform> transform_waypoints;
+      // // // for (const auto& waypoint : waypoints)
+      // // // {
+      // // //     geometry_msgs::msg::Pose pose = tf2::toMsg(waypoint);
+      // // //     geometry_msgs::msg::Transform transform;
+      // // //     transform.translation.x = pose.position.x;
+      // // //     transform.translation.y = pose.position.y;
+      // // //     transform.translation.z = pose.position.z;
+      // // //     transform.rotation = pose.orientation;
+      // // //     transform_waypoints.push_back(transform);
+      // // // }
 
-      std::vector<geometry_msgs::msg::Pose> pose_waypoints;
-      for (const auto& waypoint : waypoints)
-      {
-          geometry_msgs::msg::Pose pose;
-          tf2::convert(waypoint, pose);
-          pose_waypoints.push_back(pose);
-      }
-      double path_fraction = move_group_->computeCartesianPath(pose_waypoints, eef_step, jump_threshold, trajectory);
-
-
-      Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+      // // std::vector<geometry_msgs::msg::Pose> pose_waypoints;
+      // // for (const auto& waypoint : waypoints)
+      // // {
+      // //     geometry_msgs::msg::Pose pose;
+      // //     tf2::convert(waypoint, pose);
+      // //     pose_waypoints.push_back(pose);
+      // // }
+      // // double path_fraction = move_group_->computeCartesianPath(pose_waypoints, eef_step, jump_threshold, trajectory);
 
 
-      visual_tools->deleteAllMarkers();
-      visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-      visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
-      for (std::size_t i = 0; i < waypoints.size(); ++i)
-        visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
-      visual_tools->trigger();
+      // // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+
+
+      // // visual_tools->deleteAllMarkers();
+      // // visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+      // // visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
+      // // for (std::size_t i = 0; i < waypoints.size(); ++i)
+      // //   visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
+      // // visual_tools->trigger();
 
     // ! Could be implemented if working. 
     //   /* build executable RobotTrajectory (downward and back up) */
@@ -1863,6 +1947,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
     //       std::cout << "Waypoint " << i << ": " << waypoint << std::endl;
     //   }
         // TODO: If statement for success or failure
+      double path_fraction = 0.5; 
        // Not good traj
       if (path_fraction < min_path_fraction) {
           RCLCPP_WARN_STREAM(rclcpp::get_logger("pouring_planner"), "PourInto only produced motion for "
