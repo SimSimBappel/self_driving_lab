@@ -257,7 +257,7 @@ void MoveRobotServer::add_object_callback(
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
-        grab_pose.position.z -= request->size_y/2 - (0.018/2)-0.002;
+        grab_pose.position.z -= request->size_y/2 - 0.011; //size of testtube/2-(height of gripper/2)-(offset)
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
