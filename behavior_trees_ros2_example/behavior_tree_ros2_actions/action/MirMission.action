@@ -1,0 +1,8 @@
+#goal definition
+string mission_id
+---
+#result definition
+bool done
+---
+#feedback
+int32 cycle
