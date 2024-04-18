@@ -284,8 +284,6 @@ void MoveRobotServer::remove_object_callback(
         object_ids.push_back(request->object_id);
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-        std::vector<std::string> object_ids;
-        object_ids.push_back(request->object_id);
         planning_scene_interface.removeCollisionObjects(object_ids);
         RCLCPP_INFO(this->get_logger(), "remove_object_callback ended");
         response->result = true;
