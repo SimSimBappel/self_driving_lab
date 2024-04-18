@@ -1,6 +1,7 @@
 import cv2
 import time
 import rclpy
+import tf2_ros
 import numpy as np
 import rclpy.duration
 import tf_transformations as tf
@@ -16,22 +17,12 @@ from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from aruco_pose_estimation.pose_estimation import pose_estimation
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 
-from behavior_tree_ros2_actions.srv import LookupTransform
-import tf2_ros
-from tf2_ros.buffer import Buffer
-
-from tf2_ros.transform_listener import TransformListener
-import tf_transformations as tf
-
-import numpy as np
-from rclpy.qos import DurabilityPolicy, QoSProfile, HistoryPolicy
-
 
 class CameraSubscriber(Node):
     def __init__(self, image_topic, info_topic, debug=False):
         super().__init__('camera_subscriber')
         self.image_sub = self.create_subscription(
-                Image, image_topic, self.image_callback, 1 #qos_profile_sensor_data
+                Image, image_topic, self.image_callback, 1
             )
         self.image_sub
         self.info_sub = self.create_subscription(
@@ -53,23 +44,13 @@ class CameraSubscriber(Node):
         self.intrinsic_mat = None
         self.distortion = None
         self.runonce = False
-
-        # self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-        # _qos = QoSProfile(
-        #         depth=100,
-        #         durability=DurabilityPolicy.VOLATILE,
-        #         history=HistoryPolicy.KEEP_LAST,
-        #         )
-        # self.tf_buffer = Buffer()
-        # self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True, qos=_qos, static_qos=_qos)
-
         
     def info_callback(self, info_msg):
         self.info_msg = info_msg
+
         # get the intrinsic matrix and distortion coefficients from the camera info
         self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
         self.distortion = np.array(self.info_msg.d)
-
         self.logger.info("Camera info received.")
         self.logger.info("Intrinsic matrix: {}".format(self.intrinsic_mat))
         self.logger.info("Distortion coefficients: {}".format(self.distortion))
@@ -89,7 +70,6 @@ class CameraSubscriber(Node):
         
         try:
             # Convert ROS Image message to OpenCV image
-            print("Image received")
             self.img_raw = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
             self.img_copy = self.img_raw.copy()
             self.runonce = True
@@ -118,12 +98,6 @@ class ArucoMarkerDetector(Node):
         self.logger.info('Initializing aruco_marker_detector')
         self.initialize_parameters()
         self.camera_subscriber = CameraSubscriber(self.image_topic, self.info_topic, self.debug)
-        
-        # self.client = self.create_client(LookupTransform, 'lookup_transform')
-        # while not self.client.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('service not available, waiting again...')
-        # self.req = LookupTransform.Request()
-
 
         self.timeout = 5 # Secounds
         self.found_object = False
@@ -131,8 +105,6 @@ class ArucoMarkerDetector(Node):
 
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-        # self.tf_buffer = Buffer()
-        # self.tf_listener = TransformListener(self.tf_buffer, self)
 
         if self.debug:
             self.camera_subscriber.start_streaming()
@@ -153,7 +125,6 @@ class ArucoMarkerDetector(Node):
             options = "\n".join([s for s in ARUCO_DICT])
             self.logger.error("valid options: {}".format(options))
 
-        # code for updated version of cv2 (4.7.0)
         self.aruco_dictionary = cv2.aruco.getPredefinedDictionary(dictionary_id)
         self.aruco_parameters = cv2.aruco.DetectorParameters()
         self.aruco_detector = cv2.aruco.ArucoDetector(self.aruco_dictionary, self.aruco_parameters)
@@ -170,6 +141,7 @@ class ArucoMarkerDetector(Node):
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback
             )
+        
         
     def send_request(self, source, target, time):
         self.req.source = source
@@ -235,10 +207,10 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
                         grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
                         grab_trans_msg.transform.translation.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
-                        grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x# + goal_handle.request.slot_to_slot_transform.transform.rotation.x
-                        grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y# + goal_handle.request.slot_to_slot_transform.transform.rotation.y
-                        grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z# + goal_handle.request.slot_to_slot_transform.transform.rotation.z
-                        grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w# + goal_handle.request.slot_to_slot_transform.transform.rotation.w
+                        grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x
+                        grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y
+                        grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
+                        grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w
                         self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
 
                         self.found_object = True
