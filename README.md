@@ -9,7 +9,7 @@ install libfranka from [here](https://frankaemika.github.io/docs/installation_li
 get the 0.9.2 version during the git checkout command
 ```
 pip3 install opencv-python opencv-contrib-python transforms3d
-sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2* ros-humble-tf-transformations ros-humble-gazebo-ros2-control ros-humble-ros2-controllers ros-humble-joint-state-publisher ros-humble-gazebo-ros ros-humble-moveit ros-humble-graph-msgs ros-humble-moveit-visual-tools ros-humble-ament-cmake-clang-format
+sudo apt install ros-humble-behaviortree-cpp ros-humble-realsense2-* ros-humble-librealsense2* ros-humble-tf-transformations ros-humble-gazebo-ros2-control ros-humble-ros2-controllers ros-humble-joint-state-publisher ros-humble-gazebo-ros ros-humble-moveit ros-humble-graph-msgs ros-humble-moveit-visual-tools ros-humble-ament-cmake-clang-format ros-humble-xacro
 cd ~
 mkdir -p ros2_ws/src
 cd ros2_ws/src
