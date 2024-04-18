@@ -76,6 +76,9 @@
     <Sequence>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.08"
+                               speed="0.02"
+                               action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
