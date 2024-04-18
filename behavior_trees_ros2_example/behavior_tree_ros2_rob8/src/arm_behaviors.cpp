@@ -154,7 +154,7 @@ class DetachObjectNode: public RosServiceNode<DetachObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success add object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success detach object: %ld", response->result);
     return NodeStatus::SUCCESS;
   }
 
@@ -278,7 +278,7 @@ class RemoveObjectNode: public RosServiceNode<RemoveObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success add object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success remove object: %ld", response->result);
     return NodeStatus::SUCCESS;
   }
 

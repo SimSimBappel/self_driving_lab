@@ -298,7 +298,7 @@ void MoveRobotServer::add_object_callback(
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
-        grab_pose.position.z -= request->size_y/2 - 0.01;
+        grab_pose.position.z -= request->size_y/2 - (0.018/2)-0.002;
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
@@ -325,6 +325,7 @@ void MoveRobotServer::remove_object_callback(
         object_ids.push_back(request->object_id);
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
         planning_scene_interface.removeCollisionObjects(object_ids);
+        RCLCPP_INFO(this->get_logger(), "remove_object_callback ended");
         response->result = true;
 
       }
@@ -336,6 +337,7 @@ void MoveRobotServer::attach_object_callback(
         touch_links.push_back("panda_rightfinger");
         touch_links.push_back("panda_leftfinger");
         response->result = move_group_->attachObject(request->object_id, "panda_hand_tcp", touch_links);
+        RCLCPP_INFO(this->get_logger(), "attach_object_callback ended");
 
       }
 
@@ -343,6 +345,7 @@ void MoveRobotServer::detach_object_callback(
       const std::shared_ptr<DetachObject::Request> request,
       const std::shared_ptr<DetachObject::Response> response) {
         response->result = move_group_->detachObject(request->object_id);
+        RCLCPP_INFO(this->get_logger(), "detach_object_callback ended");
       }
 
 
@@ -1103,7 +1106,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         orientation_constraint.orientation = goal->pose.pose.orientation;
         orientation_constraint.absolute_x_axis_tolerance = 0.2;
         orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        // orientation_constraint.absolute_z_axis_tolerance = 0.2;
         orientation_constraint.weight = 1.0;
 
 
