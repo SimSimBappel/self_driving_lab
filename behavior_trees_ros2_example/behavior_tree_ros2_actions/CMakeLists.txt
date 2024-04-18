@@ -43,6 +43,7 @@ set(action_files
     "action/ArmMoveRelativePose.action"
     "action/ArmMoveToFrame.action"
     "action/ArmMoveTrajectoryPour.action"
+    "action/MirMission.action"
     # "action/MoveGroupSequence.action"
     # "action/Pickup.action"
     # "action/Place.action"
