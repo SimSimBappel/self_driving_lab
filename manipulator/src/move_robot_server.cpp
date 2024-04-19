@@ -203,6 +203,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_group_->setPlanningPipelineId("ompl");
     move_group_->setEndEffectorLink(tcp_frame); /// or move_group_->setEndEffector();
     
+    move_group_->setSupportSurfaceName("base_plate_link");
 
     // move_group_->setPlannerId("PTP");
     executor_->add_node(node_);

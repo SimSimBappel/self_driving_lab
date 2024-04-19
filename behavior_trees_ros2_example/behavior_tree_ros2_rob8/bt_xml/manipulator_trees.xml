@@ -174,6 +174,7 @@
                            source="grab_pose"
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approach_offset="{approach_offset}"
