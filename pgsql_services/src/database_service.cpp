@@ -24,6 +24,9 @@
 #include <pqxx/pqxx>
 #include "csv.h"
 
+#include <iostream>
+
+
 class DatabaseService : public rclcpp::Node {
 public:
     DatabaseService() : Node("database_service") {
@@ -242,11 +245,15 @@ private:
                             aruco_to_first_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
                             aruco_to_first_slot_transform.header.stamp = this->get_clock()->now(); // set the timestamp to the current time
 
-
-
                             geometry_msgs::msg::TransformStamped first_slot_to_current_slot_transform = read_transform_from_csv(first_slot_to_every_slot_csv, slot_id_map[slot_id]);
                             first_slot_to_current_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
                             first_slot_to_current_slot_transform.header.stamp = this->get_clock()->now(); // set the timestamp to the current time
+
+                            std::cout << "slot_id: " << slot_id << std::endl;
+
+                            for(const auto &pair : slot_id_map) {
+                                std::cout << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+                            }
 
                             std::string workstation_query = "SELECT name, lookout_pose FROM workstation WHERE workstation_id = " + W.quote(workstation_id) + ";";
 
