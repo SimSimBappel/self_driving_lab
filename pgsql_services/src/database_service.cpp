@@ -227,6 +227,9 @@ private:
 
 
                             std::string map_query = "SELECT slot_id FROM tray_slot WHERE tray_id = " + std::to_string(tray_id) + " ORDER BY slot_id" + ";";
+
+                            std::cout << map_query << std::endl;
+
                             pqxx::result map_result = W.exec(placement_query);
                             // Map the slot_ids in the range 1, 2, 3 ... sizeof(tray_id) to the tray_id
                             std::map<int, int> slot_id_map;
