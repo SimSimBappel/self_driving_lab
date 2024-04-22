@@ -8,6 +8,7 @@
 #include "camera_behaviors.cpp"
 #include "arm_behaviors.cpp"
 #include "database_behaviors.cpp"
+#include "mir_behaviors.cpp"
 #include "behaviortree_ros2/plugins.hpp"
 #include "yaml-cpp/yaml.h"
 #include "ament_index_cpp/get_package_share_directory.hpp"

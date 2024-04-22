@@ -37,6 +37,7 @@ add_executable(test_load
     src/gripper_behaviors.cpp
     src/arm_behaviors.cpp
     src/camera_behaviors.cpp
+    src/mir_behaviors.cpp
     src/test_load_and_make_xml_files.cpp)
     
  ament_target_dependencies(test_load ${THIS_PACKAGE_DEPS})
@@ -46,6 +47,7 @@ add_executable(test_load
     src/gripper_behaviors.cpp
     src/arm_behaviors.cpp
     src/camera_behaviors.cpp
+    src/mir_behaviors.cpp
     src/behavior_server.cpp)
     
  ament_target_dependencies(behavior_server ${THIS_PACKAGE_DEPS})
@@ -56,6 +58,7 @@ add_executable(test_load
     src/arm_behaviors.cpp
     src/camera_behaviors.cpp
     src/database_behaviors.cpp
+    src/mir_behaviors.cpp
     src/test_client.cpp)
     
   ament_target_dependencies(test_client ${THIS_PACKAGE_DEPS})

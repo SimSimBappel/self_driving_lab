@@ -7,6 +7,7 @@
 #include "gripper_behaviors.cpp"
 #include "camera_behaviors.cpp"
 #include "arm_behaviors.cpp"
+#include "mir_behaviors.cpp"
 #include "database_behaviors.cpp"
 #include "behaviortree_ros2/plugins.hpp"
 #include "yaml-cpp/yaml.h"
