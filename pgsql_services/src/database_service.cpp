@@ -198,6 +198,8 @@ private:
                 return;
             }
 
+
+
             for (auto row : result) {
                 int chemical_id = row["chemical_id"].as<int>();
                 std::string placement_query = "SELECT * FROM chemical_placements WHERE chemical_id = " + W.quote(chemical_id) + ";";
@@ -208,7 +210,7 @@ private:
                     response->message = "Chemical has no placements";
                     return;
                 }
-
+                // TODO: Not from placements.
                 for (auto new_row : placement_result) {
                     int slot_id = new_row["slot_id"].as<int>();
                     bool empty_bottle = new_row["empty"].as<bool>();
@@ -217,6 +219,7 @@ private:
 
                     for (auto row : slot_result) {
                         int tray_id = row["tray_id"].as<int>();
+                        
                         std::string tray_query = "SELECT workstation_id, type, aruco_id FROM tray WHERE tray_id = " + W.quote(tray_id) + ";";
                         pqxx::result tray_result = W.exec(tray_query);
 
@@ -230,12 +233,16 @@ private:
 
                             std::cout << map_query << std::endl;
 
-                            pqxx::result map_result = W.exec(placement_query);
+
+                            std::string map_query = "SELECT slot_id FROM tray_slot WHERE tray_id = " + W.quote(tray_id) + " ORDER BY slot_id" + ";";
+                            pqxx::result map_result = W.exec(map_query);
+
                             // Map the slot_ids in the range 1, 2, 3 ... sizeof(tray_id) to the tray_id
                             std::map<int, int> slot_id_map;
                             for (size_t i = 0; i < map_result.size(); ++i) {
                                 slot_id_map[map_result[i][0].as<int>()] = i + 1;
                             }
+
 
                             std::string package_share_directory = ament_index_cpp::get_package_share_directory("pgsql_services");
                             std::string aruco_to_first_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request->type + "_aruco_to_first_slot.csv";
