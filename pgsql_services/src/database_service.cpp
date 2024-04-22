@@ -212,7 +212,7 @@ private:
                 }
                 // TODO: 
                 //* [x] Not from placements.
-                //* [ ] Check logic for handling slot_to_slot
+                //* [ ] Check logic for handling slot_to_slot in vessel fnc
                 for (auto new_row : placement_result) {
                     int slot_id = new_row["slot_id"].as<int>();
                     bool empty_bottle = new_row["empty"].as<bool>();
@@ -264,11 +264,13 @@ private:
                             first_slot_to_current_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
                             first_slot_to_current_slot_transform.header.stamp = this->get_clock()->now(); // set the timestamp to the current time
 
-                            std::cout << "slot_id: " << slot_id << std::endl;
 
-                            for(const auto &pair : slot_id_map) {
-                                std::cout << "Key: " << pair.first << " Value: " << pair.second << std::endl;
-                            }
+                            //? dbg: of tray keys
+                            // std::cout << "slot_id: " << slot_id << std::endl;
+
+                            // for(const auto &pair : slot_id_map) {
+                            //     std::cout << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+                            // }
 
                             std::string workstation_query = "SELECT name, lookout_pose FROM workstation WHERE workstation_id = " + W.quote(workstation_id) + ";";
 
