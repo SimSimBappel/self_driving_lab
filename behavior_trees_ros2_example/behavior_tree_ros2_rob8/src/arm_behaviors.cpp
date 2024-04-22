@@ -87,7 +87,7 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success: %d", response->result);
     
     setOutput("pose",response->pose);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
@@ -154,7 +154,7 @@ class DetachObjectNode: public RosServiceNode<DetachObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success detach object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success detach object: %d", response->result);
     return NodeStatus::SUCCESS;
   }
 
@@ -216,7 +216,7 @@ class AttachObjectNode: public RosServiceNode<AttachObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success attach object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success attach object: %d", response->result);
     return NodeStatus::SUCCESS;
   }
 
@@ -278,7 +278,7 @@ class RemoveObjectNode: public RosServiceNode<RemoveObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success remove object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success remove object: %d", response->result);
     return NodeStatus::SUCCESS;
   }
 
@@ -341,7 +341,7 @@ class AddObjectNode: public RosServiceNode<AddObject>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success add object: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success add object: %d", response->result);
     // setOutput("aruco_id",response->aruco_id);
     // setOutput("message",response->message);
     // setOutput("success",response->success);
