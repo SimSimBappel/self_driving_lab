@@ -293,6 +293,9 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
                         grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
                         grab_trans_msg.transform.translation.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        print("slot_to_slot x",goal_handle.request.slot_to_slot_transform.transform.translation.x)
+                        print("slot_to_slot y",goal_handle.request.slot_to_slot_transform.transform.translation.y)
+                        print("slot_to_slot z",goal_handle.request.slot_to_slot_transform.transform.translation.z)
                         grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
