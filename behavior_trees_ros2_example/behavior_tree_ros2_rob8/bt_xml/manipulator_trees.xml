@@ -20,8 +20,8 @@
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.025"
-                                   accel="0.025"
+                                   speed="0.05"
+                                   accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <AttachObjectNode object_id="{object_id}"
@@ -45,8 +45,8 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.025"
-                                   accel="0.025"
+                                   speed="0.05"
+                                   accel="0.05"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
