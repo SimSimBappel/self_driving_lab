@@ -216,7 +216,12 @@ private:
                 for (auto new_row : placement_result) {
                     int slot_id = new_row["slot_id"].as<int>();
                     bool empty_bottle = new_row["empty"].as<bool>();
-                    
+
+                    // If the bottle is empty, skip this iteration
+                    if (empty_bottle) {
+                        continue;
+                    }
+                                        
                     std::string slot_query = "SELECT * FROM tray_slot WHERE slot_id = " + W.quote(slot_id) + ";";
                     pqxx::result slot_result = W.exec(slot_query);
 
