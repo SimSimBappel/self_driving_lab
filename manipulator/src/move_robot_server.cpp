@@ -285,28 +285,32 @@ void MoveRobotServer::remove_object_callback(
         object_ids.push_back(request->object_id);
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-        planning_scene_interface.removeCollisionObjects(object_ids);
-        RCLCPP_INFO(this->get_logger(), "remove_object_callback ended");
-        response->result = true;
+        //* Remove object until actually removed.
+        const int max_attempts = 15;
+        int attempts = 0;
+        bool object_removed = false;
+
+        while (!object_removed) {
+            auto object_result = planning_scene_interface.getObjects(object_ids);
+            planning_scene_interface.removeCollisionObjects(object_ids);
+            auto object_it = object_result.find(request->object_id);
+
+            if (object_it == object_result.end()) {
+                object_removed = true;
+                response->result = true;
+            } else if (attempts >= max_attempts) {
+                response->result = false;
+                break;
+            }
+            attempts++;
+        }
+
+        // planning_scene_interface.removeCollisionObjects(object_ids);
+        // RCLCPP_INFO(this->get_logger(), "remove_object_callback ended");
+        // response->result = true;
       }
-      //   //* Remove object until actually removed.
-      //   const int max_attempts = 15;
-      //   int attempts = 0;
-      //   bool object_removed = false;
 
-      //   while (!object_removed) {
-      //       auto object_result = planning_scene_interface.getObjects(object_ids);
-      //       planning_scene_interface.removeCollisionObjects(object_ids);
-      //       auto object_it = object_result.find(request->object_id);
-
-      //       if (object_it == object_result.end()) {
-      //           object_removed = true;
-      //           response->result = true;
-      //       }
-      //       attempts++;
-      //   }
-      //   response->result = false;
-      // }
+      
 
 void MoveRobotServer::attach_object_callback(
       const std::shared_ptr<AttachObject::Request> request,
@@ -331,7 +335,7 @@ void MoveRobotServer::detach_object_callback(
 
 bool MoveRobotServer::ArmMoveJ(const std_msgs::msg::Float64MultiArray & msg){
   std::vector<double> joints;
-  for(int i = 0; i<msg.data.size();i++)
+  for(long unsigned int i = 0; i<msg.data.size();i++)
   {
     joints.push_back(msg.data[i]);
   }
@@ -379,7 +383,7 @@ bool MoveRobotServer::ArmMoveL(const geometry_msgs::msg::PoseStamped & msg){
     int num_points = static_cast<int>(std::ceil(distance / separation_distance));
 
     // Calculate the step size for each interpolation point
-    double step_size = distance / num_points;
+    // double step_size = distance / num_points;
 
     // Interpolate the points and add them to the vector
     for (int i = 0; i <= num_points; ++i)
@@ -404,9 +408,9 @@ bool MoveRobotServer::ArmMoveL(const geometry_msgs::msg::PoseStamped & msg){
   waypoints.push_back(msg.pose);
 
   moveit_msgs::msg::RobotTrajectory trajectory;
-  const double jump_threshold = 0.001;
-  const double eef_step = 0.001;
-  double fraction = move_group_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  // const double jump_threshold = 0.001;
+  // const double eef_step = 0.001;
+  // double fraction = move_group_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   move_group_->execute(trajectory);
  
   return true;
@@ -484,36 +488,36 @@ bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
     move_group_->setPoseTarget(pose_goal);
     RCLCPP_INFO(this->get_logger(), "set pose goal");
     bool success = static_cast<bool>(move_group_->plan(my_plan));
-              RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
-              if(success == true){
-                  //move_group.move();
-                  // move_group_->setStartStateToCurrentState();
-                  RCLCPP_INFO(this->get_logger(), "about to exec");
-                  if(move_group_->execute(my_plan).val == 1){
-                    return true;
-                  }
-                  else{
-                    move_group_->setStartStateToCurrentState();
-                    move_group_->setPoseTarget(pose_goal);
-                    bool success = static_cast<bool>(move_group_->plan(my_plan));
-                      RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
-                    if(success == true){
-                      // move_group.move();
-                      move_group_->setStartStateToCurrentState();
-                      if(move_group_->execute(my_plan).val == 1){
-                        return true;
-                      }
-                      else{
-                        return false;
-                      }
-                      
-                    }
+    RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+    if(success == true){
+        //move_group.move();
+        // move_group_->setStartStateToCurrentState();
+        RCLCPP_INFO(this->get_logger(), "about to exec");
+        if(move_group_->execute(my_plan).val == 1){
+          return true;
+        }
+        else{
+          move_group_->setStartStateToCurrentState();
+          move_group_->setPoseTarget(pose_goal);
+          bool success = static_cast<bool>(move_group_->plan(my_plan));
+            RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
+          if(success == true){
+            // move_group.move();
+            move_group_->setStartStateToCurrentState();
+            if(move_group_->execute(my_plan).val == 1){
+              return true;
+            }
+            else{
+              return false;
+            }
+            
+          }
 
-                  }
-              }
-              else{
-                  return false;
-                }
+        }
+    }
+    
+    return false;
+    
                 
 }
 
@@ -521,6 +525,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const Home::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     RCLCPP_INFO(this->get_logger(), "Received goal homing");
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -597,7 +602,8 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const GripperJoint::Goal> goal)
   {
-    RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->joint_1);
+    (void)goal; //ignore unused parameter warning
+    RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %f",goal->joint_1);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
@@ -680,7 +686,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
         joints.data = {goal->joint_1, goal->joint_2};
         move_gripper_group_->setMaxAccelerationScalingFactor(goal->accel);
         move_gripper_group_->setMaxVelocityScalingFactor(goal->speed);
-        RCLCPP_INFO(this->get_logger(), "opening %d",goal->joint_1);
+        RCLCPP_INFO(this->get_logger(), "opening %f",goal->joint_1);
         if(MoveRobotServer::MoveGripper(joints)){
           
           result->done = true;
@@ -701,6 +707,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const Gripper::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->open);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -810,6 +817,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePlizPtpPoseMsg::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -896,6 +904,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePlizLinPoseMsg::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1004,6 +1013,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePoseMsg::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1043,7 +1053,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         orientation_constraint.orientation = goal->pose.pose.orientation;
         orientation_constraint.absolute_x_axis_tolerance = 0.2;
         orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        // orientation_constraint.absolute_z_axis_tolerance = 0.2;
         orientation_constraint.weight = 1.0;
 
         moveit_msgs::msg::Constraints orientation_constraints;
@@ -1051,10 +1061,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
         move_group_->setPathConstraints(orientation_constraints);
 
-        move_group_->setPlanningTime(10.0);
+        move_group_->setPlanningTime(20.0);
       }
       else if(goal->lin){
-
+        move_group_->setPlanningTime(20.0);
         // LINE CONSTRAINTS
         moveit_msgs::msg::PositionConstraint line_constraint;
         line_constraint.header.frame_id = move_group_->getPoseReferenceFrame();
@@ -1113,11 +1123,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         moveit_msgs::msg::Constraints empty_constraints;
         move_group_->setPathConstraints(empty_constraints);
         move_group_->clearPathConstraints();
+        move_group_->setPlanningTime(10.0);
 
       }
       
       move_group_->setPoseTarget(goal->pose);
-      move_group_->setPlanningTime(10.0);
       // move_group_->plan(plan);
 
       if(goal->pose.header.frame_id != ""){
@@ -1147,6 +1157,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePoseMsgTcp::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1210,6 +1221,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMovePose::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1250,7 +1262,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
     //     getline(ss, substr, ',');
     //     v.push_back(substr);
     // }
-    for(int i = 0; i < pose.size(); i++)
+    for(long unsigned int i = 0; i < pose.size(); i++)
     {
       pos.push_back(pose[i]);
     }
@@ -1372,6 +1384,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMoveJoints::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1396,7 +1409,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
       std_msgs::msg::Float64MultiArray joints_;
       const auto goal = goal_handle->get_goal();
       auto joint_pose = goal->joints;
-      for(int i = 0; i<joint_pose.size();i++)
+      for(long unsigned int i = 0; i<joint_pose.size();i++)
       {
         joints_.data.push_back(joint_pose[i]);
        }
@@ -1424,6 +1437,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMoveJointsRelative::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1448,7 +1462,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
       std_msgs::msg::Float64MultiArray joints_;
       const auto goal = goal_handle->get_goal();
       auto joint_pose = goal->joints;
-      for(int i = 0; i<joint_pose.size();i++)
+      for(long unsigned int i = 0; i<joint_pose.size();i++)
       {
         joints_.data.push_back(joint_pose[i]);
        }
@@ -1457,7 +1471,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
       std::vector<double> joint_group_positions;
       current_state->copyJointGroupPositions(joint_model_group, joint_group_positions);
 
-      for(int j = 0; j < joints_.data.size();j++){
+      for(long unsigned int j = 0; j < joints_.data.size();j++){
         joints_.data[j] += joint_group_positions[j];
       }
 
@@ -1488,6 +1502,7 @@ rclcpp_action::GoalResponse MoveRobotServer::sleep_handle_goal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const Sleep::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning
     RCLCPP_INFO(this->get_logger(), "Received goal request with sleep time %d", goal->msec_timeout);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1665,6 +1680,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMoveTrajectoryPour::Goal> goal)
   {
+    (void)goal; //ignore unused parameter warning 
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1739,7 +1755,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       double tilt_angle = goal->tilt_angle;
       double min_path_fraction = goal->min_path_fraction;
       // Eigen::Vector3d pour_offset = Eigen::Vector3d(0, 0.03, 0.01);
-      double pour_duration = goal->pour_duration;
+      // double pour_duration = goal->pour_duration;
 
       auto container_name = std::to_string(container_name_i);
       auto bottle_name = std::to_string(bottle_name_i);
@@ -1772,7 +1788,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       }
 
       std::string id = object_it->second.id;
-      geometry_msgs::msg::Pose pose = object_it->second.pose;
+      // geometry_msgs::msg::Pose pose = object_it->second.pose;
       object_recognition_msgs::msg::ObjectType type = object_it->second.type;
 
       container = object_it->second;

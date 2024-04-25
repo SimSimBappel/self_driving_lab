@@ -10,6 +10,8 @@ int8 aruco_id
 geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> hardcoded transform (aruco -> slot_id == 1)
 geometry_msgs/TransformStamped slot_to_slot_transform           # slot_id -> hardcoded transform (slot_id == 1 -> selected slot_id)
 
+# TODO: Add slot_id
+
 bool empty # Is the bottle empty ?
 
 bool success

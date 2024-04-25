@@ -355,13 +355,13 @@ int main(int argc, char **argv)
             << xml_models
             << "--------------------------------\n";
 
-  // factory.registerBehaviorTreeFromFile(tree_xml_file_);
+  // // factory.registerBehaviorTreeFromFile(tree_xml_file_);
   auto tree = factory.createTree("MainTree");
 
-  // std::cout << BT::writeTreeToXML(tree);
-  std::cout << "----------- XML file  ----------\n"
-            << BT::WriteTreeToXML(tree, false, false)
-            << "--------------------------------\n";
+  // // std::cout << BT::writeTreeToXML(tree);
+  // std::cout << "----------- XML file  ----------\n"
+  //           << BT::WriteTreeToXML(tree, false, false)
+  //           << "--------------------------------\n";
 
   BT::Groot2Publisher publisher(tree,5555);
 

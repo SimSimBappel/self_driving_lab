@@ -15,15 +15,9 @@
      </Reagents>
 
      <Procedure>
-         <Add reagent='carbonyl' vessel='reactor' amount='2 eq'/>
-         <Add reagent='solvent' vessel='reactor' amount='2 mL'/>
-         <Add reagent='grignard_reagent' vessel='reactor' amount='1 eq' time='5 min'/>
-
+         <Add reagent='natrium_chloride' vessel='reactor' amount='2'/>
+         <Add reagent='chlorine' vessel='reactor' amount='2'/>
+         <Add reagent='sulfuric_acid' vessel='reactor' amount='1' time='5 min'/>
          <!-- Parameter values used for temp and time -->
-         <HeatChill
-             vessel='reactor'
-             temp='reaction_temp'
-             time='reaction_time'
-             stir='true'/>
      </Procedure>
  </Blueprint>

@@ -7,8 +7,9 @@ from tkinter import filedialog
 import rclpy
 import os
 
-sussy = '/home/lilholt/github/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test.xml'
-
+# sussy = '/home/lilholt/github/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test.xml'
+#<SubTree ID="Add"/>
+sussy = '/home/intelnuc/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test.xml'
 class xdl_parser(Node):
     def __init__(self):
         super().__init__('xdl_parser')
@@ -16,7 +17,7 @@ class xdl_parser(Node):
         self.BT_client = self.create_client(Xdl, 'xdl_service') 
         self.get_logger().info("XDL Parser service has been started")
         self.avaiable_tasks_dict = {
-            'Add':'<AddObjectNode '
+            'Add':'<SubTree ID="Add" '
         }
 
         self.end_tag_dict = {
@@ -93,8 +94,10 @@ class xdl_parser(Node):
 
             else:
                 result += f'{key}="{value}" '
-
         result += '/>\n'
+        # result += ' _autoremap="true"/>\n'
+        # result += ' robot_init="{robot_init}"/>\n'
+
 
 
 
@@ -102,7 +105,8 @@ class xdl_parser(Node):
 
 
     def generate_behavior_tree(self,list_of_procedures,params_dict):
-        result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n'
+        # result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n<Script code="robot_init:=0" />\n'
+        result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n<SubTree ID="init"/>\n'
 
         for index, item in enumerate(list_of_procedures):
             tmp = self.keyword_to_string(item,params_dict[index])

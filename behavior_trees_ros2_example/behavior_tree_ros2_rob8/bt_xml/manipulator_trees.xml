@@ -24,8 +24,6 @@
                                    accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <AttachObjectNode object_id="{object_id}"
-                        service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <Fallback>
         <SubTree ID="gripping"
@@ -42,6 +40,8 @@
                    epsilon="0.02"/>
         </Sequence>
       </Fallback>
+      <AttachObjectNode object_id="{object_id}"
+                        service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
@@ -76,7 +76,7 @@
     <Sequence>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
-      <FrankaMoveGripperAction width="0.08"
+      <FrankaMoveGripperAction width="0.039"
                                speed="0.02"
                                action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
@@ -138,17 +138,22 @@
                    slot_to_slot_transform="{slot_to_slot}"
                    Transform="{object_pose_msg}"
                    action_name="__default__placeholder__"/>
-      <LookupTransformNode result="{bool_result}"
-                           transform="{object_pose_msg2}"
-                           source="grab_pose"
-                           target="panda_link0"
-                           service_name="__default__placeholder__"/>
+      <PrintValue message="before"/>
+      <RetryUntilSuccessful num_attempts="5">
+        <LookupTransformNode result="{bool_result}"
+                             transform="{object_pose_msg2}"
+                             source="grab_pose"
+                             target="panda_link0"
+                             service_name="__default__placeholder__"/>
+      </RetryUntilSuccessful>
+      <PrintValue message="after"/>
       <AddObjectNode pose="{object_pose_msg2}"
                      object_id="{aruco_id}"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
                      service_name="__default__placeholder__"/>
+      <PrintValue message="after2"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"
@@ -453,6 +458,10 @@
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
+    </Action>
+    <Action ID="PrintValue">
+      <input_port name="message"
+                  type="std::string"/>
     </Action>
     <Action ID="RemoveObjectNode">
       <input_port name="object_id"

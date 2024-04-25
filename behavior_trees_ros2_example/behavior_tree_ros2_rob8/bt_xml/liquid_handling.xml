@@ -2,11 +2,11 @@
 <root BTCPP_format="4">
   <BehaviorTree ID="Add">
     <Sequence>
-      <Fallback>
-        <AlwaysSuccess/>
-      </Fallback>
-      <SubTree ID="get_reagent"/>
-      <SubTree ID="pour_reagent"/>
+      <PrintValue message="{reagent}"/>
+      <PrintValue message="{vessel}"/>
+      <PrintValue message="{amount}"/>
+      <SubTree ID="get_reagent"
+               reagent="{reagent}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -24,10 +24,28 @@
 
   <BehaviorTree ID="get_reagent">
     <Sequence>
+      <GetChemicalNode message="{result_messages}"
+                       workstation_name="{workstation}"
+                       name_="{reagent}"
+                       type_="pick"
+                       aruco_id="{aruco_id}"
+                       empty="{empty}"
+                       success="{success}"
+                       lookout_pose="{lookout_pose_msg}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
         <SubTree ID="move_base"/>
       </Fallback>
+      <SubTree ID="visual_grasp"
+               aruco_id="{aruco_id}"
+               lookout_pose_msg="{lookout_pose_msg}"
+               aruco_to_slot="{aruco_to_slot}"
+               slot_to_slot="{slot_to_slot}"
+               keep_orientation="false"
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
     </Sequence>
   </BehaviorTree>
 
@@ -41,6 +59,51 @@
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
-  <TreeNodesModel/>
+  <TreeNodesModel>
+    <Action ID="GetChemicalNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="workstation_name"
+                   type="std::string"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <input_port name="type_"
+                  type="std::string"/>
+      <output_port name="aruco_id"
+                   type="signed char"/>
+      <output_port name="empty"
+                   type="bool"/>
+      <output_port name="success"
+                   type="bool"/>
+      <output_port name="lookout_pose"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="aruco_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="slot_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
+    <Action ID="PrintValue">
+      <input_port name="message"
+                  type="std::string"/>
+    </Action>
+    <SubTree ID="get_reagent"
+             editable="true">
+      <input_port name="reagent"/>
+    </SubTree>
+    <SubTree ID="visual_grasp"
+             editable="true">
+      <input_port name="aruco_id"/>
+      <input_port name="lookout_pose_msg"/>
+      <input_port name="aruco_to_slot"/>
+      <input_port name="slot_to_slot"/>
+      <input_port name="keep_orientation"
+                  type="bool"/>
+      <input_port name="approach_offset"
+                  default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+    </SubTree>
+  </TreeNodesModel>
 
 </root>

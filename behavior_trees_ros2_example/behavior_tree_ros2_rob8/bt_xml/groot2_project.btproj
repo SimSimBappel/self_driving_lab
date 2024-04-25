@@ -8,6 +8,11 @@
     <include path="stirring.xml"/>
     <!-- Description of Node Models (used by Groot) -->
     <TreeNodesModel>
+        <SubTree ID="Add" editable="true">
+            <input_port name="reagent"/>
+            <input_port name="vessel"/>
+            <input_port name="amount"/>
+        </SubTree>
         <Action ID="AddChemicalNode">
             <output_port name="message" type="std::string"/>
             <input_port name="formula" type="std::string"/>
@@ -254,6 +259,9 @@
             <input_port name="location_base" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <SubTree ID="get_reagent" editable="true">
+            <input_port name="reagent"/>
+        </SubTree>
         <SubTree ID="grasp_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
             <input_port name="approch_offset"/>

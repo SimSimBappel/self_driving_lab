@@ -66,12 +66,13 @@ public:
 class BehaviorServer : public rclcpp::Node 
 {
   public:
-    // BehaviorServer(const rclcpp::NodeOptions &options)
-    // : Node("behavior_services_node", options), node_(std::make_shared<rclcpp::Node>("behavior_exe_services_node"))
-    //       ,executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
-    BehaviorServer()
-    : Node("behavior_services_node")
+    BehaviorServer(const rclcpp::NodeOptions &options)
+    : Node("behavior_services_node", options), node_(std::make_shared<rclcpp::Node>("behavior_services_node"))
+          ,executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
     {
+    // BehaviorServer()
+    // : Node("behavior_services_node")
+    // {
     
       this->service_ = create_service<behavior_tree_ros2_actions::srv::Xdl>("xdl_service", std::bind(&BehaviorServer::Xdl_service, this,
                                 std::placeholders::_1, std::placeholders::_2));
@@ -245,32 +246,46 @@ class BehaviorServer : public rclcpp::Node
 
         RosNodeParams params_add_object;
         params_add_object.nh = this->node_;
-        params_add_object.server_timeout = std::chrono::milliseconds(2000);
-        params_add_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_add_object.default_port_value = "add_object_servicce";
+        params_add_object.server_timeout = std::chrono::milliseconds(2400);
+        params_add_object.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        params_add_object.default_port_value = "add_object_service";
         factory.registerNodeType<AddObjectNode>("AddObjectNode",params_add_object);
 
         RosNodeParams params_remove_object;
         params_remove_object.nh = this->node_;
-        params_remove_object.server_timeout = std::chrono::milliseconds(2000);
-        params_remove_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_remove_object.default_port_value = "remove_object_servicce";
+        params_remove_object.server_timeout = std::chrono::milliseconds(4000);
+        params_remove_object.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        params_remove_object.default_port_value = "remove_object_service";
         factory.registerNodeType<RemoveObjectNode>("RemoveObjectNode",params_remove_object);
 
         RosNodeParams params_attach_object;
         params_attach_object.nh = this->node_;
-        params_attach_object.server_timeout = std::chrono::milliseconds(2000);
-        params_attach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_attach_object.default_port_value = "attach_object_servicce";
+        params_attach_object.server_timeout = std::chrono::milliseconds(4000);
+        params_attach_object.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        params_attach_object.default_port_value = "attach_object_service";
         factory.registerNodeType<AttachObjectNode>("AttachObjectNode",params_attach_object);
 
         RosNodeParams params_detach_object;
         params_detach_object.nh = this->node_;
-        params_detach_object.server_timeout = std::chrono::milliseconds(2000);
-        params_detach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
-        params_detach_object.default_port_value = "detach_object_servicce";
+        params_detach_object.server_timeout = std::chrono::milliseconds(4000);
+        params_detach_object.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        params_detach_object.default_port_value = "detach_object_service";
         factory.registerNodeType<DetachObjectNode>("DetachObjectNode",params_detach_object);
 
+        RosNodeParams params_get_pre_pour_pose;
+        params_get_pre_pour_pose.nh = this->node_;
+        params_get_pre_pour_pose.server_timeout = std::chrono::milliseconds(4000);
+        params_get_pre_pour_pose.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        params_get_pre_pour_pose.default_port_value = "get_pre_pour_pose_service";
+        factory.registerNodeType<GetPrePourPoseNode>("GetPrePourPoseNode",params_get_pre_pour_pose);
+
+
+        RosNodeParams params_arm_move_trajectory_pour_msg;
+        params_arm_move_trajectory_pour_msg.nh = this->node_;
+        params_arm_move_trajectory_pour_msg.default_port_value = "arm_move_trajectory_pour_service";
+        params_arm_move_trajectory_pour_msg.server_timeout = std::chrono::milliseconds(3000);
+        params_arm_move_trajectory_pour_msg.wait_for_server_timeout = std::chrono::milliseconds(2000);
+        factory.registerNodeType<ArmMoveTrajectoryPourAction>("ArmMoveTrajectoryPourAction",params_arm_move_trajectory_pour_msg);
         #ifdef USE_SLEEP_PLUGIN
         RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
         #else
@@ -293,27 +308,38 @@ class BehaviorServer : public rclcpp::Node
     {
         //factory.registerBehaviorTreeFromFile(request->xdl);
         factory.registerBehaviorTreeFromText(request->xdl);
-        tree_ = factory.createTree("MainTree");
+        
+          //std::string xml_models = BT::writeTreeNodesModelXML(factory);
+            //std::cout << "----------- XML file  ----------\n"
+            //<< xml_models
+            //<< "--------------------------------\n";
+        std::cout << "register main tree success\n";
+        tree_ = factory.createTree("Main");
+        std::cout << "create main tree success\n";
 
-          std::string xml_models = BT::writeTreeNodesModelXML(factory);
-            std::cout << "----------- XML file  ----------\n"
-            << xml_models
-            << "--------------------------------\n";
+          //std::string xml_models = BT::writeTreeNodesModelXML(factory);
+            //std::cout << "----------- XML file  ----------\n"
+            //<< xml_models
+            //<< "--------------------------------\n";
 
 
 
-
+        
         // std::cout << BT::writeTreeToXML(tree);
         std::cout << "----------- XML file  ----------\n"
             << BT::WriteTreeToXML(tree_, false, false)
             << "--------------------------------\n";
         
+
+        response->result = true;
         publisher_ptr_ = std::make_unique<BT::Groot2Publisher>(tree_, 5555);
         const auto timer_period = 100ms;
             timer_ = this->create_wall_timer(
                 timer_period,
                 std::bind(&BehaviorServer::update_behavior_tree, this));
         // tree.tickWhileRunning();
+        
+
 
     }
     void update_behavior_tree() {
@@ -409,14 +435,251 @@ const std::string default_bt_xml_file =
 //  </root>
 //  )";
 
+
+// void test() {
+
+//   auto nh = std::make_shared<rclcpp::Node>("test_client");
+
+//   BehaviorTreeFactory factory;
+
+//   factory.registerNodeType<PrintValue>("PrintValue");
+
+//   RosNodeParams params_aruco_lookup_transform;
+//   params_aruco_lookup_transform.nh = nh;
+//   params_aruco_lookup_transform.server_timeout = std::chrono::milliseconds(2000);
+//   params_aruco_lookup_transform.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_aruco_lookup_transform.default_port_value = "lookup_transform";
+//   factory.registerNodeType<LookupTransformNode>("LookupTransformNode",params_aruco_lookup_transform);
+
+//   RosNodeParams params_add_object;
+//   params_add_object.nh = nh;
+//   params_add_object.server_timeout = std::chrono::milliseconds(2000);
+//   params_add_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_add_object.default_port_value = "add_object_service";
+//   factory.registerNodeType<AddObjectNode>("AddObjectNode",params_add_object);
+
+//   RosNodeParams params_remove_object;
+//   params_remove_object.nh = nh;
+//   params_remove_object.server_timeout = std::chrono::milliseconds(2000);
+//   params_remove_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_remove_object.default_port_value = "remove_object_service";
+//   factory.registerNodeType<RemoveObjectNode>("RemoveObjectNode",params_remove_object);
+
+//   RosNodeParams params_attach_object;
+//   params_attach_object.nh = nh;
+//   params_attach_object.server_timeout = std::chrono::milliseconds(2000);
+//   params_attach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_attach_object.default_port_value = "attach_object_service";
+//   factory.registerNodeType<AttachObjectNode>("AttachObjectNode",params_attach_object);
+
+//   RosNodeParams params_detach_object;
+//   params_detach_object.nh = nh;
+//   params_detach_object.server_timeout = std::chrono::milliseconds(2000);
+//   params_detach_object.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_detach_object.default_port_value = "detach_object_service";
+//   factory.registerNodeType<DetachObjectNode>("DetachObjectNode",params_detach_object);
+
+//   RosNodeParams params_get_pre_pour_pose;
+//   params_get_pre_pour_pose.nh = nh;
+//   params_get_pre_pour_pose.server_timeout = std::chrono::milliseconds(4000);
+//   params_get_pre_pour_pose.wait_for_server_timeout = std::chrono::milliseconds(2000);
+//   params_get_pre_pour_pose.default_port_value = "get_pre_pour_pose_service";
+//   factory.registerNodeType<GetPrePourPoseNode>("GetPrePourPoseNode",params_get_pre_pour_pose);
+
+
+//   RosNodeParams params_database_get_chemicals;
+//   params_database_get_chemicals.nh = nh;
+//   params_database_get_chemicals.server_timeout = std::chrono::milliseconds(2000);
+//   params_database_get_chemicals.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_database_get_chemicals.default_port_value = "get_chemical";
+//   factory.registerNodeType<GetChemicalNode>("GetChemicalNode",params_database_get_chemicals);
+
+//   RosNodeParams params_database_get_vessel;
+//   params_database_get_vessel.nh = nh;
+//   params_database_get_vessel.server_timeout = std::chrono::milliseconds(2000);
+//   params_database_get_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_database_get_vessel.default_port_value = "get_vessel";
+//   factory.registerNodeType<GetVesselNode>("GetVesselNode",params_database_get_vessel);
+
+//   RosNodeParams params_database_place_vessel;
+//   params_database_place_vessel.nh = nh;
+//   params_database_place_vessel.server_timeout = std::chrono::milliseconds(2000);
+//   params_database_place_vessel.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_database_place_vessel.default_port_value = "place_vessel";
+//   factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
+
+//   ///////////////////////////////////
+  
+//   RosNodeParams params_gripper;
+//   params_gripper.nh = nh;
+//   params_gripper.server_timeout = std::chrono::milliseconds(2000);
+//   params_gripper.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_gripper.default_port_value = "gripper_service";
+//   factory.registerNodeType<GripperAction>("GripperAction",params_gripper);
+//   //////////////////////////////////////////////////////////////////////////////
+//   RosNodeParams params_gripper_franka_grasp;
+//   params_gripper_franka_grasp.nh = nh;
+//   params_gripper_franka_grasp.server_timeout = std::chrono::milliseconds(2000);
+//   params_gripper_franka_grasp.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_gripper_franka_grasp.default_port_value = "panda_gripper/grasp";
+//   factory.registerNodeType<FrankaGraspGripperAction>("FrankaGraspGripperAction",params_gripper_franka_grasp);
+//   //////////////////////////////////////////////////////////////////////////////
+//   RosNodeParams params_gripper_franka_homing;
+//   params_gripper_franka_homing.nh = nh;
+//   params_gripper_franka_homing.server_timeout = std::chrono::milliseconds(2000);
+//   params_gripper_franka_homing.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_gripper_franka_homing.default_port_value = "panda_gripper/homing";
+//   factory.registerNodeType<FrankaHomeGripperAction>("FrankaHomeGripperAction",params_gripper_franka_homing);
+//   ////////////////////////////////////////////////////////////////////////////
+//   RosNodeParams params_gripper_franka_move;
+//   params_gripper_franka_move.nh = nh;
+//   params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
+//   params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_gripper_franka_move.default_port_value = "panda_gripper/move";
+//   factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
+//   ////////////////////////////////////////////////////////////////////////////////////////
+//   RosNodeParams params_aruco;
+//   params_aruco.nh = nh;
+//   params_aruco.server_timeout = std::chrono::milliseconds(8000);
+//   params_aruco.wait_for_server_timeout = std::chrono::milliseconds(8000);
+//   params_aruco.default_port_value = "detect_marker_pose";
+//   factory.registerNodeType<FindArucoTagAction>("ArucoAction",params_aruco);
+// ////////////////////////////////////////////////////////////////////////////////////////
+//   RosNodeParams params_arm_mode_pose;
+//   params_arm_mode_pose.nh = nh;
+//   params_arm_mode_pose.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_mode_pose.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_arm_mode_pose.default_port_value = "arm_move_pose_service";
+//   factory.registerNodeType<ArmMovePoseAction>("ArmMovePoseAction",params_arm_mode_pose);
+
+//   RosNodeParams params_arm_mode_joints;
+//   params_arm_mode_joints.nh = nh;
+//   params_arm_mode_joints.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_mode_joints.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_arm_mode_joints.default_port_value = "arm_move_joints_service";
+//   factory.registerNodeType<ArmMoveJointsAction>("ArmMoveJointsAction",params_arm_mode_joints);
+
+//   RosNodeParams params_arm_move_joints_relative;
+//   params_arm_move_joints_relative.nh = nh;
+//   params_arm_move_joints_relative.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_move_joints_relative.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_arm_move_joints_relative.default_port_value = "arm_move_joints_relative_service";
+//   factory.registerNodeType<ArmMoveJointsRelativeAction>("ArmMoveJointsRelativeAction",params_arm_move_joints_relative);
+
+//   RosNodeParams params_gripper_joint;
+//   params_gripper_joint.nh = nh;
+
+//   params_gripper_joint.default_port_value = "gripper_joint_service";
+//   factory.registerNodeType<GripperJointAction>("GripperJointAction",params_gripper_joint);
+  
+//   factory.registerNodeType<ArmArrayToPoseAction>("ArmArrayToPoseAction");
+//   factory.registerNodeType<ArmPoseMsgOffsetCalculation>("ArmPoseMsgOffsetCalculation");
+
+//   RosNodeParams params_arm_move_pose_msg;
+//   params_arm_move_pose_msg.nh = nh;
+//   params_arm_move_pose_msg.default_port_value = "arm_move_pose_msg_service";
+//   params_arm_move_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_move_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   factory.registerNodeType<ArmMovePoseMsgAction>("ArmMovePoseMsgAction",params_arm_move_pose_msg);
+
+//   RosNodeParams params_arm_move_pose_msg_tcp;
+//   params_arm_move_pose_msg_tcp.nh = nh;
+//   params_arm_move_pose_msg_tcp.default_port_value = "arm_move_pose_msg_tcp_service";
+//   params_arm_move_pose_msg_tcp.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_move_pose_msg_tcp.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   factory.registerNodeType<ArmMovePoseMsgTcpAction>("ArmMovePoseMsgTcpAction",params_arm_move_pose_msg_tcp);
+
+//     RosNodeParams params_arm_move_trajectory_pour_msg;
+//   params_arm_move_trajectory_pour_msg.nh = nh;
+//   params_arm_move_trajectory_pour_msg.default_port_value = "arm_move_trajectory_pour_service";
+//   params_arm_move_trajectory_pour_msg.server_timeout = std::chrono::milliseconds(3000);
+//   params_arm_move_trajectory_pour_msg.wait_for_server_timeout = std::chrono::milliseconds(2000);
+//   factory.registerNodeType<ArmMoveTrajectoryPourAction>("ArmMoveTrajectoryPourAction",params_arm_move_trajectory_pour_msg);
+
+//   RosNodeParams params_arm_move_pliz_ptp_pose_msg;
+//   params_arm_move_pliz_ptp_pose_msg.nh = nh;
+//   params_arm_move_pliz_ptp_pose_msg.default_port_value = "arm_move_pliz_ptp_pose_msg_service";
+//   params_arm_move_pliz_ptp_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_move_pliz_ptp_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   factory.registerNodeType<ArmMovePlizPtpPoseMsgAction>("ArmMovePlizPtpPoseMsgAction",params_arm_move_pliz_ptp_pose_msg);
+
+
+//   RosNodeParams params_arm_move_pliz_lin_pose_msg;
+//   params_arm_move_pliz_lin_pose_msg.nh = nh;
+//   params_arm_move_pliz_lin_pose_msg.default_port_value = "arm_move_pliz_lin_pose_msg_service";
+//   params_arm_move_pliz_lin_pose_msg.server_timeout = std::chrono::milliseconds(2000);
+//   params_arm_move_pliz_lin_pose_msg.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   factory.registerNodeType<ArmMovePlizLinPoseMsgAction>("ArmMovePlizLinPoseMsgAction",params_arm_move_pliz_lin_pose_msg);
+
+
+//   RosNodeParams params;
+//   params.nh = nh;
+//   params.server_timeout = std::chrono::milliseconds(2000);
+//   params.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params.default_port_value = "sleep_service";
+
+//   factory.registerNodeType<ArmPoseOffsetCalculation>("ArmPoseOffsetCalculation");
+
+//   RosNodeParams params_home_arm;
+//   params_home_arm.nh = nh;
+//   params_home_arm.server_timeout = std::chrono::milliseconds(2000);
+//   params_home_arm.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_home_arm.default_port_value = "home_arm";
+
+//   factory.registerNodeType<HomeArmAction>("HomeArmAction",params_home_arm);
+
+
+//   RosNodeParams params_clear_octomap;
+//   params_clear_octomap.nh = nh;
+//   params_clear_octomap.server_timeout = std::chrono::milliseconds(2000);
+//   params_clear_octomap.wait_for_server_timeout = std::chrono::milliseconds(1000);
+//   params_clear_octomap.default_port_value = "clear_octomap";
+//   factory.registerNodeType<ClearOctomapNode>("ClearOctomapNode",params_clear_octomap);
+
+// #ifdef USE_SLEEP_PLUGIN
+//   RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
+// #else
+//   factory.registerNodeType<SleepAction>("SleepAction", params);
+// #endif
+
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/panda_test.xml");
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/stirring.xml");
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/mobile_base_trees.xml");
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/manipulator_trees.xml");
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/liquid_handling.xml");
+//   factory.registerBehaviorTreeFromFile(ament_index_cpp::get_package_share_directory("behavior_tree_ros2_rob8") + "/bt_xml/database_trees.xml");
+
+//   std::string xml_models = BT::writeTreeNodesModelXML(factory);
+//   std::cout << "----------- XML file  ----------\n"
+//             << xml_models
+//             << "--------------------------------\n";
+
+//   // // factory.registerBehaviorTreeFromFile(tree_xml_file_);
+//   auto tree = factory.createTree("MainTree");
+
+// }
+
+
+
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
+
+
+    
+
+
+    //test();
+
+
+
+
     // rclcpp::NodeOptions node_options;
     // node_options.automatically_declare_parameters_from_overrides(true);
     // auto behavior_node = std::make_shared<BehaviorServer>(node_options);
-    
-    auto behavior_node = std::make_shared<BehaviorServer>();
+    rclcpp::NodeOptions node_options;
+    node_options.automatically_declare_parameters_from_overrides(true);
+    auto behavior_node = std::make_shared<BehaviorServer>(node_options);
     rclcpp::spin(behavior_node);
 
     rclcpp::shutdown();

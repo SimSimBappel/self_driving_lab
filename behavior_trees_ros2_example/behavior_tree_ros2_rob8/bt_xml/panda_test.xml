@@ -78,18 +78,23 @@
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
       <SubTree ID="visual_place"
                lookout_pose_msg="{lookout_pose_msg}"
-               keep_orientation="false"
+               keep_orientation="true"
                aruco_id="{aruco_id}"
                slot_to_slot="{slot_to_slot}"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                aruco_to_slot="{aruco_to_slot}"/>
-      <Script code="posse:= &apos;-0.401;0.369;0.474;-3.137;-0.008;0.005&apos;"/>
-      <ArmMovePoseAction name="arm"
-                         pose="{posse}"
-                         speed="0.2"
-                         accel="0.2"
-                         keep_orientation="true"
-                         action_name="__default__placeholder__"/>
+      <Fallback>
+        <AlwaysSuccess/>
+        <Sequence>
+          <Script code="posse:= &apos;-0.401;0.369;0.474;-3.137;-0.008;0.005&apos;"/>
+          <ArmMovePoseAction name="arm"
+                             pose="{posse}"
+                             speed="0.2"
+                             accel="0.2"
+                             keep_orientation="false"
+                             action_name="__default__placeholder__"/>
+        </Sequence>
+      </Fallback>
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="natrium_chloride"
