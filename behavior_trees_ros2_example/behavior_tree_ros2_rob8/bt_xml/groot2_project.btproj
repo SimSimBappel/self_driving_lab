@@ -226,8 +226,22 @@
             <input_port name="location_id" type="int"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <Action ID="RemoveChemicalPlacementNode">
+            <output_port name="message" type="std::string"/>
+            <output_port name="success" type="bool"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="slot_id" type="signed char"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
         <Action ID="RemoveObjectNode">
             <input_port name="object_id" type="signed char"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="RemoveVesselPlacementNode">
+            <output_port name="message" type="std::string"/>
+            <output_port name="success" type="bool"/>
+            <input_port name="name_" type="std::string"/>
+            <input_port name="slot_id" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="RemoveWorkstationNode">

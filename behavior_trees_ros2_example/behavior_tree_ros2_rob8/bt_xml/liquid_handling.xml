@@ -46,6 +46,11 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
+      <RemoveChemicalPlacementNode message="{message}"
+                                   success="{success}"
+                                   name_="{reagent}"
+                                   slot_id="10"
+                                   service_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -88,6 +93,19 @@
     <Action ID="PrintValue">
       <input_port name="message"
                   type="std::string"/>
+    </Action>
+    <Action ID="RemoveChemicalPlacementNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="success"
+                   type="bool"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <input_port name="slot_id"
+                  type="signed char"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
     </Action>
     <SubTree ID="get_reagent"
              editable="true">

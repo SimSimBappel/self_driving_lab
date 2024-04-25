@@ -13,6 +13,8 @@
 #include "pgsql_interfaces/srv/get_chemical.hpp"
 #include "pgsql_interfaces/srv/get_vessel.hpp"
 #include "pgsql_interfaces/srv/place_vessel.hpp"
+#include "pgsql_interfaces/srv/remove_chemical_placement.hpp"
+#include "pgsql_interfaces/srv/remove_vessel_placement.hpp"
 // #include "pgsql_interfaces/srv/add_chemical.hpp"
 // #include "pgsql_interfaces/srv/add_workstation.hpp"
 // #include "pgsql_interfaces/srv/upsert_chemical_location.hpp"
@@ -27,6 +29,8 @@
 using GetChemical = pgsql_interfaces::srv::GetChemical;
 using GetVessel = pgsql_interfaces::srv::GetVessel;
 using PlaceVessel = pgsql_interfaces::srv::PlaceVessel;
+using RemoveChemicalPlacement = pgsql_interfaces::srv::RemoveChemicalPlacement;
+using RemoveVesselPlacement = pgsql_interfaces::srv::RemoveVesselPlacement;
 // using AddChemical = pgsql_interfaces::srv::AddChemical;
 // using AddWorkstation = pgsql_interfaces::srv::AddWorkstation;
 // using UpsertChemicalLocation = pgsql_interfaces::srv::UpsertChemicalLocation;
@@ -228,6 +232,141 @@ class PlaceVesselNode: public RosServiceNode<PlaceVessel>
     setOutput("lookout_pose",response->lookout_pose);
     setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
     setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
+    return NodeStatus::SUCCESS;
+  }
+
+  // Callback invoked when there was an error at the level
+  // of the communication between client and server.
+  // This will set the status of the TreeNode to either SUCCESS or FAILURE,
+  // based on the return value.
+  // If not overridden, it will return FAILURE by default.
+  virtual NodeStatus onFailure(ServiceNodeErrorCode error) override
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: %d", error);
+    return NodeStatus::FAILURE;
+  }
+};
+
+
+
+
+class RemoveChemicalPlacementNode: public RosServiceNode<RemoveChemicalPlacement>
+{
+  public:
+
+  RemoveChemicalPlacementNode(const std::string& name,
+                  const NodeConfig& conf,
+                  const RosNodeParams& params)
+    : RosServiceNode<RemoveChemicalPlacement>(name, conf, params)
+  {}
+
+  // The specific ports of this Derived class
+  // should be merged with the ports of the base class,
+  // using RosServiceNode::providedBasicPorts()
+  static PortsList providedPorts()
+  {
+    return providedBasicPorts({
+        OutputPort<std::string>("message"),
+        // OutputPort<std::string>("workstation_name"),
+        InputPort<int8_t>("slot_id"),
+        OutputPort<bool>("success"),
+        // OutputPort<geometry_msgs::msg::PoseStamped>("lookout_pose"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
+        InputPort<std::string>("name_")});
+  }
+
+  // This is called when the TreeNode is ticked and it should
+  // send the request to the service provider
+  bool setRequest(Request::SharedPtr& request) override
+  {
+    // use input ports to set A and B
+    getInput("name_", request->name);
+    getInput("slot_id", request->slot_id);
+    // must return true if we are ready to send the request
+    return true;
+  }
+
+  // Callback invoked when the answer is received.
+  // It must return SUCCESS or FAILURE
+  NodeStatus onResponseReceived(const Response::SharedPtr& response) override
+  {
+    RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "message: %s", response->message.c_str());
+    // setOutput("aruco_id",response->aruco_id);
+    setOutput("message",response->message);
+    setOutput("success",response->success);
+    // setOutput("workstation_name",response->workstation_name);
+    // setOutput("lookout_pose",response->lookout_pose);
+    // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
+    // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
+    return NodeStatus::SUCCESS;
+  }
+
+  // Callback invoked when there was an error at the level
+  // of the communication between client and server.
+  // This will set the status of the TreeNode to either SUCCESS or FAILURE,
+  // based on the return value.
+  // If not overridden, it will return FAILURE by default.
+  virtual NodeStatus onFailure(ServiceNodeErrorCode error) override
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: %d", error);
+    return NodeStatus::FAILURE;
+  }
+};
+
+
+
+class RemoveVesselPlacementNode: public RosServiceNode<RemoveVesselPlacement>
+{
+  public:
+
+  RemoveVesselPlacementNode(const std::string& name,
+                  const NodeConfig& conf,
+                  const RosNodeParams& params)
+    : RosServiceNode<RemoveVesselPlacement>(name, conf, params)
+  {}
+
+  // The specific ports of this Derived class
+  // should be merged with the ports of the base class,
+  // using RosServiceNode::providedBasicPorts()
+  static PortsList providedPorts()
+  {
+    return providedBasicPorts({
+        OutputPort<std::string>("message"),
+        // OutputPort<std::string>("workstation_name"),
+        InputPort<int8_t>("slot_id"),
+        OutputPort<bool>("success"),
+        // OutputPort<geometry_msgs::msg::PoseStamped>("lookout_pose"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
+        // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
+        InputPort<std::string>("name_")});
+  }
+
+  // This is called when the TreeNode is ticked and it should
+  // send the request to the service provider
+  bool setRequest(Request::SharedPtr& request) override
+  {
+    // use input ports to set A and B
+    getInput("name_", request->name);
+    getInput("slot_id", request->slot_id);
+    // must return true if we are ready to send the request
+    return true;
+  }
+
+  // Callback invoked when the answer is received.
+  // It must return SUCCESS or FAILURE
+  NodeStatus onResponseReceived(const Response::SharedPtr& response) override
+  {
+    RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "message: %s", response->message.c_str());
+    // setOutput("aruco_id",response->aruco_id);
+    setOutput("message",response->message);
+    setOutput("success",response->success);
+    // setOutput("workstation_name",response->workstation_name);
+    // setOutput("lookout_pose",response->lookout_pose);
+    // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
+    // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
     return NodeStatus::SUCCESS;
   }
 

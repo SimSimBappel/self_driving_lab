@@ -198,6 +198,22 @@ int main(int argc, char **argv)
   params_database_place_vessel.default_port_value = "place_vessel";
   factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
 
+  RosNodeParams params_database_remove_chemical_placement;
+  // params_database_place_vessel.nh = shared_from_this();
+  params_database_remove_chemical_placement.nh = nh;
+  params_database_remove_chemical_placement.server_timeout = std::chrono::milliseconds(2000);
+  params_database_remove_chemical_placement.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_remove_chemical_placement.default_port_value = "remove_chemical_placement";
+  factory.registerNodeType<RemoveChemicalPlacementNode>("RemoveChemicalPlacementNode",params_database_remove_chemical_placement);
+
+  RosNodeParams params_database_remove_vessel_placement;
+  // params_database_place_vessel.nh = shared_from_this();
+  params_database_remove_vessel_placement.nh = nh;
+  params_database_remove_vessel_placement.server_timeout = std::chrono::milliseconds(2000);
+  params_database_remove_vessel_placement.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_remove_vessel_placement.default_port_value = "remove_vessel_placement";
+  factory.registerNodeType<RemoveVesselPlacementNode>("RemoveVesselPlacementNode",params_database_remove_vessel_placement);
+
   ///////////////////////////////////
   
   RosNodeParams params_gripper;
