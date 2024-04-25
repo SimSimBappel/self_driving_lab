@@ -20,8 +20,8 @@
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.025"
-                                   accel="0.025"
+                                   speed="0.05"
+                                   accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <AttachObjectNode object_id="{object_id}"
@@ -45,8 +45,8 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.025"
-                                   accel="0.025"
+                                   speed="0.05"
+                                   accel="0.05"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -76,6 +76,9 @@
     <Sequence>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.08"
+                               speed="0.02"
+                               action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -171,6 +174,7 @@
                            source="grab_pose"
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approach_offset="{approach_offset}"

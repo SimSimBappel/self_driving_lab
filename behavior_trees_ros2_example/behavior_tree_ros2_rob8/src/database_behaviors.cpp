@@ -87,6 +87,7 @@ class GetChemicalNode: public RosServiceNode<GetChemical>
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
     RCLCPP_INFO(node_->get_logger(), "Success: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "message: %s", response->message.c_str());
     setOutput("aruco_id",response->aruco_id);
     setOutput("message",response->message);
     setOutput("success",response->success);
@@ -152,6 +153,7 @@ class GetVesselNode: public RosServiceNode<GetVessel>
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
     RCLCPP_INFO(node_->get_logger(), "Sum: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "message: %s", response->message.c_str());
     setOutput("aruco_id",response->aruco_id);
     setOutput("message",response->message);
     setOutput("success",response->success);
@@ -218,6 +220,7 @@ class PlaceVesselNode: public RosServiceNode<PlaceVessel>
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
     RCLCPP_INFO(node_->get_logger(), "Sum: %ld", response->success);
+    RCLCPP_INFO(node_->get_logger(), "message: %s", response->message.c_str());
     setOutput("aruco_id",response->aruco_id);
     setOutput("message",response->message);
     setOutput("success",response->success);

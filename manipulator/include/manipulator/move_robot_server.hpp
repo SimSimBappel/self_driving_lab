@@ -222,7 +222,7 @@ private:
     moveit::planning_interface::MoveGroupInterfacePtr move_gripper_group_;
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
 
-    // moveit_visual_tools::MoveItVisualToolsPtr visual_tools;
+    moveit_visual_tools::MoveItVisualToolsPtr visual_tools;
     // moveit_visual_tools::MoveItVisualTools visual_tools;
 
     // std::shared_ptr<moveit_cpp::MoveItCpp> moveit_cpp_ptr_;

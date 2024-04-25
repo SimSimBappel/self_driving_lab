@@ -75,13 +75,13 @@
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
-               approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
       <SubTree ID="visual_place"
                lookout_pose_msg="{lookout_pose_msg}"
                keep_orientation="false"
                aruco_id="{aruco_id}"
                slot_to_slot="{slot_to_slot}"
-               approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                aruco_to_slot="{aruco_to_slot}"/>
       <Script code="posse:= &apos;-0.401;0.369;0.474;-3.137;-0.008;0.005&apos;"/>
       <ArmMovePoseAction name="arm"
@@ -107,7 +107,7 @@
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
-               approach_offset="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>

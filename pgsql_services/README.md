@@ -72,7 +72,7 @@ Chemical not found
 
 #### Example CLI
 ```
-ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'natrium_chloride'}"
+ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'sulfuric_acid'}"
 ---
 pgsql_interfaces.srv.GetChemical_Response(workstation_name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=645658287), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=2, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644511923), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.5, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644531086), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, message='Chemical found')
 
@@ -100,6 +100,16 @@ Operation completed successfully
 No free slots
 Tray type is not vessel
 Could not access database
+
+
+pgsql_interfaces.srv.GetChemical_Response(workstation_name='workstation2', 
+
+lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=387100400), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.30844, y=0.41801, z=0.14444), orientation=geometry_msgs.msg.Quaternion(x=0.71522, y=0.69876, z=-0.0099642, w=0.00915))), 
+
+aruco_id=14, 
+aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=386682328), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=-0.12011000000000001, z=-0.06631), rotation=geometry_msgs.msg.Quaternion(x=-0.25685740834180054, y=-0.2568574083418005, z=-0.6588051849977608, w=0.6588051849977605))), 
+
+slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=386723959), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, message='Chemical found')
 
 
 #### Example CLI

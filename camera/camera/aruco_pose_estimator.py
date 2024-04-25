@@ -1,9 +1,11 @@
+import os
 import cv2
 import time
 import rclpy
 import tf2_ros
 import numpy as np
 import rclpy.duration
+import glob
 import tf_transformations as tf
 from rclpy.node import Node
 from cv_bridge import CvBridge
@@ -25,10 +27,14 @@ class CameraSubscriber(Node):
                 Image, image_topic, self.image_callback, 1
             )
         self.image_sub
-        self.info_sub = self.create_subscription(
-            CameraInfo, info_topic, self.info_callback, qos_profile_sensor_data
-        )
-        self.info_sub 
+        self.depth_sub = self.create_subscription(
+                Image, '/camera/depth/image_raw', self.depth_callback, 1
+            )
+        self.depth_sub
+        # self.info_sub = self.create_subscription(
+        #     CameraInfo, info_topic, self.info_callback, qos_profile_sensor_data
+        # )
+        # self.info_sub 
         self.bridge = CvBridge()
         self.logger = self.get_logger()
         if debug:
@@ -37,6 +43,7 @@ class CameraSubscriber(Node):
         else:    
             self.streaming = False
         self.img_raw = None
+        self.depth_raw = None
         self.img_copy = None
         self.info_msg = None
         self.debug = debug
@@ -44,20 +51,24 @@ class CameraSubscriber(Node):
         self.intrinsic_mat = None
         self.distortion = None
         self.runonce = False
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        package_dir = os.path.dirname(script_dir)
+        calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
+        self.calib_cam(calibration_file_path)
         
-    def info_callback(self, info_msg):
-        self.info_msg = info_msg
+    # def info_callback(self, info_msg):
+    #     self.info_msg = info_msg
 
-        # get the intrinsic matrix and distortion coefficients from the camera info
-        self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
-        self.distortion = np.array(self.info_msg.d)
-        self.logger.info("Camera info received.")
-        self.logger.info("Intrinsic matrix: {}".format(self.intrinsic_mat))
-        self.logger.info("Distortion coefficients: {}".format(self.distortion))
-        self.logger.info("Camera frame: {}x{}".format(self.info_msg.width, self.info_msg.height))
+    #     # get the intrinsic matrix and distortion coefficients from the camera info
+    #     self.intrinsic_mat = np.reshape(np.array(self.info_msg.k), (3, 3))
+    #     self.distortion = np.array(self.info_msg.d)
+    #     self.logger.info("Camera info received.")
+    #     self.logger.info("Intrinsic matrix: {}".format(self.intrinsic_mat))
+    #     self.logger.info("Distortion coefficients: {}".format(self.distortion))
+    #     self.logger.info("Camera frame: {}x{}".format(self.info_msg.width, self.info_msg.height))
 
-        # Assume that camera parameters will remain the same...
-        self.destroy_subscription(self.info_sub)
+    #     # Assume that camera parameters will remain the same...
+    #     self.destroy_subscription(self.info_sub)
 
     def image_callback(self, data: Image):
         if not self.streaming:
@@ -77,6 +88,25 @@ class CameraSubscriber(Node):
         except Exception as e:
             self.logger.warn(str(e))
             return
+        
+    def depth_callback(self, data: Image):
+        if not self.streaming:
+            return
+
+        if self.info_msg is None:
+            if self.runonce:
+                self.logger.warn("No camera info has been received!")
+            return
+        
+        try:
+            # Convert ROS Image message to OpenCV image
+            self.depth_raw = self.bridge.imgmsg_to_cv2(data, desired_encoding="rgb8")
+            # self.img_copy = self.img_raw.copy()
+            # self.runonce = True
+            self.datastamp = data.header.stamp
+        except Exception as e:
+            self.logger.warn(str(e))
+            return
 
     def get_latest_image(self):
         return self.img_raw
@@ -87,6 +117,57 @@ class CameraSubscriber(Node):
     def stop_streaming(self):
         if not self.debug:
             self.streaming = False
+
+    def calib_cam(self, calibration_file_path): 
+        if os.path.exists(calibration_file_path):
+            # Load calibration data from file
+            with np.load(calibration_file_path) as data:
+                mtx, dist = [data[i] for i in ('mtx', 'dist')]
+            self.logger.info("Camera calibration data loaded from file.")
+            return mtx, dist
+
+        # If calibration file doesn't exist, perform calibration
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+        objp = np.zeros((6*9,3), np.float32)
+        objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
+        objpoints = [] # 3d point in real world space
+        imgpoints = [] # 2d points in image plane.
+
+        package_dir = os.path.abspath(__file__)
+        for i in range(2): 
+            package_dir = os.path.dirname(os.path.dirname(package_dir))
+
+        # image_path = os.path.join(package_dir, 'src', 'self_driving_lab', 'camera', 'resource', 'calib_images', 'checkerboard')
+        image_path = '/home/intelnuc/sdl_ws/src/self_driving_lab/camera/resource/calib_images/checkerboard/'
+        images = glob.glob(os.path.join(image_path, '*.jpg'))
+        if os.path.exists(image_path):
+            self.logger.info("Calibration images found")
+        # images = glob.glob(os.path.join('/home/intelnuc/sdl_ws/src/self_driving_lab/camera/resource/calib_images/checkerboard/', '*.jpg'))
+
+        for fname in images:
+            img = cv2.imread(fname)
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            ret, corners = cv2.findChessboardCorners(gray, (9,6),None)
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+                imgpoints.append(corners2)
+
+        ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
+
+        self.logger.debug("matrix: " + str(mtx))
+        self.logger.debug("distortion: " + str(dist))
+        self.logger.info("Camera calibrated")
+
+        # Save calibration data to file
+        # np.savez(calibration_file_path, mtx=mtx, dist=dist)
+        self.logger.info("Camera calibration data saved to file.")
+
+        self.intrinsic_mat = mtx
+        self.distortion = dist
+        self.info_msg = True
+        # return mtx, dist  # Return camera matrix and distortion coefficients
+
 
     
 
@@ -178,7 +259,12 @@ class ArucoMarkerDetector(Node):
                 pose_array.header.frame_id =  self.camera_frame 
                 markers.header.stamp = self.camera_subscriber.datastamp
 
-                _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
+                # _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=None,
+                #                                                 aruco_detector=self.aruco_detector,
+                #                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
+                #                                                 distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
+
+                _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=self.camera_subscriber.depth_raw,
                                                                 aruco_detector=self.aruco_detector,
                                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
                                                                 distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
@@ -207,6 +293,9 @@ class ArucoMarkerDetector(Node):
                         grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x + goal_handle.request.slot_to_slot_transform.transform.translation.x
                         grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y + goal_handle.request.slot_to_slot_transform.transform.translation.y
                         grab_trans_msg.transform.translation.z = goal_handle.request.aruco_to_slot_transform.transform.translation.z + goal_handle.request.slot_to_slot_transform.transform.translation.z
+                        print("slot_to_slot x",goal_handle.request.slot_to_slot_transform.transform.translation.x)
+                        print("slot_to_slot y",goal_handle.request.slot_to_slot_transform.transform.translation.y)
+                        print("slot_to_slot z",goal_handle.request.slot_to_slot_transform.transform.translation.z)
                         grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x
                         grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y
                         grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
@@ -258,19 +347,47 @@ class ArucoMarkerDetector(Node):
             markers.header.stamp = self.camera_subscriber.datastamp
             pose_array.header.stamp = self.camera_subscriber.datastamp
 
-            frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=None,
+            frame, pose_array, markers = pose_estimation(rgb_frame=self.camera_subscriber.img_raw, depth_frame=self.camera_subscriber.depth_raw,
                     aruco_detector=self.aruco_detector,
                     marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
                     distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
 
             if len(markers.marker_ids) > 0:
-                self.logger.info("Markers detected")
-                for i, pose in enumerate(pose_array.poses):
-                    pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
+                for index, marker_id in enumerate(markers.marker_ids):
+                    aruco = TransformStamped()
+                    zime = self.get_clock().now()
+                    aruco.header.stamp = zime.to_msg()
+                    aruco.header.frame_id = self.camera_frame
+                    aruco.child_frame_id = "aruco_marker_" + str(marker_id)
+                    aruco.transform.translation.x = markers.poses[index].position.x
+                    aruco.transform.translation.y = markers.poses[index].position.y 
+                    aruco.transform.translation.z = markers.poses[index].position.z 
+                    aruco.transform.rotation.x = markers.poses[index].orientation.x  
+                    aruco.transform.rotation.y = markers.poses[index].orientation.y
+                    aruco.transform.rotation.z = markers.poses[index].orientation.z
+                    aruco.transform.rotation.w = markers.poses[index].orientation.w
+                    aruco = self.tf_turn_around_axis(aruco, x=np.pi)
 
-                # Publish the results with the poses and markes positions    
-                self.poses_pub.publish(pose_array)
-                self.markers_pub.publish(markers)
+                    grab_trans_msg = TransformStamped()
+                    grab_trans_msg.header.stamp = aruco.header.stamp
+                    grab_trans_msg.header.frame_id = aruco.child_frame_id
+                    grab_trans_msg.child_frame_id = "grab_pose"
+                    grab_trans_msg.transform.translation.x = 0.0
+                    grab_trans_msg.transform.translation.y = -0.12011
+                    grab_trans_msg.transform.translation.z = -0.06631
+                    grab_trans_msg.transform.rotation.x = -0.2568574083418005
+                    grab_trans_msg.transform.rotation.y = -0.25685740834180043
+                    grab_trans_msg.transform.rotation.z = -0.6588051849977608
+                    grab_trans_msg.transform.rotation.w = 0.6588051849977606
+                    self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
+
+                # self.logger.info("Markers detected")
+                # for i, pose in enumerate(pose_array.poses):
+                #     pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
+
+                # # Publish the results with the poses and markes positions    
+                # self.poses_pub.publish(pose_array)
+                # self.markers_pub.publish(markers)
             else:
                 self.logger.info("No markers detected")
 

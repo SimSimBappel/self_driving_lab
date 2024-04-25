@@ -24,6 +24,9 @@
 #include <pqxx/pqxx>
 #include "csv.h"
 
+#include <iostream>
+
+
 class DatabaseService : public rclcpp::Node {
 public:
     DatabaseService() : Node("database_service") {
@@ -195,6 +198,8 @@ private:
                 return;
             }
 
+
+
             for (auto row : result) {
                 int chemical_id = row["chemical_id"].as<int>();
                 std::string placement_query = "SELECT * FROM chemical_placements WHERE chemical_id = " + W.quote(chemical_id) + ";";
@@ -205,15 +210,24 @@ private:
                     response->message = "Chemical has no placements";
                     return;
                 }
-
+                // TODO: 
+                //* [x] Not from placements.
+                //* [ ] Check logic for handling slot_to_slot in vessel fnc
                 for (auto new_row : placement_result) {
                     int slot_id = new_row["slot_id"].as<int>();
                     bool empty_bottle = new_row["empty"].as<bool>();
+
+                    // If the bottle is empty, skip this iteration
+                    if (empty_bottle) {
+                        continue;
+                    }
+                                        
                     std::string slot_query = "SELECT * FROM tray_slot WHERE slot_id = " + W.quote(slot_id) + ";";
                     pqxx::result slot_result = W.exec(slot_query);
 
                     for (auto row : slot_result) {
                         int tray_id = row["tray_id"].as<int>();
+                        
                         std::string tray_query = "SELECT workstation_id, type, aruco_id FROM tray WHERE tray_id = " + W.quote(tray_id) + ";";
                         pqxx::result tray_result = W.exec(tray_query);
 
@@ -222,19 +236,44 @@ private:
                             std::string tray_type = tray_row["type"].as<std::string>();
                             int aruco_id = tray_row["aruco_id"].as<int>();
 
+
+                            // std::string map_query = "SELECT slot_id FROM tray_slot WHERE tray_id = " + std::to_string(tray_id) + " ORDER BY slot_id" + ";";
+
+                            // std::cout << map_query << std::endl;
+
+
+                            std::string map_query = "SELECT slot_id FROM tray_slot WHERE tray_id = " + W.quote(tray_id) + " ORDER BY slot_id" + ";";
+                            pqxx::result map_result = W.exec(map_query);
+
+                            // Map the slot_ids in the range 1, 2, 3 ... sizeof(tray_id) to the tray_id
+                            std::map<int, int> slot_id_map;
+                            for (size_t i = 0; i < map_result.size(); ++i) {
+                                slot_id_map[map_result[i][0].as<int>()] = i + 1;
+                            }
+
                             std::string package_share_directory = ament_index_cpp::get_package_share_directory("pgsql_services");
                             std::string aruco_to_first_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request->type + "_aruco_to_first_slot.csv";
                             std::string first_slot_to_every_slot_csv = package_share_directory + "/data/" + tray_type + "_" + request->type + "_first_slot_to_every_slot.csv";
+
 
                             geometry_msgs::msg::TransformStamped aruco_to_first_slot_transform = read_transform_from_csv(aruco_to_first_slot_csv);
                             aruco_to_first_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
                             aruco_to_first_slot_transform.header.stamp = this->get_clock()->now(); // set the timestamp to the current time
 
-                            geometry_msgs::msg::TransformStamped first_slot_to_current_slot_transform = read_transform_from_csv(first_slot_to_every_slot_csv, slot_id);
+                            geometry_msgs::msg::TransformStamped first_slot_to_current_slot_transform = read_transform_from_csv(first_slot_to_every_slot_csv, slot_id_map[slot_id]);
                             first_slot_to_current_slot_transform.header.frame_id = "panda_link0"; // replace with your frame ID
                             first_slot_to_current_slot_transform.header.stamp = this->get_clock()->now(); // set the timestamp to the current time
 
+
+                            //? dbg: of tray keys
+                            // std::cout << "slot_id: " << slot_id << std::endl;
+
+                            // for(const auto &pair : slot_id_map) {
+                            //     std::cout << "Key: " << pair.first << " Value: " << pair.second << std::endl;
+                            // }
+
                             std::string workstation_query = "SELECT name, lookout_pose FROM workstation WHERE workstation_id = " + W.quote(workstation_id) + ";";
+
 
                             pqxx::result workstation_result = W.exec(workstation_query);
 
