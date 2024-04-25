@@ -13,7 +13,7 @@ class FibonacciActionServer(Node):
     def __init__(self):
         super().__init__('mir_server_node')
         self.mir = mir_api.MiR()
-        self.mir_url = "http://192.168.100.51/api/v2.0.0/"
+        self.mir_url = "http://192.168.100.140/api/v2.0.0/"
         self.battery_threshold = 30
 
         status = self.mir.get_system_info(self.mir_url)
@@ -21,12 +21,10 @@ class FibonacciActionServer(Node):
             self.get_logger().info('MIR IS LOW ON BATTERY :|')
             self.get_logger().info('CHARGE MIR ROBOT :|')
         else:
-            self.mir.delete_mission_queue(self.mir_url)
+            pass
+            #self.mir.delete_mission_queue(self.mir_url)
 
-
-        # self.mir.get_mission_done_or_not(mission_id) # to be used with action result
-
-        # self.mir.get_exe_mission() # feedback to actio while running the misson
+        
 
 
 
@@ -45,9 +43,18 @@ class FibonacciActionServer(Node):
             result.done = False
             return result
         else:
-            self.mir.delete_mission_queue(self.mir_url)
+            #self.mir.delete_mission_queue(self.mir_url)
+            pass
         
-        self.mir.post_to_mission_queue(self.mir_url,goal_handle.request.mission_id)
+        
+        missions = self.mir.get_all_missions(self.mir_url)
+        for j in missions:
+                    if j['name'] == goal_handle.request.mission_id:
+                        guid = j['guid']
+
+
+        self.mir.post_to_mission_queue(self.mir_url,guid)
+        
         while self.mir.get_mission_done_or_not(goal_handle.request.mission_id):
             time.sleep(0.5)
         result = MirMission.Result()
