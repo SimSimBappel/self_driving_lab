@@ -182,7 +182,6 @@ class ArucoMarkerDetector(Node):
 
         self.timeout = 5 # Secounds
         self.found_object = False
-        self.aruco_size = 0.0435 # Meters
 
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
