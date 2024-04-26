@@ -1597,7 +1597,7 @@ void MoveRobotServer::get_pre_pour_pose_callback(
 
         const std::string container_name = std::to_string(request->object_id);
 
-        RCLCPP_INFO(this->get_logger(), container_name);
+        RCLCPP_INFO(this->get_logger(), container_name.c_str());
 
         std::vector<std::string> object_ids;
         object_ids.push_back(container_name);
