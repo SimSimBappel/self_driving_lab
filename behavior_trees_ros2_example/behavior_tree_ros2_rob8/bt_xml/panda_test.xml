@@ -53,9 +53,7 @@
   <BehaviorTree ID="MainTree">
     <Sequence>
       <SubTree ID="init"
-               empty_hand="{empty_hand}"
-               storage_tray="5"
-               side_grasp_tray="7"/>
+               empty_hand="{empty_hand}"/>
       <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;0.3&apos;"/>
       <ArmMoveJointsRelativeAction joints="{relative_joint}"
                                    speed="0.1"
@@ -73,6 +71,9 @@
                        type_="pick"
                        slot_id="{slot_id}"
                        service_name="__default__placeholder__"/>
+      <SubTree ID="visual_pour"
+               chemical_name="natrium_chloride"
+               vessel_name="beaker_250ml"/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
                lookout_pose_msg="{lookout_pose_msg}"
@@ -128,10 +129,6 @@
       <Fallback>
         <AlwaysSuccess/>
         <Sequence>
-          <SubTree ID="init"
-                   empty_hand="1"
-                   storage_tray="5"
-                   side_grasp_tray="7"/>
           <Sequence>
             <Script code="in_pose_test:= &apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
             <ArmArrayToPoseAction array="{in_pose_test}"
