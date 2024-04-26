@@ -87,7 +87,9 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success: %d", response->result);
+    RCLCPP_INFO(node_->get_logger(), "Success get pre-pour pose: %ld", response->result);
+    RCLCPP_INFO(node_->get_logger(), "x: %d", response->pose.pose.position.x);
+    RCLCPP_INFO(node_->get_logger(), "y: %d", response->pose.pose.position.y);
     
     setOutput("pose",response->pose);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);

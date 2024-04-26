@@ -102,6 +102,61 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="grasp_pour_msg">
+    <Sequence>
+      <Sleep msec="200"/>
+      <ArmPoseMsgOffsetCalculation offset="{approach_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{approach_pose}"/>
+      <ArmPoseMsgOffsetCalculation offset="{retract_offset}"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{retract_pose}"/>
+      <GripperJointAction joint_2="0.04"
+                          speed="0.02"
+                          accel="0.02"
+                          joint_1="0.04"
+                          action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{approach_pose}"
+                            speed="0.2"
+                            accel="0.2"
+                            keep_orientation="false"
+                            lin="false"
+                            action_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
+      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                   speed="0.05"
+                                   accel="0.05"
+                                   action_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <Sleep msec="200"/>
+      <Fallback>
+        <SubTree ID="gripping"
+                 width="0.02"
+                 speed="0.03"
+                 force="3"
+                 epsilon="0.03"/>
+        <Sequence>
+          <Sleep msec="1000"/>
+          <SubTree ID="gripping"
+                   width="0.02"
+                   speed="0.03"
+                   force="3"
+                   epsilon="0.03"/>
+        </Sequence>
+      </Fallback>
+      <AttachObjectNode object_id="{object_id}"
+                        service_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
+      <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
+                                   speed="0.05"
+                                   accel="0.05"
+                                   action_name="__default__placeholder__"/>
+    </Sequence>
+  </BehaviorTree>
+
   <BehaviorTree ID="gripping">
     <Fallback>
       <FrankaGraspGripperAction width="{width}"
@@ -303,9 +358,10 @@
       <GetPrePourPoseNode object_id="{aruco_id1}"
                           pose="{bottle_pose}"
                           service_name="__default__placeholder__"/>
-      <SubTree ID="grasp_pose_msg"
+      <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
-               approch_offset="-0.2;0.0;0.0;0.0;0.0;0.0"
+               retract_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
+               approach_offset="-0.05;0.0;0.0;0.0;0.0;0.0"
                object_id="{aruco_id1}"/>
       <ArmMovePoseMsgAction pose="{pose_above_vessel}"
                             speed="0.2"
@@ -577,6 +633,13 @@
              editable="true">
       <input_port name="target_pose_msg"/>
       <input_port name="approch_offset"/>
+      <input_port name="object_id"/>
+    </SubTree>
+    <SubTree ID="grasp_pour_msg"
+             editable="true">
+      <input_port name="target_pose_msg"/>
+      <input_port name="retract_offset"/>
+      <input_port name="approach_offset"/>
       <input_port name="object_id"/>
     </SubTree>
     <SubTree ID="gripping"

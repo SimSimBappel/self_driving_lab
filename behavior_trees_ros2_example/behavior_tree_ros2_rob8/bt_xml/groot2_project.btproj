@@ -303,6 +303,12 @@
             <input_port name="approch_offset"/>
             <input_port name="object_id"/>
         </SubTree>
+        <SubTree ID="grasp_pour_msg" editable="true">
+            <input_port name="target_pose_msg"/>
+            <input_port name="retract_offset"/>
+            <input_port name="approach_offset"/>
+            <input_port name="object_id"/>
+        </SubTree>
         <SubTree ID="gripping" editable="true">
             <input_port name="width" default="0.02"/>
             <input_port name="speed" default="0.03"/>

@@ -218,7 +218,7 @@ def generate_launch_description():
 
     # RViz
     rviz_base = os.path.join(get_package_share_directory('manipulator'), 'rviz')
-    rviz_full_config = os.path.join(rviz_base, 'system_default.rviz')
+    rviz_full_config = os.path.join(rviz_base, 'system_default2.rviz')
 
     rviz_node = Node(
         package='rviz2',

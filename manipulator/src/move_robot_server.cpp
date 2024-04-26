@@ -66,7 +66,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
           executor_(std::make_shared<rclcpp::executors::SingleThreadedExecutor>())
           {
     node_namespace_ = ((std::string) this->get_namespace()).erase(0, 1);
-    
+
     // service_example_server_ = this->create_service<MoveRobotServer::srv::ExampleService>(
     //         "/robot_service",
     //         std::bind(&MoveRobotServer::service_example_callback, this, std::placeholders::_1, std::placeholders::_2)
@@ -98,7 +98,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::home_arm_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::home_arm_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::home_arm_handle_accepted, this, _1));
-    
+
     this->action_server_gripper_ = rclcpp_action::create_server<Gripper>(
       this,
       "gripper_service",
@@ -112,14 +112,14 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_pose_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_pose_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pose_handle_accepted, this, _1));
-    
+
     this->action_server_arm_move_pose_msg_ = rclcpp_action::create_server<ArmMovePoseMsg>(
       this,
       "arm_move_pose_msg_service",
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pose_msg_handle_accepted, this, _1));
-    
+
     this->action_server_arm_move_pose_msg_tcp_ = rclcpp_action::create_server<ArmMovePoseMsgTcp>(
       this,
       "arm_move_pose_msg_tcp_service",
@@ -133,7 +133,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_accepted, this, _1));
-    
+
     this->action_server_arm_move_pliz_lin_pose_msg_ = rclcpp_action::create_server<ArmMovePlizLinPoseMsg>(
       this,
       "arm_move_pliz_lin_pose_msg_service",
@@ -154,7 +154,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_joints_relative_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_joints_relative_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_joints_relative_handle_accepted, this, _1));
-    
+
     this->action_server_sleep_ = rclcpp_action::create_server<Sleep>(
       this,
       "sleep_service",
@@ -182,16 +182,16 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
       std::bind(&MoveRobotServer::arm_move_trajectory_pour_handle_goal, this, _1, _2),
       std::bind(&MoveRobotServer::arm_move_trajectory_pour_handle_cancel, this, _1),
       std::bind(&MoveRobotServer::arm_move_trajectory_pour_handle_accepted, this, _1));
-    
+
     subscription_ = this->create_subscription<geometry_msgs::msg::PoseStamped>(
       "topic", 10, std::bind(&MoveRobotServer::Move, this, _1));
-    
+
     subscription_gripper_ = this->create_subscription<std_msgs::msg::Float64MultiArray>(
       "gripper", 10, std::bind(&MoveRobotServer::MoveGripper, this, _1));
 
     move_gripper_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GRIPPER_GROUP);
-    
-    move_gripper_group_->setPlanningPipelineId("ompl");  
+
+    move_gripper_group_->setPlanningPipelineId("ompl");
 
     move_group_ = std::make_shared<moveit::planning_interface::MoveGroupInterface>(node_, PLANNING_GROUP);
     move_group_->setPoseReferenceFrame(base_link);
@@ -202,7 +202,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     move_group_->setMaxAccelerationScalingFactor(MAX_ACCELERATION_SCALE);
     move_group_->setPlanningPipelineId("ompl");
     move_group_->setEndEffectorLink(tcp_frame); /// or move_group_->setEndEffector();
-    
+
     move_group_->setSupportSurfaceName("base_plate_link");
 
     // move_group_->setPlannerId("PTP");
@@ -211,14 +211,16 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
 
     auto robot_model_ = move_group_->getRobotModel();
 
-    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "visual_markers", robot_model_);
+    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, base_link, "visual_markers", robot_model_);
 
-    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+    Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
 
-    // text_pose.translation().z() = 1.0;
+    text_pose.translation().z() = 1.0;
     visual_tools->deleteAllMarkers();  // clear all old markers
-    // visual_tools->publishText(text_pose, "Chemical_Lab_Terminator", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-    // visual_tools->trigger();
+    visual_tools->publishText(text_pose, "Frank_________A", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+    visual_tools->trigger();
+
+
 
 
 
@@ -233,13 +235,13 @@ void MoveRobotServer::add_object_callback(
 
         moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
         moveit_msgs::msg::CollisionObject object_to_attach;
-        
-        
+
+
         object_to_attach.id = request->object_id;
-        
-        
+
+
         shape_msgs::msg::SolidPrimitive primitive;
-        
+
         if(request->shape == "box"){
           primitive.type = primitive.BOX;
           primitive.dimensions.resize(3);
@@ -272,7 +274,7 @@ void MoveRobotServer::add_object_callback(
         //   planning_scene_monitor::LockedPlanningSceneRW scene(moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
         //   scene->processCollisionObjectMsg(object_to_attach);
         // }  // Unlock PlanningScene
-        
+
         planning_scene_interface.applyCollisionObject(object_to_attach);
 
         RCLCPP_INFO(this->get_logger(), "add_object_callback ended");
@@ -313,12 +315,12 @@ void MoveRobotServer::remove_object_callback(
         // response->result = true;
       }
 
-      
+
 
 void MoveRobotServer::attach_object_callback(
       const std::shared_ptr<AttachObject::Request> request,
       const std::shared_ptr<AttachObject::Response> response) {
-        std::vector<std::string> touch_links; 
+        std::vector<std::string> touch_links;
         touch_links.push_back("panda_rightfinger");
         touch_links.push_back("panda_leftfinger");
         response->result = move_group_->attachObject(request->object_id, "panda_hand_tcp", touch_links);
@@ -415,7 +417,7 @@ bool MoveRobotServer::ArmMoveL(const geometry_msgs::msg::PoseStamped & msg){
   // const double eef_step = 0.001;
   // double fraction = move_group_->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   move_group_->execute(trajectory);
- 
+
   return true;
 }
 
@@ -424,7 +426,7 @@ bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
   // std::vector<double> joints = {-0.628318531, 0.628318531};
   // std::vector<std::string> joint_names = {"gripper_joint1", "gripper_joint2"};
   std::vector<double> joints = {msg.data[0], msg.data[1]};
-  
+
   // joint_names = {"gripper_joint1", "gripper_joint2"};
   move_gripper_group_->setJointValueTarget(gripper_joint_names,joints);
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
@@ -445,7 +447,7 @@ bool MoveRobotServer::MoveGripper(const std_msgs::msg::Float64MultiArray & msg)
 bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
 {
     RCLCPP_INFO(this->get_logger(), "move function called");
-    
+
     geometry_msgs::msg::Pose pose_goal; // = move_group_->getCurrentPose().pose;
     // pose_goal.position.x = 0.1;;
     // pose_goal.position.y = -0.4;
@@ -456,7 +458,7 @@ bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
     // //                        request->transform.rotation.w);
     // tf2::Quaternion q_new;
     // q_new.setRPY(0.0, 1.529, -1.529);
-    
+
     // //q_new = q_rot * q_orig;
     // q_new.normalize();
     // pose_goal.orientation.x = q_new.x();
@@ -472,7 +474,7 @@ bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
     //                        request->transform.rotation.w);
     tf2::Quaternion q_new;
     q_new.setRPY(0.0, 1.529, -1.529);
-    
+
     //q_new = q_rot * q_orig;
     q_new.normalize();
     pose_goal.orientation.x = msg.pose.orientation.x;
@@ -513,15 +515,15 @@ bool MoveRobotServer::Move(const geometry_msgs::msg::PoseStamped & msg)
             else{
               return false;
             }
-            
+
           }
 
         }
     }
-    
+
     return false;
-    
-                
+
+
 }
 
 rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
@@ -557,7 +559,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     move_group_->setMaxAccelerationScalingFactor(0.1);
     auto feedback = std::make_shared<Home::Feedback>();
     auto result = std::make_shared<Home::Result>();
-    
+
     bool success = static_cast<bool>(move_group_->plan(my_plan));
               RCLCPP_INFO(this->get_logger(), " (movement) %s", success ? "" : "FAILED");
               if(success == true){
@@ -586,7 +588,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
                         goal_handle->abort(result);
                         RCLCPP_INFO(this->get_logger(), "Goal arborted");
                       }
-                      
+
                     }
 
                   }
@@ -596,7 +598,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
                   goal_handle->abort(result);
                   RCLCPP_INFO(this->get_logger(), "Goal arborted");
                 }
-    
+
 
   }
 
@@ -631,7 +633,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     //     joints.data = {-0.628318531, 0.628318531};
     //     RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
     //     if(MoveRobotServer::MoveGripper(joints)){
-          
+
     //       result->done = true;
     //       goal_handle->succeed(result);
     //       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -645,7 +647,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     //   }
     //   if(open == false)
     //   {
-        
+
     //     joints.data = {0.0, 0.0};
     //     RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
     //     if(MoveRobotServer::MoveGripper(joints)){
@@ -672,7 +674,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     //   const auto goal = goal_handle->get_goal();
     //   auto pose = goal->pose;
     //   std::vector<std::string> v;
- 
+
     //   std::stringstream ss(pose);
     //   std::vector<double> pos;
     // while (ss.good()) {
@@ -685,13 +687,13 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_joint_handle_goal(
     //   pos.push_back(stod(v[i]));
     // }
 
-    
+
         joints.data = {goal->joint_1, goal->joint_2};
         move_gripper_group_->setMaxAccelerationScalingFactor(goal->accel);
         move_gripper_group_->setMaxVelocityScalingFactor(goal->speed);
         RCLCPP_INFO(this->get_logger(), "opening %f",goal->joint_1);
         if(MoveRobotServer::MoveGripper(joints)){
-          
+
           result->done = true;
           goal_handle->succeed(result);
           RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -736,7 +738,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
     //     joints.data = {-0.628318531, 0.628318531};
     //     RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
     //     if(MoveRobotServer::MoveGripper(joints)){
-          
+
     //       result->done = true;
     //       goal_handle->succeed(result);
     //       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -750,7 +752,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
     //   }
     //   if(open == false)
     //   {
-        
+
     //     joints.data = {0.0, 0.0};
     //     RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
     //     if(MoveRobotServer::MoveGripper(joints)){
@@ -781,7 +783,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
         move_gripper_group_->setMaxVelocityScalingFactor(goal->speed);
         RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
         if(MoveRobotServer::MoveGripper(joints)){
-          
+
           result->done = true;
           goal_handle->succeed(result);
           RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -795,7 +797,7 @@ rclcpp_action::GoalResponse MoveRobotServer::gripper_handle_goal(
       }
       if(open == false)
       {
-        
+
         joints.data = {0.0, 0.0};
         RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
         if(MoveRobotServer::MoveGripper(joints)){
@@ -837,12 +839,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_pliz_ptp_pose_msg_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_pliz_ptp_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizPtpPoseMsg> goal_handle){
       auto result = std::make_shared<ArmMovePlizPtpPoseMsg::Result>();
-      
+
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
       move_group_->clearPathConstraints();
@@ -851,7 +853,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       move_group_->setPlannerId("PTP");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
-      
+
       if(MoveRobotServer::Move(pose))
       {
           result->done = true;
@@ -868,7 +870,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       //   joints.data = {-0.628318531, 0.628318531};
       //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
       //   if(MoveRobotServer::MoveGripper(joints)){
-          
+
       //     result->done = true;
       //     goal_handle->succeed(result);
       //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -882,7 +884,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_ptp_pose_msg_handle_g
       // }
       // if(open == false)
       // {
-        
+
       //   joints.data = {0.0, 0.0};
       //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
       //   if(MoveRobotServer::MoveGripper(joints)){
@@ -924,12 +926,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_pliz_lin_pose_msg_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_pliz_lin_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePlizLinPoseMsg> goal_handle){
       auto result = std::make_shared<ArmMovePlizLinPoseMsg::Result>();
-      
+
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
 
@@ -946,10 +948,10 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
       //                   goal_handle->succeed(result);
       //                   RCLCPP_INFO(this->get_logger(), "Goal succeeded");
       // }
- 
 
 
-  
+
+
       move_group_->setPlanningPipelineId("pilz_industrial_motion_planner");
       move_group_->setPlannerId("LIN");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
@@ -995,7 +997,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
                         goal_handle->abort(result);
                         RCLCPP_INFO(this->get_logger(), "Goal canceled");
                       }
-                      
+
                     }
 
                   }
@@ -1006,7 +1008,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pliz_lin_pose_msg_handle_g
                   RCLCPP_INFO(this->get_logger(), "Goal canceled");
                 }
 
-    
+
   }
 
 
@@ -1033,7 +1035,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_pose_msg_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_pose_msg_execute(const std::shared_ptr<GoalHandleArmMovePoseMsg> goal_handle){
@@ -1129,7 +1131,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         move_group_->setPlanningTime(10.0);
 
       }
-      
+
       move_group_->setPoseTarget(goal->pose);
       // move_group_->plan(plan);
 
@@ -1139,7 +1141,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
       else{
         move_group_->setPoseReferenceFrame(base_link);
       }
-      
+
       if(MoveRobotServer::Move(pose))
       {
           result->done = true;
@@ -1151,7 +1153,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
           goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
-      
+
   }
 
 
@@ -1177,12 +1179,12 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_goal(
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_pose_msg_tcp_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_pose_msg_tcp_execute(const std::shared_ptr<GoalHandleArmMovePoseMsgTcp> goal_handle){
       auto result = std::make_shared<ArmMovePoseMsgTcp::Result>();
-      
+
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
       move_group_->setPlanningPipelineId("ompl");
@@ -1202,7 +1204,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_goal(
       else{
         move_group_->setPoseReferenceFrame(base_link);
       }
-      
+
       if(MoveRobotServer::Move(pose))
       {
           move_group_->setEndEffectorLink(tcp_frame);
@@ -1216,7 +1218,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_tcp_handle_goal(
           goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
       }
-    
+
   }
 
 
@@ -1241,7 +1243,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_pose_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_pose_execute(const std::shared_ptr<GoalHandleArmMovePose> goal_handle){
@@ -1250,14 +1252,14 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       const auto goal = goal_handle->get_goal();
       auto pose = goal->pose;
     //   std::vector<std::string> v;
- 
+
     //   std::stringstream ss(pose);
       std::vector<double> pos;
 
       bool keep_orientation = goal->keep_orientation;
 
-      
-      
+
+
       // move_group_->setPoseTarget(goal->pose);
       // move_group_->setPlanningTime(10.0);
     // while (ss.good()) {
@@ -1270,17 +1272,17 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       pos.push_back(pose[i]);
     }
       geometry_msgs::msg::PoseStamped pose_goal; // = move_group_->getCurrentPose().pose;
-   
+
       pose_goal.pose.position.x = pos[0];
       pose_goal.pose.position.y = pos[1];
       pose_goal.pose.position.z = pos[2];
 
       tf2::Quaternion q_new;
       q_new.setRPY(pos[3], pos[4], pos[5]);
-    
+
 
       q_new.normalize();
-      
+
       pose_goal.pose.orientation.x = q_new.x();
       pose_goal.pose.orientation.y = q_new.y();
       pose_goal.pose.orientation.z = q_new.z();
@@ -1351,7 +1353,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       //   joints.data = {-0.628318531, 0.628318531};
       //   RCLCPP_INFO(this->get_logger(), "opening %d",goal->open);
       //   if(MoveRobotServer::MoveGripper(joints)){
-          
+
       //     result->done = true;
       //     goal_handle->succeed(result);
       //     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
@@ -1365,7 +1367,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
       // }
       // if(open == false)
       // {
-        
+
       //   joints.data = {0.0, 0.0};
       //   RCLCPP_INFO(this->get_logger(), "closing %d",goal->open);
       //   if(MoveRobotServer::MoveGripper(joints)){
@@ -1404,7 +1406,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_joints_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_joints_execute(const std::shared_ptr<GoalHandleArmMoveJoints> goal_handle){
@@ -1416,13 +1418,13 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_handle_goal(
       {
         joints_.data.push_back(joint_pose[i]);
        }
-      
+
       move_group_->setPlanningPipelineId("ompl");
       move_group_->setMaxAccelerationScalingFactor(goal->accel);
       move_group_->setMaxVelocityScalingFactor(goal->speed);
       // move_group_->setMaxAccelerationScalingFactor(0.6);
       // move_group_->setMaxVelocityScalingFactor(0.6);
-      
+
       if(MoveRobotServer::ArmMoveJ(joints_))
       {
           result->done = true;
@@ -1457,7 +1459,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_joints_relative_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   void MoveRobotServer::arm_move_joints_relative_execute(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle){
@@ -1483,7 +1485,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
       move_group_->setMaxVelocityScalingFactor(goal->speed);
       // move_group_->setMaxAccelerationScalingFactor(0.6);
       // move_group_->setMaxVelocityScalingFactor(0.6);
-      
+
       if(MoveRobotServer::ArmMoveJ(joints_))
       {
           result->done = true;
@@ -1607,20 +1609,21 @@ void MoveRobotServer::get_pre_pour_pose_callback(
 
         // ? Get the poses from the objects identified by the given object ids list
         // ? Assert that the object id is in the list of objects and is a valid object
-        
+
         // Get the poses of the objects
-        std::map<std::string, geometry_msgs::msg::Pose> object_poses = planning_scene_interface.getObjectPoses({"bottle"});
+        std::map<std::string, geometry_msgs::msg::Pose> object_poses = planning_scene_interface.getObjectPoses({container_name});
 
         // Check if the pose of the "bottle" object was found
         if(object_poses.find(container_name) != object_poses.end()) {
             // Get the pose of the "bottle" object
             geometry_msgs::msg::Pose bottle_pose = object_poses[container_name];
             visual_tools->publishAxisLabeled(bottle_pose, container_name);
+            visual_tools->trigger();
 
             // Set the target pose
-            bottle_pose.position.x += 0.0;
+            bottle_pose.position.x += 0.1;
             bottle_pose.position.y += 0.0;
-            bottle_pose.position.z += 0.0;
+            bottle_pose.position.z += 0.25;
 
             // Get the orientation of the bottle
             tf2::Quaternion quat(
@@ -1633,8 +1636,11 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             tf2::Quaternion quat_y_rotation;
             quat_y_rotation.setRPY(0, M_PI/2, 0);
 
+            tf2::Quaternion quat_z_rotation;
+            quat_z_rotation.setRPY(0, 0, M_PI);
+
             // Combine the rotations
-            quat = quat * quat_y_rotation; //* quat_z_rotation;
+            quat = quat * quat_y_rotation;// * quat_z_rotation;
 
             // Update the orientation of the bottle
             bottle_pose.orientation.x = quat.x();
@@ -1642,74 +1648,87 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             bottle_pose.orientation.z = quat.z();
             bottle_pose.orientation.w = quat.w();
 
+            visual_tools->publishAxisLabeled(bottle_pose, "grasp_target");
+            visual_tools->trigger();
+
             // move_group.setPoseTarget(bottle_pose);
 
             tf2::Quaternion quat_x_rotation;
             quat_x_rotation.setRPY(M_PI/12, 0, 0); // M_PI/12 radians = 15 degrees
 
-            bool success = false;
+            geometry_msgs::msg::PoseStamped stamped_pose;
+            stamped_pose.pose = bottle_pose;
+            stamped_pose.header.frame_id = "panda_link0";
+            stamped_pose.header.stamp = rclcpp::Clock().now();
+            response->result = true;
+            response->pose = stamped_pose;
 
-              for (int i = 0; i < 12; ++i) {
-                  // Set the new pose as the target
-                  move_group_->setPoseTarget(bottle_pose);
+            // bool success = false;
+            //! DO NOT DELETE
+            // TODO: Add clear octomap service -> Otherwise we cant sample more poses. 
+            //   for (int i = 0; i < 12; ++i) {
+            //       // Set the new pose as the target
+            //       move_group_->setPoseTarget(bottle_pose);
 
-                  // Plan the motion
-                  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-                  move_group_->setPlanningTime(4.0);
-                  success = (move_group_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+            //       // Plan the motion
+            //       moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+            //       move_group_->setPlanningTime(4.0);
+            //       success = (move_group_->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
 
-                  // If the planning was successful, generate the approach pose and plan a trajectory to it
-                  if (success) {
-                  geometry_msgs::msg::PoseStamped stamped_pose;
-                  stamped_pose.pose = bottle_pose;
-                  stamped_pose.header.frame_id = "panda_link0";
-                  stamped_pose.header.stamp = rclcpp::Clock().now();
-                  response->result = true;
-                  response->pose = stamped_pose; 
+            //       // If the planning was successful, generate the approach pose and plan a trajectory to it
+            //       if (success) {
+            //       geometry_msgs::msg::PoseStamped stamped_pose;
+            //       stamped_pose.pose = bottle_pose;
+            //       stamped_pose.header.frame_id = "panda_link0";
+            //       stamped_pose.header.stamp = rclcpp::Clock().now();
+            //       response->result = true;
+            //       response->pose = stamped_pose;
 
-                  visual_tools->publishAxisLabeled(bottle_pose, "bottle_pose_grasp");
+            //       visual_tools->publishAxisLabeled(bottle_pose, "bottle_pose_grasp");
+            //       visual_tools->trigger();
 
-                  std::cout << "done done done2" << std::endl;
-                  std::cout << "done done done2" << std::endl;
-                  std::cout << "done done done2" << std::endl;
-                  std::cout << "done done done2" << std::endl;
-                  std::cout << "done done done2" << std::endl;
-                  std::cout << "done done done2" << std::endl;
-                  return;
-                  }
+            //       std::cout << "done done done2" << std::endl;
+            //       std::cout << "done done done2" << std::endl;
+            //       std::cout << "done done done2" << std::endl;
+            //       std::cout << "done done done2" << std::endl;
+            //       std::cout << "done done done2" << std::endl;
+            //       std::cout << "done done done2" << std::endl;
+            //       return;
+            //       }
 
-                  // Apply the x-rotation to the current orientation
-                  quat = quat * quat_x_rotation;
+            //       // Apply the x-rotation to the current orientation
+            //       quat = quat * quat_x_rotation;
 
-                  // Update the orientation of the bottle
-                  bottle_pose.orientation.x = quat.x();
-                  bottle_pose.orientation.y = quat.y();
-                  bottle_pose.orientation.z = quat.z();
-                  bottle_pose.orientation.w = quat.w();
+            //       // Update the orientation of the bottle
+            //       bottle_pose.orientation.x = quat.x();
+            //       bottle_pose.orientation.y = quat.y();
+            //       bottle_pose.orientation.z = quat.z();
+            //       bottle_pose.orientation.w = quat.w();
 
-              }
+            //   }
 
-            if (!success) {
-                throw std::runtime_error("Planning failed after 12 attempts");
-                response->result = false;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                std::cout << "done done done1" << std::endl;
-                // std::cout << "Object 'bottle' not found" << std::endl;
-            }
+            // if (!success) {
+            //     throw std::runtime_error("Planning failed after 12 attempts");
+            //     response->result = false;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     std::cout << "done done done1" << std::endl;
+            //     // std::cout << "Object 'bottle' not found" << std::endl;
+            // }
 
-        } else {
-          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
-          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
-          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+        // } else {
+        //   RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+        //   RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+        //   RCLCPP_INFO(this->get_logger(), "Object not found!!!");
 
-        }
+        // }
 
         RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose_callback ended");
+      }
       }
 
 //! get_pre_pour_pose END
@@ -1718,7 +1737,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ArmMoveTrajectoryPour::Goal> goal)
   {
-    (void)goal; //ignore unused parameter warning 
+    (void)goal; //ignore unused parameter warning
     // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
@@ -1735,7 +1754,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
   {
     using namespace std::placeholders;
     std::thread{std::bind(&MoveRobotServer::arm_move_trajectory_pour_execute, this, _1), goal_handle}.detach();
-  
+
   }
 
   // ! ------------------------ PourInto ------------------------
@@ -1866,7 +1885,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       geometry_msgs::msg::Pose bottle_pose_ = bottle_object.pose;
 
-      //! We got objects and poses, do thing with them. 
+      //! We got objects and poses, do thing with them.
 
       //? container frame:
       // - top-center of container object
@@ -1910,7 +1929,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       Eigen::Isometry3d bottle_tip_frame_n_id_eigen;
       tf2::fromMsg(current_pose.pose, bottle_tip_frame_n_id_eigen);
-      
+
       // visual_tools.publishAxisLabeled(bottle_tip_in_tool_link, "BOTTLE_TIP_IN_TOOL_LINK!");
       // visual_tools.trigger();
 
@@ -2011,7 +2030,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       // Set the trajectory message
       robot_trajectory->setRobotTrajectoryMsg(*move_group_->getCurrentState(), trajectory);
-      
+
       // Create a reverse trajectory
       auto reverse_trajectory = std::make_shared<robot_trajectory::RobotTrajectory>(*robot_trajectory);
       reverse_trajectory->reverse();
@@ -2034,18 +2053,18 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
           result->done = false;
           goal_handle->abort(result);
           RCLCPP_INFO(this->get_logger(), "Goal canceled");
-   
+
       } // else (good traj)
 
       RCLCPP_INFO(rclcpp::get_logger("pouring_planner"), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", path_fraction * 100.0);
 
       //! At runtime, uncomment this.
       move_group_->execute(trajectory_msg);
-      
+
       rclcpp::sleep_for(std::chrono::seconds(2));
 
       move_group_->execute(reverse_trajectory_msg);
-      
+
       result->done = true;
       visual_tools->deleteAllMarkers();
       goal_handle->succeed(result);
