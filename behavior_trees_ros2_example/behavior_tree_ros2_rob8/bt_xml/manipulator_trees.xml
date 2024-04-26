@@ -26,6 +26,8 @@
                    slot_to_slot="{slot_to_slot_transform}"
                    approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                    aruco_to_slot="{aruco_to_slot_transform}"/>
+          <SetBlackboard value="&apos;empty&apos;"
+                         output_key="empty_hand"/>
         </Sequence>
       </Precondition>
       <Sequence>
@@ -35,7 +37,7 @@
                            aruco_id="{aruco_id}"
                            emptied="{emptied}"
                            success="{success}"
-                           tray_id="{storage_tray}"
+                           tray_id="{side_grasp_tray}"
                            lookout_pose="{lookout_pose}"
                            aruco_to_slot_transform="{aruco_to_slot_transform}"
                            slot_to_slot_transform="{slot_to_slot_transform}"
@@ -47,6 +49,8 @@
                  slot_to_slot="{slot_to_slot_transform}"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                  aruco_to_slot="{aruco_to_slot_transform}"/>
+        <SetBlackboard value="&apos;empty&apos;"
+                       output_key="empty_hand"/>
       </Sequence>
     </Fallback>
   </BehaviorTree>
