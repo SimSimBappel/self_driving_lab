@@ -6,7 +6,8 @@
                storage_tray="5"
                side_grasp_tray="7"
                emptied="{emptied}"
-               storage_vessel_tray="10"/>
+               storage_vessel_tray="10"
+               empty_hand="{empty_hand}"/>
       <Sequence>
         <HomeArmAction action_name="__default__placeholder__"/>
         <AlwaysSuccess/>
@@ -36,6 +37,7 @@
       <input_port name="emptied"/>
       <input_port name="storage_vessel_tray"
                   default="10"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
   </TreeNodesModel>
 

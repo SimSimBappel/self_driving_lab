@@ -293,6 +293,7 @@
             <input_port name="side_grasp_tray" default="7"/>
             <input_port name="emptied"/>
             <input_port name="storage_vessel_tray" default="10"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
         <SubTree ID="get_reagent" editable="true">
             <input_port name="reagent"/>
@@ -317,11 +318,16 @@
             <input_port name="side_grasp_tray" default="7"/>
             <input_port name="emptied"/>
             <input_port name="storage_vessel_tray" default="10"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
         <SubTree ID="place_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
             <input_port name="approach_offset"/>
             <input_port name="object_id"/>
+        </SubTree>
+        <SubTree ID="pour_reagent" editable="true">
+            <output_port name="empty_hand"/>
+            <input_port name="reagent"/>
         </SubTree>
         <SubTree ID="visual_grasp" editable="true">
             <input_port name="aruco_id"/>
