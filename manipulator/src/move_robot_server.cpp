@@ -211,14 +211,14 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
 
     auto robot_model_ = move_group_->getRobotModel();
 
-    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "/cartesian_path", robot_model_);
+    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, PLANNING_GROUP, "visual_markers", robot_model_);
 
-    visual_tools->enableBatchPublishing();
-    Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-    text_pose.translation().z() = 1.0;
-    visual_tools->publishText(text_pose, "Chemical_Lab_Terminator", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+    // Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
+
+    // text_pose.translation().z() = 1.0;
     visual_tools->deleteAllMarkers();  // clear all old markers
-    visual_tools->trigger();
+    // visual_tools->publishText(text_pose, "Chemical_Lab_Terminator", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+    // visual_tools->trigger();
 
 
 
@@ -1597,6 +1597,8 @@ void MoveRobotServer::get_pre_pour_pose_callback(
 
         const std::string container_name = std::to_string(request->object_id);
 
+        RCLCPP_INFO(this->get_logger(), container_name);
+
         std::vector<std::string> object_ids;
         object_ids.push_back(container_name);
 
@@ -1610,10 +1612,10 @@ void MoveRobotServer::get_pre_pour_pose_callback(
         std::map<std::string, geometry_msgs::msg::Pose> object_poses = planning_scene_interface.getObjectPoses({"bottle"});
 
         // Check if the pose of the "bottle" object was found
-        if(object_poses.find("bottle") != object_poses.end()) {
+        if(object_poses.find(container_name) != object_poses.end()) {
             // Get the pose of the "bottle" object
-            geometry_msgs::msg::Pose bottle_pose = object_poses["bottle"];
-            visual_tools->publishAxisLabeled(bottle_pose, "bottle_pose");
+            geometry_msgs::msg::Pose bottle_pose = object_poses[container_name];
+            visual_tools->publishAxisLabeled(bottle_pose, container_name);
 
             // Set the target pose
             bottle_pose.position.x += 0.0;
@@ -1666,6 +1668,13 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                   response->pose = stamped_pose; 
 
                   visual_tools->publishAxisLabeled(bottle_pose, "bottle_pose_grasp");
+
+                  std::cout << "done done done2" << std::endl;
+                  std::cout << "done done done2" << std::endl;
+                  std::cout << "done done done2" << std::endl;
+                  std::cout << "done done done2" << std::endl;
+                  std::cout << "done done done2" << std::endl;
+                  std::cout << "done done done2" << std::endl;
                   return;
                   }
 
@@ -1677,16 +1686,27 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                   bottle_pose.orientation.y = quat.y();
                   bottle_pose.orientation.z = quat.z();
                   bottle_pose.orientation.w = quat.w();
+
               }
 
             if (!success) {
                 throw std::runtime_error("Planning failed after 12 attempts");
+                response->result = false;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                std::cout << "done done done1" << std::endl;
+                // std::cout << "Object 'bottle' not found" << std::endl;
             }
 
         } else {
-          response->result = false;
-          RCLCPP_INFO(this->get_logger(), "Object not found");
-          // std::cout << "Object 'bottle' not found" << std::endl;
+          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+          RCLCPP_INFO(this->get_logger(), "Object not found!!!");
+
         }
 
         RCLCPP_INFO(this->get_logger(), "get_pre_pour_pose_callback ended");
@@ -1797,7 +1817,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
 
       container_object = object_it->second;
 
-      const Eigen::Translation3d pour_offset(Eigen::Vector3d(0.03, -0.03, 0.0));
+      // const Eigen::Translation3d pour_offset(Eigen::Vector3d(0.03, -0.03, 0.0));
 
 
       if (!isValidObject(container_object))
@@ -1857,7 +1877,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       container_frame_n = container_frame_n * Eigen::Translation3d(Eigen::Vector3d(0, 0, container_object.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT] / 2));
       container_frame_n.linear().setIdentity();
 
-      visual_tools.>publishAxisLabeled(container_frame_n, "CONTAINER_FRAME");
+      visual_tools->publishAxisLabeled(container_frame_n, "CONTAINER_FRAME");
       visual_tools->trigger();
 
       //! TESTING
@@ -1894,9 +1914,9 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       // visual_tools.publishAxisLabeled(bottle_tip_in_tool_link, "BOTTLE_TIP_IN_TOOL_LINK!");
       // visual_tools.trigger();
 
-      geometry_msgs::msg::Vector3Stamped pouring_axis;
-      pouring_axis.header.frame_id = container_name;
-      pouring_axis.vector.x = 1.0; // should be ok, minus if hand is oriented differently
+      // geometry_msgs::msg::Vector3Stamped pouring_axis;
+      // pouring_axis.header.frame_id = container_name;
+      // pouring_axis.vector.x = 1.0; // should be ok, minus if hand is oriented differently
 
       // Convert the Vector3Stamped message to an Eigen Vector3d
       Eigen::Vector3d tilt_axis;
