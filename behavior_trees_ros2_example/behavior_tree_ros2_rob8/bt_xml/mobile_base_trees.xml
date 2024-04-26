@@ -2,7 +2,15 @@
 <root BTCPP_format="4">
   <BehaviorTree ID="move_base">
     <Sequence>
-      <AlwaysSuccess/>
+      <SubTree ID="empty_gripper"
+               storage_tray="5"
+               side_grasp_tray="7"
+               emptied="{emptied}"
+               storage_vessel_tray="10"/>
+      <Sequence>
+        <HomeArmAction action_name="__default__placeholder__"/>
+        <AlwaysSuccess/>
+      </Sequence>
     </Sequence>
   </BehaviorTree>
 
@@ -13,6 +21,22 @@
   </BehaviorTree>
 
   <!-- Description of Node Models (used by Groot) -->
-  <TreeNodesModel/>
+  <TreeNodesModel>
+    <Action ID="HomeArmAction">
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <SubTree ID="empty_gripper"
+             editable="true">
+      <input_port name="storage_tray"
+                  default="5"/>
+      <input_port name="side_grasp_tray"
+                  default="7"/>
+      <input_port name="emptied"/>
+      <input_port name="storage_vessel_tray"
+                  default="10"/>
+    </SubTree>
+  </TreeNodesModel>
 
 </root>

@@ -52,7 +52,10 @@
 
   <BehaviorTree ID="MainTree">
     <Sequence>
-      <SubTree ID="init"/>
+      <SubTree ID="init"
+               empty_hand="{empty_hand}"
+               storage_tray="5"
+               side_grasp_tray="7"/>
       <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;0.3&apos;"/>
       <ArmMoveJointsRelativeAction joints="{relative_joint}"
                                    speed="0.1"
@@ -61,13 +64,14 @@
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="sulfuric_acid"
-                       type_="pick"
                        aruco_id="{aruco_id}"
                        empty="{empty}"
                        success="{success}"
                        lookout_pose="{lookout_pose_msg}"
                        aruco_to_slot_transform="{aruco_to_slot}"
                        slot_to_slot_transform="{slot_to_slot}"
+                       type_="pick"
+                       slot_id="{slot_id}"
                        service_name="__default__placeholder__"/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
@@ -98,13 +102,14 @@
       <GetChemicalNode message="{result_messages}"
                        workstation_name="{workstation}"
                        name_="natrium_chloride"
-                       type_="pick"
                        aruco_id="{aruco_id}"
                        empty="{empty}"
                        success="{success}"
                        lookout_pose="{lookout_pose_msg}"
                        aruco_to_slot_transform="{aruco_to_slot}"
                        slot_to_slot_transform="{slot_to_slot}"
+                       type_="pick"
+                       slot_id="{slot_id}"
                        service_name="__default__placeholder__"/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
@@ -123,7 +128,10 @@
       <Fallback>
         <AlwaysSuccess/>
         <Sequence>
-          <SubTree ID="init"/>
+          <SubTree ID="init"
+                   empty_hand="1"
+                   storage_tray="5"
+                   side_grasp_tray="7"/>
           <Sequence>
             <Script code="in_pose_test:= &apos;0.623;-0.2;0.381;-3.142;0.0;0.0&apos;"/>
             <ArmArrayToPoseAction array="{in_pose_test}"
@@ -278,8 +286,6 @@
                    type="std::string"/>
       <input_port name="name_"
                   type="std::string"/>
-      <input_port name="type_"
-                  type="std::string"/>
       <output_port name="aruco_id"
                    type="signed char"/>
       <output_port name="empty"
@@ -292,6 +298,10 @@
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <output_port name="slot_to_slot_transform"
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="type_"
+                  type="std::string"/>
+      <output_port name="slot_id"
+                   type="signed char"/>
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
@@ -331,6 +341,11 @@
       <input_port name="approch_offset"/>
       <input_port name="object_id"/>
     </SubTree>
+    <SubTree ID="init"
+             editable="true">
+      <output_port name="empty_hand"
+                   default="&apos;empty&apos;"/>
+    </SubTree>
     <SubTree ID="place_pose_msg"
              editable="true">
       <input_port name="target_pose_msg"/>
@@ -357,21 +372,6 @@
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
     </SubTree>
-    <Action ID="RemoveChemicalPlacementNode">
-            <output_port name="message" type="std::string"/>
-            <output_port name="success" type="bool"/>
-            <input_port name="name_" type="std::string"/>
-            <input_port name="slot_id" type="signed char"/>
-            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
-        </Action>
-    <Action ID="RemoveVesselPlacementNode">
-            <output_port name="message" type="std::string"/>
-            <output_port name="success" type="bool"/>
-            <input_port name="name_" type="std::string"/>
-            <input_port name="slot_id" type="signed char"/>
-            <input_port name="service_name" type="std::string" default="__default__placeholder__">Service name</input_port>
-        </Action>
-
   </TreeNodesModel>
 
 </root>

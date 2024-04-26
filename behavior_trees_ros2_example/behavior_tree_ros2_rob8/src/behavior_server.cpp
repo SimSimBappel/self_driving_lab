@@ -112,6 +112,14 @@ class BehaviorServer : public rclcpp::Node
   params_database_place_vessel.default_port_value = "place_vessel";
   factory.registerNodeType<PlaceVesselNode>("PlaceVesselNode",params_database_place_vessel);
 
+  RosNodeParams params_database_place_chemical;
+  // params_database_place_vessel.nh = shared_from_this();
+  params_database_place_chemical.nh = this->node_;
+  params_database_place_chemical.server_timeout = std::chrono::milliseconds(2000);
+  params_database_place_chemical.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_database_place_chemical.default_port_value = "place_chemical";
+  factory.registerNodeType<PlaceChemicalNode>("PlaceChemicalNode",params_database_place_chemical);
+
         RosNodeParams params_database_remove_chemical_placement;
         // params_database_place_vessel.nh = shared_from_this();
         params_database_remove_chemical_placement.nh = this->node_;

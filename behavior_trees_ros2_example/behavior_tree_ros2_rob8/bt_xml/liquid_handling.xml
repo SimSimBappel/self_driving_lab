@@ -6,7 +6,8 @@
       <PrintValue message="{vessel}"/>
       <PrintValue message="{amount}"/>
       <SubTree ID="get_reagent"
-               reagent="{reagent}"/>
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -23,35 +24,45 @@
   </BehaviorTree>
 
   <BehaviorTree ID="get_reagent">
-    <Sequence>
-      <GetChemicalNode message="{result_messages}"
-                       workstation_name="{workstation}"
-                       name_="{reagent}"
-                       type_="pick"
-                       aruco_id="{aruco_id}"
-                       empty="{empty}"
-                       success="{success}"
-                       lookout_pose="{lookout_pose_msg}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       service_name="__default__placeholder__"/>
-      <Fallback>
-        <AlwaysSuccess/>
-        <SubTree ID="move_base"/>
-      </Fallback>
-      <SubTree ID="visual_grasp"
-               aruco_id="{aruco_id}"
-               lookout_pose_msg="{lookout_pose_msg}"
-               aruco_to_slot="{aruco_to_slot}"
-               slot_to_slot="{slot_to_slot}"
-               keep_orientation="false"
-               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
-      <RemoveChemicalPlacementNode message="{message}"
-                                   success="{success}"
-                                   name_="{reagent}"
-                                   slot_id="10"
-                                   service_name="__default__placeholder__"/>
-    </Sequence>
+    <Precondition else="FAILURE"
+                  if="empty_hand==&apos;empty&apos;">
+      <Sequence>
+        <GetChemicalNode message="{result_messages}"
+                         workstation_name="{workstation}"
+                         name_="{reagent}"
+                         aruco_id="{aruco_id}"
+                         empty="{empty}"
+                         success="{success}"
+                         lookout_pose="{lookout_pose_msg}"
+                         aruco_to_slot_transform="{aruco_to_slot}"
+                         slot_to_slot_transform="{slot_to_slot}"
+                         type_="pick"
+                         slot_id="{slot_id}"
+                         service_name="__default__placeholder__"/>
+        <Fallback>
+          <AlwaysSuccess/>
+          <SubTree ID="move_base"
+                   storage_tray="5"
+                   side_grasp_tray="7"
+                   emptied="{empty}"
+                   storage_vessel_tray="10"/>
+        </Fallback>
+        <SubTree ID="visual_grasp"
+                 aruco_id="{aruco_id}"
+                 lookout_pose_msg="{lookout_pose_msg}"
+                 aruco_to_slot="{aruco_to_slot}"
+                 slot_to_slot="{slot_to_slot}"
+                 keep_orientation="false"
+                 approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
+        <RemoveChemicalPlacementNode message="{message}"
+                                     success="{success}"
+                                     name_="{reagent}"
+                                     slot_id="{slot_id}"
+                                     service_name="__default__placeholder__"/>
+        <SetBlackboard value="{reagent}"
+                       output_key="empty_hand"/>
+      </Sequence>
+    </Precondition>
   </BehaviorTree>
 
   <BehaviorTree ID="pour_reagent">
@@ -72,8 +83,6 @@
                    type="std::string"/>
       <input_port name="name_"
                   type="std::string"/>
-      <input_port name="type_"
-                  type="std::string"/>
       <output_port name="aruco_id"
                    type="signed char"/>
       <output_port name="empty"
@@ -86,6 +95,10 @@
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <output_port name="slot_to_slot_transform"
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="type_"
+                  type="std::string"/>
+      <output_port name="slot_id"
+                   type="signed char"/>
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
@@ -110,6 +123,17 @@
     <SubTree ID="get_reagent"
              editable="true">
       <input_port name="reagent"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="move_base"
+             editable="true">
+      <input_port name="storage_tray"
+                  default="5"/>
+      <input_port name="side_grasp_tray"
+                  default="7"/>
+      <input_port name="emptied"/>
+      <input_port name="storage_vessel_tray"
+                  default="10"/>
     </SubTree>
     <SubTree ID="visual_grasp"
              editable="true">

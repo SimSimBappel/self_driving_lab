@@ -11,6 +11,7 @@ geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> h
 geometry_msgs/TransformStamped slot_to_slot_transform           # slot_id -> hardcoded transform (slot_id == 1 -> selected slot_id)
 
 # TODO: Add slot_id
+int8 slot_id
 
 bool empty # Is the bottle empty ?
 

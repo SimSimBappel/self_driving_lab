@@ -1,5 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root BTCPP_format="4">
+  <BehaviorTree ID="empty_gripper">
+    <Fallback>
+      <Precondition else="FAILURE"
+                    if="empty_hand==&apos;empty&apos;">
+        <AlwaysSuccess/>
+      </Precondition>
+      <Precondition else="FAILURE"
+                    if="empty_hand==&apos;beaker_250ml&apos;">
+        <Sequence>
+          <PlaceVesselNode message="{message}"
+                           workstation_name="{workstation}"
+                           name_="&apos;beaker_250ml&apos;"
+                           aruco_id="{aruco_id}"
+                           success="{success}"
+                           tray_id="{storage_vessel_tray}"
+                           lookout_pose="{lookout_pose}"
+                           aruco_to_slot_transform="{aruco_to_slot_transform}"
+                           slot_to_slot_transform="{slot_to_slot_transform}"
+                           service_name="__default__placeholder__"/>
+          <SubTree ID="visual_place"
+                   lookout_pose_msg="{lookout_pose}"
+                   keep_orientation="true"
+                   aruco_id="{aruco_id}"
+                   slot_to_slot="{slot_to_slot_transform}"
+                   approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                   aruco_to_slot="{aruco_to_slot_transform}"/>
+        </Sequence>
+      </Precondition>
+      <Sequence>
+        <PlaceChemicalNode message="{message}"
+                           workstation_name="{workstation}"
+                           name_="{empty_hand}"
+                           aruco_id="{aruco_id}"
+                           emptied="{emptied}"
+                           success="{success}"
+                           tray_id="{storage_tray}"
+                           lookout_pose="{lookout_pose}"
+                           aruco_to_slot_transform="{aruco_to_slot_transform}"
+                           slot_to_slot_transform="{slot_to_slot_transform}"
+                           service_name="__default__placeholder__"/>
+        <SubTree ID="visual_place"
+                 lookout_pose_msg="{lookout_pose}"
+                 keep_orientation="true"
+                 aruco_id="{aruco_id}"
+                 slot_to_slot="{slot_to_slot_transform}"
+                 approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                 aruco_to_slot="{aruco_to_slot_transform}"/>
+      </Sequence>
+    </Fallback>
+  </BehaviorTree>
+
   <BehaviorTree ID="grasp_pose_msg">
     <Sequence>
       <Sleep msec="200"/>
@@ -30,14 +81,14 @@
                  width="0.02"
                  speed="0.03"
                  force="3"
-                 epsilon="0.02"/>
+                 epsilon="0.03"/>
         <Sequence>
           <Sleep msec="1000"/>
           <SubTree ID="gripping"
                    width="0.02"
                    speed="0.03"
                    force="3"
-                   epsilon="0.02"/>
+                   epsilon="0.03"/>
         </Sequence>
       </Fallback>
       <AttachObjectNode object_id="{object_id}"
@@ -80,6 +131,7 @@
                                speed="0.02"
                                action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
+      <Script code="empty_hand:=&apos;chlorine&apos;"/>
     </Sequence>
   </BehaviorTree>
 
@@ -192,13 +244,14 @@
       <GetChemicalNode message="{result_messages1}"
                        workstation_name="{workstation1}"
                        name_="{chemical_name}"
-                       type_="pour"
                        aruco_id="{aruco_id1}"
                        empty="{empty1}"
                        success="{success1}"
                        lookout_pose="{lookout_pose_msg1}"
                        aruco_to_slot_transform="{aruco_to_slot1}"
                        slot_to_slot_transform="{slot_to_slot1}"
+                       type_="pour"
+                       slot_id=""
                        service_name="__default__placeholder__"/>
       <GetVesselNode message="{result_messages2}"
                      workstation_name="{workstation2}"
@@ -380,8 +433,6 @@
                    type="std::string"/>
       <input_port name="name_"
                   type="std::string"/>
-      <input_port name="type_"
-                  type="std::string"/>
       <output_port name="aruco_id"
                    type="signed char"/>
       <output_port name="empty"
@@ -394,6 +445,10 @@
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <output_port name="slot_to_slot_transform"
                    type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="type_"
+                  type="std::string"/>
+      <output_port name="slot_id"
+                   type="signed char"/>
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
@@ -459,6 +514,54 @@
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
     </Action>
+    <Action ID="PlaceChemicalNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="workstation_name"
+                   type="std::string"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <output_port name="aruco_id"
+                   type="signed char"/>
+      <input_port name="emptied"
+                  type="bool"/>
+      <output_port name="success"
+                   type="bool"/>
+      <input_port name="tray_id"
+                  type="int"/>
+      <output_port name="lookout_pose"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="aruco_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="slot_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
+    <Action ID="PlaceVesselNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="workstation_name"
+                   type="std::string"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <output_port name="aruco_id"
+                   type="signed char"/>
+      <output_port name="success"
+                   type="bool"/>
+      <input_port name="tray_id"
+                  type="int"/>
+      <output_port name="lookout_pose"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="aruco_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="slot_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
     <Action ID="PrintValue">
       <input_port name="message"
                   type="std::string"/>
@@ -492,6 +595,15 @@
       <input_port name="target_pose_msg"/>
       <input_port name="approach_offset"/>
       <input_port name="object_id"/>
+    </SubTree>
+    <SubTree ID="visual_place"
+             editable="true">
+      <input_port name="lookout_pose_msg"/>
+      <input_port name="keep_orientation"/>
+      <input_port name="aruco_id"/>
+      <input_port name="slot_to_slot"/>
+      <input_port name="approach_offset"/>
+      <input_port name="aruco_to_slot"/>
     </SubTree>
   </TreeNodesModel>
 

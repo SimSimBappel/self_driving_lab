@@ -12,6 +12,7 @@
             <input_port name="reagent"/>
             <input_port name="vessel"/>
             <input_port name="amount"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
         <Action ID="AddChemicalNode">
             <output_port name="message" type="std::string"/>
@@ -157,13 +158,14 @@
             <output_port name="message" type="std::string"/>
             <output_port name="workstation_name" type="std::string"/>
             <input_port name="name_" type="std::string"/>
-            <input_port name="type_" type="std::string"/>
             <output_port name="aruco_id" type="signed char"/>
             <output_port name="empty" type="bool"/>
             <output_port name="success" type="bool"/>
             <output_port name="lookout_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <output_port name="aruco_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <output_port name="slot_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="type_" type="std::string"/>
+            <output_port name="slot_id" type="signed char"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="GetPrePourPoseNode">
@@ -203,6 +205,19 @@
             <output_port name="transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="source" type="std::string"/>
             <input_port name="target" type="std::string"/>
+            <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
+        </Action>
+        <Action ID="PlaceChemicalNode">
+            <output_port name="message" type="std::string"/>
+            <output_port name="workstation_name" type="std::string"/>
+            <input_port name="name_" type="std::string"/>
+            <output_port name="aruco_id" type="signed char"/>
+            <input_port name="emptied" type="bool"/>
+            <output_port name="success" type="bool"/>
+            <input_port name="tray_id" type="int"/>
+            <output_port name="lookout_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <output_port name="aruco_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <output_port name="slot_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="PlaceVesselNode">
@@ -273,8 +288,15 @@
             <input_port name="location_base" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <SubTree ID="empty_gripper" editable="true">
+            <input_port name="storage_tray" default="5"/>
+            <input_port name="side_grasp_tray" default="7"/>
+            <input_port name="emptied"/>
+            <input_port name="storage_vessel_tray" default="10"/>
+        </SubTree>
         <SubTree ID="get_reagent" editable="true">
             <input_port name="reagent"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
         <SubTree ID="grasp_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
@@ -286,6 +308,15 @@
             <input_port name="speed" default="0.03"/>
             <input_port name="force" default="5"/>
             <input_port name="epsilon" default="0.02"/>
+        </SubTree>
+        <SubTree ID="init" editable="true">
+            <output_port name="empty_hand" default="&apos;empty&apos;"/>
+        </SubTree>
+        <SubTree ID="move_base" editable="true">
+            <input_port name="storage_tray" default="5"/>
+            <input_port name="side_grasp_tray" default="7"/>
+            <input_port name="emptied"/>
+            <input_port name="storage_vessel_tray" default="10"/>
         </SubTree>
         <SubTree ID="place_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>

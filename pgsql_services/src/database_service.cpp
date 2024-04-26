@@ -299,6 +299,7 @@ private:
                                 response->slot_to_slot_transform = first_slot_to_current_slot_transform;
                                 response->empty = empty_bottle;
                                 response->success = true;
+                                response->slot_id = slot_id;
                                 response->message = "Chemical found";
 
                                 // std::cout << response << std::endl;

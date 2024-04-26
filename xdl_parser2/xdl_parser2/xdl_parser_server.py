@@ -94,8 +94,8 @@ class xdl_parser(Node):
 
             else:
                 result += f'{key}="{value}" '
-        result += '/>\n'
-        # result += ' _autoremap="true"/>\n'
+        # result += '/>\n'
+        result += ' _autoremap="true"/>\n'
         # result += ' robot_init="{robot_init}"/>\n'
 
 
@@ -106,7 +106,7 @@ class xdl_parser(Node):
 
     def generate_behavior_tree(self,list_of_procedures,params_dict):
         # result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n<Script code="robot_init:=0" />\n'
-        result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n<SubTree ID="init"/>\n'
+        result = '<?xml version="1.0" encoding="UTF-8"?>\n<root BTCPP_format="4">\n<BehaviorTree ID="Main">\n<Sequence>\n<SubTree ID="init" _autoremap="true"/>\n'
 
         for index, item in enumerate(list_of_procedures):
             tmp = self.keyword_to_string(item,params_dict[index])
