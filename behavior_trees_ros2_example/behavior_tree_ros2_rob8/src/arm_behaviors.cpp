@@ -127,7 +127,7 @@ class DetachObjectNode: public RosServiceNode<DetachObject>
   {
     return providedBasicPorts({
       // InputPort<geometry_msgs::msg::PoseStamped>("pose"),
-      InputPort<int8_t>("object_id"),
+      InputPort<std::string>("object_id"),
       OutputPort<geometry_msgs::msg::PoseStamped>("pose"),
       // InputPort<std::string>("shape"),
       // InputPort<double>("size_x"),
@@ -143,8 +143,8 @@ class DetachObjectNode: public RosServiceNode<DetachObject>
     
     // getInput("pose", request->pose);
     // getInput("object_id", request->object_id);
-    auto object_id = getInput<int8_t>("object_id");
-    request->object_id = std::to_string(object_id.value());
+    auto object_id = getInput<std::string>("object_id");
+    request->object_id = object_id.value();
     // getInput("shape", request->shape);
     // getInput("size_x", request->size_x);
     // getInput("size_y", request->size_y);
@@ -190,7 +190,7 @@ class AttachObjectNode: public RosServiceNode<AttachObject>
   {
     return providedBasicPorts({
       // InputPort<geometry_msgs::msg::PoseStamped>("pose"),
-      InputPort<int8_t>("object_id"),
+      InputPort<std::string>("object_id"),
       // InputPort<std::string>("shape"),
       // InputPort<double>("size_x"),
       // InputPort<double>("size_y")
@@ -205,8 +205,8 @@ class AttachObjectNode: public RosServiceNode<AttachObject>
     
     // getInput("pose", request->pose);
     // getInput("object_id", request->object_id);
-    auto object_id = getInput<int8_t>("object_id");
-    request->object_id = std::to_string(object_id.value());
+    auto object_id = getInput<std::string>("object_id");
+    request->object_id = object_id.value();
     // getInput("shape", request->shape);
     // getInput("size_x", request->size_x);
     // getInput("size_y", request->size_y);
@@ -252,7 +252,7 @@ class RemoveObjectNode: public RosServiceNode<RemoveObject>
   {
     return providedBasicPorts({
       // InputPort<geometry_msgs::msg::PoseStamped>("pose"),
-      InputPort<int8_t>("object_id"),
+      InputPort<std::string>("object_id"),
       // InputPort<std::string>("shape"),
       // InputPort<double>("size_x"),
       // InputPort<double>("size_y")
@@ -267,8 +267,8 @@ class RemoveObjectNode: public RosServiceNode<RemoveObject>
     
     // getInput("pose", request->pose);
     // getInput("object_id", request->object_id);
-    auto object_id = getInput<int8_t>("object_id");
-    request->object_id = std::to_string(object_id.value());
+    auto object_id = getInput<std::string>("object_id");
+    request->object_id = object_id.value();
     // getInput("shape", request->shape);
     // getInput("size_x", request->size_x);
     // getInput("size_y", request->size_y);
@@ -313,7 +313,7 @@ class AddObjectNode: public RosServiceNode<AddObject>
   {
     return providedBasicPorts({
       InputPort<geometry_msgs::msg::PoseStamped>("pose"),
-      InputPort<int8_t>("object_id"),
+      InputPort<std::string>("object_id"),
       InputPort<std::string>("shape"),
       InputPort<double>("size_x"),
       InputPort<double>("size_y")
@@ -331,9 +331,8 @@ class AddObjectNode: public RosServiceNode<AddObject>
     getInput("shape", request->shape);
     getInput("size_x", request->size_x);
     getInput("size_y", request->size_y);
-    auto object_id = getInput<int8_t>("object_id");
-    uint8_t temp = object_id.value();
-    request->object_id = std::to_string(temp);
+    auto object_id = getInput<std::string>("object_id");
+    request->object_id = object_id.value();
     RCLCPP_INFO(node_->get_logger(), "String object_id: %s", request->object_id.c_str());
     // must return true if we are ready to send the request
     return true;

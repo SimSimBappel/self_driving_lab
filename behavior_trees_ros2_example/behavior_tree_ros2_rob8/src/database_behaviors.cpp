@@ -278,6 +278,7 @@ class PlaceChemicalNode: public RosServiceNode<PlaceChemical>
         OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
         OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
         InputPort<std::string>("name_"),
+
         InputPort<bool>("emptied"),
         InputPort<int32_t>("tray_id")});
   }

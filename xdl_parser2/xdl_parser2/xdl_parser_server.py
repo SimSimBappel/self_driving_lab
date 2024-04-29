@@ -36,7 +36,8 @@ class xdl_parser(Node):
         root = tk.Tk()
         root.withdraw()
 
-        path = filedialog.askopenfilename() 
+        # path = filedialog.askopenfilename() 
+        path = "/home/intelnuc/sdl_ws/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/xdl_xml/blueprint.xml"
         with open(path,"r") as file:
             xml_string = file.read()
             file.close()

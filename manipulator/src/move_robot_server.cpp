@@ -1056,9 +1056,9 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
 
         orientation_constraint.orientation = goal->pose.pose.orientation;
-        orientation_constraint.absolute_x_axis_tolerance = 0.2;
-        orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        // orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.absolute_x_axis_tolerance = 0.4;
+        orientation_constraint.absolute_y_axis_tolerance = 0.4;
+        orientation_constraint.absolute_z_axis_tolerance = 1.57;
         orientation_constraint.weight = 1.0;
 
         moveit_msgs::msg::Constraints orientation_constraints;
@@ -1621,9 +1621,9 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             visual_tools->trigger();
 
             // Set the target pose
-            bottle_pose.position.x += 0.1;
+            bottle_pose.position.x += 0.0;
             bottle_pose.position.y += 0.0;
-            bottle_pose.position.z += 0.25;
+            bottle_pose.position.z += 0.0;
 
             // Get the orientation of the bottle
             tf2::Quaternion quat(

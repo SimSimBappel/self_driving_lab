@@ -340,8 +340,10 @@
             <input_port name="lookout_pose_msg"/>
             <input_port name="aruco_to_slot"/>
             <input_port name="slot_to_slot"/>
-            <input_port name="keep_orientation" type="bool"/>
+            <input_port name="keep_orientation"/>
             <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+            <inout_port name="empty_hand"/>
+            <input_port name="reagent"/>
         </SubTree>
         <SubTree ID="visual_place" editable="true">
             <input_port name="lookout_pose_msg"/>
@@ -350,6 +352,7 @@
             <input_port name="slot_to_slot"/>
             <input_port name="approach_offset"/>
             <input_port name="aruco_to_slot"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
     </TreeNodesModel>
 </root>

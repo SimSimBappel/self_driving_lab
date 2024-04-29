@@ -25,19 +25,19 @@
                    aruco_id="{aruco_id}"
                    slot_to_slot="{slot_to_slot_transform}"
                    approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                   aruco_to_slot="{aruco_to_slot_transform}"/>
-          <SetBlackboard value="&apos;empty&apos;"
-                         output_key="empty_hand"/>
+                   aruco_to_slot="{aruco_to_slot_transform}"
+                   empty_hand=""/>
         </Sequence>
       </Precondition>
       <Sequence>
+        <PrintValue message="{empty_hand}"/>
         <PlaceChemicalNode message="{message}"
                            workstation_name="{workstation}"
                            name_="{empty_hand}"
                            aruco_id="{aruco_id}"
                            emptied="{emptied}"
                            success="{success}"
-                           tray_id="{side_grasp_tray}"
+                           tray_id="{storage_tray}"
                            lookout_pose="{lookout_pose}"
                            aruco_to_slot_transform="{aruco_to_slot_transform}"
                            slot_to_slot_transform="{slot_to_slot_transform}"
@@ -48,9 +48,8 @@
                  aruco_id="{aruco_id}"
                  slot_to_slot="{slot_to_slot_transform}"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                 aruco_to_slot="{aruco_to_slot_transform}"/>
-        <SetBlackboard value="&apos;empty&apos;"
-                       output_key="empty_hand"/>
+                 aruco_to_slot="{aruco_to_slot_transform}"
+                 empty_hand="{empty_hand}"/>
       </Sequence>
     </Fallback>
   </BehaviorTree>
@@ -79,22 +78,11 @@
                                    accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <Sleep msec="200"/>
-      <Fallback>
-        <SubTree ID="gripping"
-                 width="0.02"
-                 speed="0.03"
-                 force="3"
-                 epsilon="0.03"/>
-        <Sequence>
-          <Sleep msec="1000"/>
-          <SubTree ID="gripping"
-                   width="0.02"
-                   speed="0.03"
-                   force="3"
-                   epsilon="0.03"/>
-        </Sequence>
-      </Fallback>
+      <SubTree ID="gripping"
+               width="0.02"
+               speed="0.03"
+               force="3"
+               epsilon="0.03"/>
       <AttachObjectNode object_id="{object_id}"
                         service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
@@ -121,6 +109,7 @@
                           joint_1="0.04"
                           action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePoseMsgAction pose="{approach_pose}"
                             speed="0.2"
@@ -163,16 +152,20 @@
 
   <BehaviorTree ID="gripping">
     <Fallback>
+      <Sleep msec="200"/>
       <FrankaGraspGripperAction width="{width}"
                                 speed="{speed}"
                                 force="{force}"
                                 epsilon="{epsilon}"
                                 action_name="__default__placeholder__"/>
-      <FrankaGraspGripperAction width="{width}"
-                                speed="{speed}"
-                                force="{force}"
-                                epsilon="{epsilon}"
-                                action_name="__default__placeholder__"/>
+      <Sequence>
+        <Sleep msec="3000"/>
+        <FrankaGraspGripperAction width="{width}"
+                                  speed="{speed}"
+                                  force="{force}"
+                                  epsilon="{epsilon}"
+                                  action_name="__default__placeholder__"/>
+      </Sequence>
     </Fallback>
   </BehaviorTree>
 
@@ -186,11 +179,8 @@
     <Sequence>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
-      <FrankaMoveGripperAction width="0.039"
-                               speed="0.02"
-                               action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
-      <Script code="empty_hand:=&apos;chlorine&apos;"/>
+      <Script code="empty_hand:=&apos;empty&apos;"/>
     </Sequence>
   </BehaviorTree>
 
@@ -259,7 +249,7 @@
       </RetryUntilSuccessful>
       <PrintValue message="after"/>
       <AddObjectNode pose="{object_pose_msg2}"
-                     object_id="{aruco_id}"
+                     object_id="{reagent}"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
@@ -268,7 +258,12 @@
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"
-               object_id="{aruco_id}"/>
+               object_id="{reagent}"/>
+      <Fallback>
+        <AlwaysSuccess/>
+        <SetBlackboard value="{reagent}"
+                       output_key="empty_hand"/>
+      </Fallback>
     </Sequence>
   </BehaviorTree>
 
@@ -294,7 +289,7 @@
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approach_offset="{approach_offset}"
-               object_id="{aruco_id}"/>
+               object_id="{empty_hand}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -348,13 +343,13 @@
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg1}"
-                     object_id="{aruco_id1}"
+                     object_id="glas"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
                      service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg2}"
-                     object_id="{aruco_id2}"
+                     object_id="glas"
                      shape="cylinder"
                      size_x="0.05"
                      size_y="0.10.5"
@@ -365,8 +360,8 @@
       <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
                retract_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
-               approach_offset="-0.05;0.0;0.0;0.0;0.0;0.0"
-               object_id="{aruco_id1}"/>
+               approach_offset="0.05;0.0;0.0;0.0;0.0;0.0"
+               object_id="{reagent}"/>
       <ArmMovePoseMsgAction pose="{pose_above_vessel}"
                             speed="0.2"
                             accel="0.2"
@@ -671,6 +666,7 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
   </TreeNodesModel>
 

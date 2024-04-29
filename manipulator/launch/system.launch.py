@@ -348,6 +348,18 @@ def generate_launch_description():
     #     launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time')}.items()
     # )
 
+    behavior_server = Node(
+        package='behavior_tree_ros2_rob8',
+        executable='behavior_server',
+        output='screen'
+    )
+
+    xdl_parser = Node(
+        package='xdl_parser2',
+        executable='xdl_parser_server',
+        output='screen'
+    )
+
     return LaunchDescription(
         [robot_arg,
          use_sim_time_arg,
@@ -367,6 +379,8 @@ def generate_launch_description():
          pgsql_node,
         #  launch_moveit,
          launch_pose_estimation,
+        #  behavior_server,
+         xdl_parser
          ]
         + load_controllers
     )
