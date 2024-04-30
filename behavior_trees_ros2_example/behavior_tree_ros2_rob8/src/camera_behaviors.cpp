@@ -3,6 +3,7 @@
 #include <behaviortree_ros2/bt_service_node.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "behavior_tree_ros2_actions/action/find_aruco_tag.hpp"
+#include "behavior_tree_ros2_actions/action/wait_for_user.hpp"
 #include "behavior_tree_ros2_actions/srv/lookup_transform.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
 
@@ -118,6 +119,43 @@ class LookupTransformNode: public RosServiceNode<LookupTransform>
   virtual NodeStatus onFailure(ServiceNodeErrorCode error) override
   {
     RCLCPP_ERROR(node_->get_logger(), "Error: %d", error);
+    return NodeStatus::FAILURE;
+  }
+};
+
+
+class WaitForUserAction: public RosActionNode<behavior_tree_ros2_actions::action::WaitForUser>
+{
+public:
+  WaitForUserAction(const std::string& name,
+              const NodeConfig& conf,
+              const RosNodeParams& params)
+    : RosActionNode<behavior_tree_ros2_actions::action::WaitForUser>(name, conf, params)
+  {}
+
+  static BT::PortsList providedPorts()
+  {
+    return providedBasicPorts({InputPort<int8_t>("id"),InputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),InputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"), OutputPort<geometry_msgs::msg::PoseStamped>("Transform")});
+  }
+
+  bool setGoal(Goal& goal) override{
+    return true;
+  }
+
+  void onHalt() override{
+    RCLCPP_INFO( node_->get_logger(), "%s: onHalt", name().c_str() );
+  }
+
+  BT::NodeStatus onResultReceived(const WrappedResult& wr) override{
+    
+
+    RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
+               wr.result->done ? "true" : "false" );
+    return NodeStatus::SUCCESS;
+  }
+
+  virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
+    RCLCPP_ERROR( node_->get_logger(), "%s: onFailure with error: %s", name().c_str(), toStr(error) );
     return NodeStatus::FAILURE;
   }
 };

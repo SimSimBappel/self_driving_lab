@@ -44,6 +44,7 @@ set(action_files
     "action/ArmMoveToFrame.action"
     "action/ArmMoveTrajectoryPour.action"
     "action/MirMission.action"
+    "action/WaitForUser.action"
     # "action/MoveGroupSequence.action"
     # "action/Pickup.action"
     # "action/Place.action"
