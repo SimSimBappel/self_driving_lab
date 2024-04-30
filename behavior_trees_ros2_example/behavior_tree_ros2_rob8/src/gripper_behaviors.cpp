@@ -43,7 +43,7 @@ public:
     goal.force = force.value();
     goal.epsilon.inner = epsilon.value();
     goal.epsilon.outer = epsilon.value();
-    RCLCPP_INFO( node_-> get_logger(), name().c_str(), goal);
+    // RCLCPP_INFO( node_-> get_logger(), name().c_str(), goal);
     return true;
   }
 

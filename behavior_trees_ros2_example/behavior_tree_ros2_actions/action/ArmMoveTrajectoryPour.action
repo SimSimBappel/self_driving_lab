@@ -1,6 +1,6 @@
 #goal definition
-int8 container_name
-int8 bottle_name
+string container_name
+string bottle_name
 # geometry_msgs/Vector3 pour_offset
 float32 tilt_angle
 float32 min_path_fraction

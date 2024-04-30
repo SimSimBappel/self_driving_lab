@@ -74,20 +74,50 @@
       <SubTree ID="visual_pour"
                chemical_name="natrium_chloride"
                vessel_name="beaker_250ml"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="MainTree_backup">
+    <Sequence>
+      <SubTree ID="init"
+               empty_hand="{empty_hand}"/>
+      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;0.3&apos;"/>
+      <ArmMoveJointsRelativeAction joints="{relative_joint}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
+      <GetChemicalNode message="{result_messages}"
+                       workstation_name="{workstation}"
+                       name_="sulfuric_acid"
+                       aruco_id="{aruco_id}"
+                       empty="{empty}"
+                       success="{success}"
+                       lookout_pose="{lookout_pose_msg}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       type_="pick"
+                       slot_id="{slot_id}"
+                       service_name="__default__placeholder__"/>
+      <SubTree ID="visual_pour"
+               chemical_name="natrium_chloride"
+               vessel_name="beaker_250ml"/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
                lookout_pose_msg="{lookout_pose_msg}"
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
-               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+               empty_hand="{empty_hand}"
+               reagent="{reagent}"/>
       <SubTree ID="visual_place"
                lookout_pose_msg="{lookout_pose_msg}"
                keep_orientation="true"
                aruco_id="{aruco_id}"
                slot_to_slot="{slot_to_slot}"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-               aruco_to_slot="{aruco_to_slot}"/>
+               aruco_to_slot="{aruco_to_slot}"
+               empty_hand="{empty_hand}"/>
       <Fallback>
         <AlwaysSuccess/>
         <Sequence>
@@ -118,7 +148,9 @@
                aruco_to_slot="{aruco_to_slot}"
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
-               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"/>
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+               empty_hand="{empty_hand}"
+               reagent="{reagent}"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
@@ -355,10 +387,11 @@
       <input_port name="lookout_pose_msg"/>
       <input_port name="aruco_to_slot"/>
       <input_port name="slot_to_slot"/>
-      <input_port name="keep_orientation"
-                  type="bool"/>
+      <input_port name="keep_orientation"/>
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+      <inout_port name="empty_hand"/>
+      <input_port name="reagent"/>
     </SubTree>
     <SubTree ID="visual_place"
              editable="true">
@@ -368,6 +401,7 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
   </TreeNodesModel>
 

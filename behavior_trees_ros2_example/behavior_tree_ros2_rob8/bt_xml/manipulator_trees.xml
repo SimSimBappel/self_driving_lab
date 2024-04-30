@@ -119,8 +119,8 @@
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.05"
-                                   accel="0.05"
+                                   speed="0.01"
+                                   accel="0.01"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <Sleep msec="200"/>
@@ -129,14 +129,14 @@
                  width="0.02"
                  speed="0.03"
                  force="3"
-                 epsilon="0.03"/>
+                 epsilon="0.01"/>
         <Sequence>
           <Sleep msec="1000"/>
           <SubTree ID="gripping"
                    width="0.02"
                    speed="0.03"
                    force="3"
-                   epsilon="0.03"/>
+                   epsilon="0.01"/>
         </Sequence>
       </Fallback>
       <AttachObjectNode object_id="{object_id}"
@@ -144,8 +144,8 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
-                                   speed="0.05"
-                                   accel="0.05"
+                                   speed="0.01"
+                                   accel="0.01"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -179,6 +179,9 @@
     <Sequence>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <HomeArmAction action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.039"
+                               speed="0.02"
+                               action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
       <Script code="empty_hand:=&apos;empty&apos;"/>
     </Sequence>
@@ -343,28 +346,43 @@
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg1}"
-                     object_id="glas"
+                     object_id="{chemical_name}"
                      shape="cylinder"
                      size_x="0.02"
-                     size_y="0.15.5"
+                     size_y="0.155"
                      service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg2}"
-                     object_id="glas"
+                     object_id="{vessel_name}"
                      shape="cylinder"
-                     size_x="0.05"
-                     size_y="0.10.5"
+                     size_x="0.08"
+                     size_y="0.096"
                      service_name="__default__placeholder__"/>
-      <GetPrePourPoseNode object_id="{aruco_id1}"
-                          pose="{bottle_pose}"
+      <GetPrePourPoseNode container_name="{vessel_name}"
+                          pose_bottle="{bottle_pose}"
+                          bottle_name="{chemical_name}"
+                          result="{result}"
+                          pose_container="{pose_above_container}"
                           service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
                retract_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
-               approach_offset="0.05;0.0;0.0;0.0;0.0;0.0"
-               object_id="{reagent}"/>
-      <ArmMovePoseMsgAction pose="{pose_above_vessel}"
-                            speed="0.2"
-                            accel="0.2"
+               approach_offset="0.1;0.0;0.0;0.0;0.0;0.0"
+               object_id="{chemical_name}"/>
+      <ArmMovePoseMsgAction pose="{pose_above_container}"
+                            speed="0.15"
+                            accel="0.15"
+                            keep_orientation="false"
+                            lin="false"
+                            action_name="__default__placeholder__"/>
+      <ArmMoveTrajectoryPourAction container_name="{vessel_name}"
+                                   bottle_name="{chemical_name}"
+                                   tilt_angle="1.9"
+                                   min_path_fraction="0.9"
+                                   pour_duration="4.0"
+                                   action_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{pose_above_container}"
+                            speed="0.15"
+                            accel="0.15"
                             keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
@@ -410,6 +428,21 @@
                   type="bool"/>
       <input_port name="lin"
                   type="bool"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="ArmMoveTrajectoryPourAction">
+      <input_port name="container_name"
+                  type="signed char"/>
+      <input_port name="bottle_name"
+                  type="signed char"/>
+      <input_port name="tilt_angle"
+                  type="float"/>
+      <input_port name="min_path_fraction"
+                  type="float"/>
+      <input_port name="pour_duration"
+                  type="float"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
@@ -509,9 +542,15 @@
                   type="std::string">Service name</input_port>
     </Action>
     <Action ID="GetPrePourPoseNode">
-      <input_port name="object_id"
-                  type="signed char"/>
-      <output_port name="pose"
+      <input_port name="container_name"
+                  type="std::string"/>
+      <output_port name="pose_bottle"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="bottle_name"
+                  type="std::string"/>
+      <output_port name="result"
+                   type="bool"/>
+      <output_port name="pose_container"
                    type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <input_port name="service_name"
                   default="__default__placeholder__"

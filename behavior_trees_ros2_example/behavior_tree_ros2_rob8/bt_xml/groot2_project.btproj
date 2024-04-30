@@ -169,8 +169,11 @@
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="GetPrePourPoseNode">
-            <input_port name="object_id" type="signed char"/>
-            <output_port name="pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="container_name" type="std::string"/>
+            <output_port name="pose_bottle" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+            <input_port name="bottle_name" type="std::string"/>
+            <output_port name="result" type="bool"/>
+            <output_port name="pose_container" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
         <Action ID="GetVesselNode">

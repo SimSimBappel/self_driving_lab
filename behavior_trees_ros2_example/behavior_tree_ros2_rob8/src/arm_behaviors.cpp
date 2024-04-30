@@ -61,9 +61,12 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
         // OutputPort<std::string>("workstation_name"),
         // OutputPort<int8_t>("aruco_id"),
         // OutputPort<bool>("empty"),
-        InputPort<int8_t>("object_id"),
+        InputPort<std::string>("container_name"),
+        InputPort<std::string>("bottle_name"),
         OutputPort<bool>("result"),
-        OutputPort<geometry_msgs::msg::PoseStamped>("pose")
+        OutputPort<geometry_msgs::msg::PoseStamped>("pose_container"),
+        OutputPort<geometry_msgs::msg::PoseStamped>("pose_bottle")
+
         // OutputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),
         // OutputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"),
         });
@@ -74,8 +77,8 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
   bool setRequest(Request::SharedPtr& request) override
   {
     // use input ports to set A and B
-    
-    getInput("object_id", request->object_id);
+    getInput("container_name", request->container_name);
+    getInput("bottle_name", request->bottle_name);
     // auto name_ = getInput<std::string>("name_");
     // request->name = name_.value();
     // RCLCPP_INFO(node_->get_logger(), "String name: %s", request->object_id);
@@ -87,11 +90,12 @@ class GetPrePourPoseNode: public RosServiceNode<GetPrePourPose>
   // It must return SUCCESS or FAILURE
   NodeStatus onResponseReceived(const Response::SharedPtr& response) override
   {
-    RCLCPP_INFO(node_->get_logger(), "Success get pre-pour pose: %ld", response->result);
-    RCLCPP_INFO(node_->get_logger(), "x: %d", response->pose.pose.position.x);
-    RCLCPP_INFO(node_->get_logger(), "y: %d", response->pose.pose.position.y);
+    // RCLCPP_INFO(node_->get_logger(), "Success get pre-pour pose: %ld", response->result);
+    // RCLCPP_INFO(node_->get_logger(), "x: %d", response->pose.pose.position.x);
+    // RCLCPP_INFO(node_->get_logger(), "y: %d", response->pose.pose.position.y);
     
-    setOutput("pose",response->pose);
+    setOutput("pose_container",response->pose_container);
+    setOutput("pose_bottle",response->pose_bottle);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
     // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
     return NodeStatus::SUCCESS;
@@ -830,19 +834,25 @@ public:
   static BT::PortsList providedPorts()
   {
     // return providedBasicPorts({InputPort<std::string>("pose")});
-    return providedBasicPorts({InputPort<int8_t>("container_name"),InputPort<int8_t>("bottle_name"),InputPort<float>("tilt_angle"), InputPort<float>("min_path_fraction"), InputPort<float>("pour_duration")});
+    return providedBasicPorts({InputPort<std::string>("container_name"),InputPort<std::string>("bottle_name"),InputPort<float>("tilt_angle"), InputPort<float>("min_path_fraction"), InputPort<float>("pour_duration")});
   }
 
   bool setGoal(Goal& goal) override{
     // auto pose = getInput<geometry_msgs::msg::PoseStamped>("pose");
-    auto container_name = getInput<int8_t>("container_name");
-    auto bottle_name = getInput<int8_t>("bottle_name");
+    // auto container_name = getInput<int8_t>("container_name");
+    // auto bottle_name = getInput<int8_t>("bottle_name");
     auto tilt_angle = getInput<float>("tilt_angle");
     auto min_path_fraction = getInput<float>("min_path_fraction");
     auto pour_duration = getInput<float>("pour_duration");
 
+    auto container_name = getInput<std::string>("container_name");
     goal.container_name = container_name.value();
+
+    auto bottle_name = getInput<std::string>("bottle_name");
     goal.bottle_name = bottle_name.value();
+
+    // goal.container_name = container_name.value();
+    // goal.bottle_name = bottle_name.value();
     goal.tilt_angle = tilt_angle.value();
     goal.min_path_fraction = min_path_fraction.value();
     goal.pour_duration = pour_duration.value();

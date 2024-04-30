@@ -1,4 +1,6 @@
-int8 object_id
+string container_name
+string bottle_name
 ---
 bool result
-geometry_msgs/PoseStamped pose
+geometry_msgs/PoseStamped pose_container
+geometry_msgs/PoseStamped pose_bottle
