@@ -306,6 +306,7 @@
             <input_port name="target_pose_msg"/>
             <input_port name="approch_offset"/>
             <input_port name="object_id"/>
+            <output_port name="object_is_not_there" default="0"/>
         </SubTree>
         <SubTree ID="grasp_pour_msg" editable="true">
             <input_port name="target_pose_msg"/>
@@ -345,8 +346,7 @@
             <input_port name="slot_to_slot"/>
             <input_port name="keep_orientation"/>
             <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-            <inout_port name="empty_hand"/>
-            <input_port name="reagent"/>
+            <output_port name="object_not_there" default="0"/>
         </SubTree>
         <SubTree ID="visual_place" editable="true">
             <input_port name="lookout_pose_msg"/>
@@ -355,7 +355,6 @@
             <input_port name="slot_to_slot"/>
             <input_port name="approach_offset"/>
             <input_port name="aruco_to_slot"/>
-            <inout_port name="empty_hand"/>
         </SubTree>
     </TreeNodesModel>
 </root>

@@ -5,11 +5,9 @@
       <PrintValue message="{reagent}"/>
       <PrintValue message="{vessel}"/>
       <PrintValue message="{amount}"/>
-      <PrintValue message="{empty_hand}"/>
       <SubTree ID="get_reagent"
                reagent="{reagent}"
                empty_hand="{empty_hand}"/>
-      <PrintValue message="jeg er her 3"/>
       <SubTree ID="pour_reagent"
                empty_hand="{empty_hand}"
                reagent="{reagent}"/>
@@ -53,38 +51,74 @@
                    storage_vessel_tray="10"
                    empty_hand="{empty_hand}"/>
         </Fallback>
-        <SubTree ID="visual_grasp"
-                 aruco_id="{aruco_id}"
-                 lookout_pose_msg="{lookout_pose_msg}"
-                 aruco_to_slot="{aruco_to_slot}"
-                 slot_to_slot="{slot_to_slot}"
-                 keep_orientation="false"
-                 approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                 empty_hand="{empty_hand}"
-                 reagent="{reagent}"/>
         <Fallback>
-          <AlwaysSuccess/>
-          <RemoveChemicalPlacementNode message="{message}"
-                                       success="{success}"
-                                       name_="{reagent}"
-                                       slot_id="{slot_id}"
-                                       service_name="__default__placeholder__"/>
+          <SubTree ID="visual_grasp"
+                   aruco_id="{aruco_id}"
+                   lookout_pose_msg="{lookout_pose_msg}"
+                   aruco_to_slot="{aruco_to_slot}"
+                   slot_to_slot="{slot_to_slot}"
+                   keep_orientation="false"
+                   approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                   object_not_there="{object_not_there}"/>
+          <Precondition else="FAILURE"
+                        if="object_is_not_there==1">
+            <Sequence>
+              <RemoveChemicalPlacementNode message="{message}"
+                                           success="{success}"
+                                           name_="{reagent}"
+                                           slot_id="{slot_id}"
+                                           service_name="__default__placeholder__"/>
+              <GetChemicalNode message="{result_messages}"
+                               workstation_name="{workstation}"
+                               name_="{reagent}"
+                               aruco_id="{aruco_id}"
+                               empty="{empty}"
+                               success="{success}"
+                               lookout_pose="{lookout_pose_msg}"
+                               aruco_to_slot_transform="{aruco_to_slot}"
+                               slot_to_slot_transform="{slot_to_slot}"
+                               type_="pick"
+                               slot_id="{slot_id}"
+                               service_name="__default__placeholder__"/>
+              <Fallback>
+                <AlwaysSuccess/>
+                <SubTree ID="move_base"
+                         storage_tray="5"
+                         side_grasp_tray="7"
+                         emptied="{empty}"
+                         storage_vessel_tray="10"
+                         empty_hand="{empty_hand}"/>
+              </Fallback>
+              <SubTree ID="visual_grasp"
+                       aruco_id="{aruco_id}"
+                       lookout_pose_msg="{lookout_pose_msg}"
+                       aruco_to_slot="{aruco_to_slot}"
+                       slot_to_slot="{slot_to_slot}"
+                       keep_orientation="false"
+                       approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                       object_not_there="{object_not_there}"/>
+            </Sequence>
+          </Precondition>
         </Fallback>
+        <SetBlackboard value="{reagent}"
+                       output_key="empty_hand"/>
+        <RemoveChemicalPlacementNode message="{message}"
+                                     success="{success}"
+                                     name_="{reagent}"
+                                     slot_id="{slot_id}"
+                                     service_name="__default__placeholder__"/>
       </Sequence>
     </Precondition>
   </BehaviorTree>
 
   <BehaviorTree ID="pour_reagent">
     <Sequence>
-      <Fallback>
-        <AlwaysSuccess/>
-        <SubTree ID="move_base"
-                 storage_tray="5"
-                 side_grasp_tray="7"
-                 emptied="false"
-                 storage_vessel_tray="10"
-                 empty_hand="{empty_hand}"/>
-      </Fallback>
+      <SubTree ID="move_base"
+               storage_tray="5"
+               side_grasp_tray="7"
+               emptied="false"
+               storage_vessel_tray="10"
+               empty_hand="{empty_hand}"/>
       <Fallback>
         <Precondition else="FAILURE"
                       if="empty_hand==&apos;empty&apos;">
@@ -92,17 +126,17 @@
         </Precondition>
         <Sequence>
           <SubTree ID="empty_gripper"
-                   storage_tray="7"
+                   storage_tray="5"
                    side_grasp_tray="7"
                    emptied="false"
                    storage_vessel_tray="10"
-                   empty_hand="{empty_hand}"/>
-          <PrintValue message="here should pour"/>
+                   empty_hand=""/>
+          <SubTree ID="visual_pour"/>
         </Sequence>
       </Fallback>
       <SubTree ID="empty_gripper"
-               storage_tray="7"
-               side_grasp_tray="7"
+               storage_tray="5"
+               side_grasp_tray="5"
                emptied="false"
                storage_vessel_tray="10"
                empty_hand="{empty_hand}"/>
@@ -196,8 +230,8 @@
       <input_port name="keep_orientation"/>
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-      <inout_port name="empty_hand"/>
-      <input_port name="reagent"/>
+      <output_port name="object_not_there"
+                   default="0"/>
     </SubTree>
   </TreeNodesModel>
 
