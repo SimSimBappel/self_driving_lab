@@ -59,9 +59,9 @@
                    slot_to_slot="{slot_to_slot}"
                    keep_orientation="false"
                    approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                   empty_hand=""
-                   reagent=""
-                   object_not_there="{object_not_there}"/>
+                   object_not_there="{object_not_there}"
+                   reagent="{reagent}"
+                   empty_hand="{empty_hand}"/>
           <Precondition else="FAILURE"
                         if="object_is_not_there==1">
             <Sequence>
@@ -98,9 +98,9 @@
                        slot_to_slot="{slot_to_slot}"
                        keep_orientation="false"
                        approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                       empty_hand=""
-                       reagent=""
-                       object_not_there="{object_not_there}"/>
+                       object_not_there="{object_not_there}"
+                       reagent="{reagent}"
+                       empty_hand="{empty_hand}"/>
             </Sequence>
           </Precondition>
         </Fallback>
@@ -134,7 +134,7 @@
                    side_grasp_tray="7"
                    emptied="false"
                    storage_vessel_tray="10"
-                   empty_hand=""/>
+                   empty_hand="{empty_hand}"/>
           <SubTree ID="visual_pour"/>
         </Sequence>
       </Fallback>
@@ -234,8 +234,8 @@
       <input_port name="keep_orientation"/>
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-      <inout_port name="empty_hand"/>
-      <input_port name="reagent"/>
+      <output_port name="object_not_there"
+                   default="0"/>
     </SubTree>
   </TreeNodesModel>
 

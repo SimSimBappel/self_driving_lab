@@ -195,6 +195,40 @@
     </Sequence>
   </BehaviorTree>
 
+  <BehaviorTree ID="pick_and_place_test">
+    <Repeat num_cycles="10">
+      <Sequence>
+        <GetChemicalNode message="{result_messages}"
+                         workstation_name="{workstation}"
+                         name_="natrium_chloride"
+                         aruco_id="{aruco_id}"
+                         empty="{empty}"
+                         success="{success}"
+                         lookout_pose="{lookout_pose_msg}"
+                         aruco_to_slot_transform="{aruco_to_slot}"
+                         slot_to_slot_transform="{slot_to_slot}"
+                         type_="pick"
+                         slot_id="{slot_id}"
+                         service_name="__default__placeholder__"/>
+        <SubTree ID="visual_grasp"
+                 aruco_id="{aruco_id}"
+                 lookout_pose_msg="{lookout_pose_msg}"
+                 aruco_to_slot="{aruco_to_slot}"
+                 slot_to_slot="{slot_to_slot}"
+                 keep_orientation="false"
+                 approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                 object_not_there="{object_not_there}"/>
+        <SubTree ID="visual_place"
+                 lookout_pose_msg="{lookout_pose_msg}"
+                 keep_orientation="true"
+                 aruco_id="{aruco_id}"
+                 slot_to_slot="{slot_to_slot}"
+                 approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                 aruco_to_slot="{aruco_to_slot}"/>
+      </Sequence>
+    </Repeat>
+  </BehaviorTree>
+
   <BehaviorTree ID="place_pose_msg">
     <Sequence>
       <Sleep msec="200"/>
@@ -260,7 +294,7 @@
       </RetryUntilSuccessful>
       <PrintValue message="2"/>
       <AddObjectNode pose="{object_pose_msg2}"
-                     object_id="{aruco_id}"
+                     object_id="{reagent}"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
@@ -269,8 +303,8 @@
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"
-               object_id="{aruco_id}"
-               object_is_not_there="0"/>
+               object_id="{reagent}"
+               object_is_not_there="{object_not_there}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -702,6 +736,18 @@
       <input_port name="target_pose_msg"/>
       <input_port name="approach_offset"/>
       <input_port name="object_id"/>
+    </SubTree>
+    <SubTree ID="visual_grasp"
+             editable="true">
+      <input_port name="aruco_id"/>
+      <input_port name="lookout_pose_msg"/>
+      <input_port name="aruco_to_slot"/>
+      <input_port name="slot_to_slot"/>
+      <input_port name="keep_orientation"/>
+      <input_port name="approach_offset"
+                  default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+      <output_port name="object_not_there"
+                   default="0"/>
     </SubTree>
     <SubTree ID="visual_place"
              editable="true">
