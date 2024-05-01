@@ -106,7 +106,7 @@
             <output_port name="pose_w_offset" type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
         </Action>
         <Action ID="ArucoAction">
-            <input_port name="id" type="signed char"/>
+            <input_port name="id" type="unsigned char"/>
             <input_port name="aruco_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="slot_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <output_port name="Transform" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
@@ -291,6 +291,15 @@
             <input_port name="location_base" type="geometry_msgs::msg::Pose_&lt;std::allocator&lt;void&gt; &gt;"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <Action ID="WaitForUserAction">
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <SubTree ID="aruco_pose_test" editable="true">
+            <input_port name="aruco_id"/>
+            <input_port name="lookout_pose"/>
+            <input_port name="aruco_to_slot"/>
+            <input_port name="slot_to_slot"/>
+        </SubTree>
         <SubTree ID="empty_gripper" editable="true">
             <input_port name="storage_tray" default="5"/>
             <input_port name="side_grasp_tray" default="7"/>

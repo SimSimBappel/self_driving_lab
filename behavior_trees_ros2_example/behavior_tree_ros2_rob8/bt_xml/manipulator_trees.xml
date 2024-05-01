@@ -250,7 +250,7 @@
                    slot_to_slot_transform="{slot_to_slot}"
                    Transform="{object_pose_msg}"
                    action_name="__default__placeholder__"/>
-      <PrintValue message="before"/>
+      <PrintValue message="1"/>
       <RetryUntilSuccessful num_attempts="5">
         <LookupTransformNode result="{bool_result}"
                              transform="{object_pose_msg2}"
@@ -258,18 +258,19 @@
                              target="panda_link0"
                              service_name="__default__placeholder__"/>
       </RetryUntilSuccessful>
-      <PrintValue message="after"/>
+      <PrintValue message="2"/>
       <AddObjectNode pose="{object_pose_msg2}"
                      object_id="{aruco_id}"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
                      service_name="__default__placeholder__"/>
-      <PrintValue message="after2"/>
+      <PrintValue message="3"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"
-               object_id="{aruco_id}"/>
+               object_id="{aruco_id}"
+               object_is_not_there="0"/>
     </Sequence>
   </BehaviorTree>
 

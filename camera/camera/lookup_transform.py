@@ -33,14 +33,17 @@ class FrameListener(Node):
             response.transform = PoseStamped()
             response.transform.header.stamp = self.get_clock().now().to_msg()
             response.transform.header.frame_id = "panda_link0"
-            response.transform.pose.position.x = t.transform.translation.x - 0.02
+            response.transform.pose.position.x = t.transform.translation.x
             response.transform.pose.position.y = t.transform.translation.y
             response.transform.pose.position.z = t.transform.translation.z
             response.transform.pose.orientation.x = t.transform.rotation.x
             response.transform.pose.orientation.y = t.transform.rotation.y
             response.transform.pose.orientation.z = t.transform.rotation.z
             response.transform.pose.orientation.w = t.transform.rotation.w
-            frames = self.tf_buffer.all_frames_as_string()
+
+
+
+            # frames = self.tf_buffer.all_frames_as_string()
             # self.get_logger().info('Current frames in tf2 tree:')
             # for frame in frames.split('\n'):
             #     self.get_logger().info(f'- {frame.strip()}')

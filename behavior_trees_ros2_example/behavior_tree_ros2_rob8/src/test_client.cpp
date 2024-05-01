@@ -105,6 +105,13 @@ int main(int argc, char **argv)
   params_aruco_lookup_transform.default_port_value = "lookup_transform";
   factory.registerNodeType<LookupTransformNode>("LookupTransformNode",params_aruco_lookup_transform);
 
+  RosNodeParams params_wait_for_user;
+  params_wait_for_user.nh = nh;
+  params_wait_for_user.server_timeout = std::chrono::milliseconds(2000);
+  params_wait_for_user.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_wait_for_user.default_port_value = "wait_for_user";
+  factory.registerNodeType<WaitForUserAction>("WaitForUserAction",params_wait_for_user);
+
   RosNodeParams params_add_object;
   params_add_object.nh = nh;
   params_add_object.server_timeout = std::chrono::milliseconds(2000);

@@ -1,5 +1,7 @@
 # Request
-int8 id
+
+uint8 id
+# int32 id #changed so test fiducials can be used
 geometry_msgs/TransformStamped aruco_to_slot_transform          # tray type -> hardcoded transform (aruco -> slot_id == 1)
 geometry_msgs/TransformStamped slot_to_slot_transform   
 ---

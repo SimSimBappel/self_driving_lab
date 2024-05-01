@@ -8,7 +8,7 @@ class UserActionServer(Node):
 
     def __init__(self):
         super().__init__('user_action_server')
-        self._action_server = ActionServer(self, WaitForUser, 'WaitForUser', self.execute_callback)
+        self._action_server = ActionServer(self, WaitForUser, 'wait_for_user', self.execute_callback)
         self.get_logger().info('User action server initialized.')
 
     async def execute_callback(self, goal_handle):

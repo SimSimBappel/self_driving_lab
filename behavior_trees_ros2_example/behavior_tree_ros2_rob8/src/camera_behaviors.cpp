@@ -42,7 +42,7 @@ public:
 
     // RCLCPP_INFO( node_->get_logger(), "%s: onResultReceived. Done = %s", name().c_str(), 
     //            wr.result->done ? "true" : "false" );
-    return NodeStatus::SUCCESS;//wr.result->marker_pose_msg; // ? NodeStatus::SUCCESS : NodeStatus::FAILURE;
+    return NodeStatus::SUCCESS;
   }
 
   virtual BT::NodeStatus onFailure(ActionNodeErrorCode error) override{
@@ -135,7 +135,7 @@ public:
 
   static BT::PortsList providedPorts()
   {
-    return providedBasicPorts({InputPort<int8_t>("id"),InputPort<geometry_msgs::msg::TransformStamped>("aruco_to_slot_transform"),InputPort<geometry_msgs::msg::TransformStamped>("slot_to_slot_transform"), OutputPort<geometry_msgs::msg::PoseStamped>("Transform")});
+    return providedBasicPorts({});
   }
 
   bool setGoal(Goal& goal) override{
