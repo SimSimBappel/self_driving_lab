@@ -349,21 +349,13 @@
                            target="panda_link0"
                            service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg1}"
-<<<<<<< HEAD
                      object_id="{chemical_name}"
-=======
-                     object_id="{aruco_id1}"
->>>>>>> 110f5c9 (a)
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.155"
                      service_name="__default__placeholder__"/>
       <AddObjectNode pose="{object_pose_msg2}"
-<<<<<<< HEAD
                      object_id="{vessel_name}"
-=======
-                     object_id="{aruco_id2}"
->>>>>>> 110f5c9 (a)
                      shape="cylinder"
                      size_x="0.08"
                      size_y="0.096"
@@ -377,7 +369,6 @@
       <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
                retract_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
-<<<<<<< HEAD
                approach_offset="0.1;0.0;0.0;0.0;0.0;0.0"
                object_id="{chemical_name}"/>
       <ArmMovePoseMsgAction pose="{pose_above_container}"
@@ -395,13 +386,6 @@
       <ArmMovePoseMsgAction pose="{pose_above_container}"
                             speed="0.15"
                             accel="0.15"
-=======
-               approach_offset="-0.05;0.0;0.0;0.0;0.0;0.0"
-               object_id="{aruco_id1}"/>
-      <ArmMovePoseMsgAction pose="{pose_above_vessel}"
-                            speed="0.2"
-                            accel="0.2"
->>>>>>> 110f5c9 (a)
                             keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
