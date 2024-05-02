@@ -8,6 +8,8 @@
       <SubTree ID="get_reagent"
                reagent="{reagent}"
                empty_hand="{empty_hand}"/>
+      <PrintValue message="asd"/>
+      <PrintValue message="{empty_hand}"/>
       <SubTree ID="pour_reagent"
                empty_hand="{empty_hand}"
                reagent="{reagent}"/>
@@ -42,6 +44,7 @@
                          type_="pick"
                          slot_id="{slot_id}"
                          service_name="__default__placeholder__"/>
+        <PrintValue message="got_chemical"/>
         <Fallback>
           <AlwaysSuccess/>
           <SubTree ID="move_base"
@@ -104,38 +107,54 @@
             </Sequence>
           </Precondition>
         </Fallback>
-        <SetBlackboard value="{reagent}"
-                       output_key="empty_hand"/>
-        <RemoveChemicalPlacementNode message="{message}"
-                                     success="{success}"
+        <PrintValue message="5"/>
+        <PrintValue message="6"/>
+        <Sleep msec="200"/>
+        <PrintValue message="{empty_hand}"/>
+        <PrintValue message="{reagent}"/>
+        <RemoveChemicalPlacementNode message="{m}"
+                                     success="{s}"
                                      name_="{reagent}"
                                      slot_id="{slot_id}"
                                      service_name="__default__placeholder__"/>
+        <Sleep msec="200"/>
+        <PrintValue message="7"/>
+        <SetBlackboard value="{reagent}"
+                       output_key="empty_hand"/>
       </Sequence>
     </Precondition>
   </BehaviorTree>
 
   <BehaviorTree ID="pour_reagent">
     <Sequence>
-      <SubTree ID="move_base"
-               storage_tray="5"
-               side_grasp_tray="7"
-               emptied="false"
-               storage_vessel_tray="10"
-               empty_hand="{empty_hand}"/>
+      <Fallback>
+        <AlwaysSuccess/>
+        <SubTree ID="move_base"
+                 storage_tray="5"
+                 side_grasp_tray="7"
+                 emptied="false"
+                 storage_vessel_tray="10"
+                 empty_hand="{empty_hand}"/>
+      </Fallback>
       <Fallback>
         <Precondition else="FAILURE"
                       if="empty_hand==&apos;empty&apos;">
-          <SubTree ID="visual_pour"/>
+          <SubTree ID="visual_pour"
+                   chemical_name="{reagent}"
+                   vessel_name="beaker_250ml"/>
         </Precondition>
         <Sequence>
+          <PrintValue message="will empty gripper"/>
           <SubTree ID="empty_gripper"
                    storage_tray="5"
                    side_grasp_tray="7"
                    emptied="false"
                    storage_vessel_tray="10"
                    empty_hand="{empty_hand}"/>
-          <SubTree ID="visual_pour"/>
+          <PrintValue message="will empty gripper"/>
+          <SubTree ID="visual_pour"
+                   chemical_name="{reagent}"
+                   vessel_name="beaker_250ml"/>
         </Sequence>
       </Fallback>
       <SubTree ID="empty_gripper"
@@ -222,7 +241,7 @@
     </SubTree>
     <SubTree ID="pour_reagent"
              editable="true">
-      <output_port name="empty_hand"/>
+      <inout_port name="empty_hand"/>
       <input_port name="reagent"/>
     </SubTree>
     <SubTree ID="visual_grasp"
@@ -236,6 +255,13 @@
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <output_port name="object_not_there"
                    default="0"/>
+      <inout_port name="reagent"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="visual_pour"
+             editable="true">
+      <input_port name="chemical_name"/>
+      <input_port name="vessel_name"/>
     </SubTree>
   </TreeNodesModel>
 

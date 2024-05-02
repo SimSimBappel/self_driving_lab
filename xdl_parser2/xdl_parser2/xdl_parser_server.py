@@ -127,7 +127,6 @@ class xdl_parser(Node):
 
         result += '</Sequence>\n</BehaviorTree>\n</root>'
         success = True
-        print(result)
 
 
         return result, success

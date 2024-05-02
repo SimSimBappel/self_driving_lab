@@ -529,7 +529,7 @@ private:
     }
 
     void remove_chemical_placement(const std::shared_ptr<pgsql_interfaces::srv::RemoveChemicalPlacement::Request> request,
-                    std::shared_ptr<pgsql_interfaces::srv::RemoveChemicalPlacement::Response> response) {
+                  const std::shared_ptr<pgsql_interfaces::srv::RemoveChemicalPlacement::Response> response) {
         try {
             // Connect to the database
             pqxx::connection C("dbname=" + db_name + " user=" + db_user + " password=" + db_password + " hostaddr=" + db_host + " port=" + db_port);
@@ -563,13 +563,21 @@ private:
 
                 // Set the message to provide additional information about the operation
                 response->message = "Operation completed successfully"; // or an error message
+                RCLCPP_INFO(this->get_logger(), "remove chemical success: %ld", response->success);
+                RCLCPP_INFO(this->get_logger(), response->message.c_str());
             } else {
                 std::cout << "Could not access database" << std::endl;
                 response->success = false;
+                response->message = "Could not access database";
+                RCLCPP_INFO(this->get_logger(), "remove chemical success: %ld", response->success);
+                RCLCPP_INFO(this->get_logger(), "Could not access database");
             }
         } catch (const std::exception &e) {
             std::cerr << e.what() << std::endl;
+            RCLCPP_INFO(this->get_logger(), "remove chemical success: %ld", response->success);
+            RCLCPP_INFO(this->get_logger(), "remove chemical message: %s", e.what());
             response->success = false;
+            response->message = std::string("Caught exception: ") + e.what();
         }
     }
 
@@ -608,13 +616,17 @@ private:
 
                 // Set the message to provide additional information about the operation
                 response->message = "Operation completed successfully"; // or an error message
+                RCLCPP_INFO(this->get_logger(), "remove chemical success: %ld", response->success);
             } else {
                 std::cout << "Could not access database" << std::endl;
                 response->success = false;
+                RCLCPP_INFO(this->get_logger(), "remove chemical success: %ld", response->success);
             }
         } catch (const std::exception &e) {
             std::cerr << e.what() << std::endl;
             response->success = false;
+
+            
         }
     }
 

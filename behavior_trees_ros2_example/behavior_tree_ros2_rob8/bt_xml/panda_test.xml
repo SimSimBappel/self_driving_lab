@@ -93,7 +93,7 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-               object_not_there="0"
+               object_not_there="{object_not_there}"
                empty_hand="{empty_hand}"
                reagent="{reagent}"/>
       <SubTree ID="visual_place"
@@ -135,15 +135,15 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-               object_not_there="0"
+               object_not_there="{object_not_there}"
                empty_hand="{empty_hand}"
                reagent="{reagent}"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
-      <DetachObjectNode object_id="{aruco_id}"
+      <DetachObjectNode object_id="{reagent}"
                         service_name="__default__placeholder__"/>
-      <RemoveObjectNode object_id="{aruco_id}"
+      <RemoveObjectNode object_id="{reagent}"
                         service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
@@ -559,6 +559,7 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+      <input_port name="empty_hand"/>
     </SubTree>
     <SubTree ID="visual_pour"
              editable="true">

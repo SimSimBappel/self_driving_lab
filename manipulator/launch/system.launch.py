@@ -180,11 +180,13 @@ def generate_launch_description():
                   'max_range': 1.0,
                   'min_range': 0.2}
 
+    DeclareLaunchArgument("log_level", default_value="info", description="The ROS logger level")
     # Start the actual move_group node/action server
     run_move_group_node = Node(
         package='moveit_ros_move_group',
         executable='move_group',
         output='screen',
+        arguments=['--ros-args', '--log-level', 'info'],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -204,6 +206,7 @@ def generate_launch_description():
         package="manipulator",
         executable="move_robot_server",
         output="screen",
+        arguments=['--ros-args', '--log-level', 'info'],
         parameters=[
             robot_description,
             robot_description_semantic,
@@ -241,6 +244,7 @@ def generate_launch_description():
         executable='lookup',
         name='lookup',
         output='both',
+        arguments=['--ros-args', '--log-level', 'info'],
         parameters=[robot_description],
     )
 

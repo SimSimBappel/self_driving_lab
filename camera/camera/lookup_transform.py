@@ -27,7 +27,10 @@ class FrameListener(Node):
             response.transform = PoseStamped()
             response.transform.header.stamp = self.get_clock().now().to_msg()
             response.transform.header.frame_id = "panda_link0"
-            response.transform.pose.position = t.transform.translation
+            response.transform.pose.position.x = t.transform.translation.x
+            response.transform.pose.position.y = t.transform.translation.y
+            response.transform.pose.position.z = t.transform.translation.z
+
             response.transform.pose.orientation = t.transform.rotation
 
         except TransformException as ex:

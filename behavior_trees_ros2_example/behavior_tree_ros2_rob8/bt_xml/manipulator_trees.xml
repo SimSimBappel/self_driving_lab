@@ -25,7 +25,8 @@
                    aruco_id="{aruco_id}"
                    slot_to_slot="{slot_to_slot_transform}"
                    approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                   aruco_to_slot="{aruco_to_slot_transform}"/>
+                   aruco_to_slot="{aruco_to_slot_transform}"
+                   empty_hand="{empty_hand}"/>
           <SetBlackboard value="&apos;empty&apos;"
                          output_key="empty_hand"/>
         </Sequence>
@@ -48,7 +49,8 @@
                  aruco_id="{aruco_id}"
                  slot_to_slot="{slot_to_slot_transform}"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                 aruco_to_slot="{aruco_to_slot_transform}"/>
+                 aruco_to_slot="{aruco_to_slot_transform}"
+                 empty_hand="{empty_hand}"/>
         <SetBlackboard value="&apos;empty&apos;"
                        output_key="empty_hand"/>
       </Sequence>
@@ -192,7 +194,7 @@
                                speed="0.02"
                                action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
-      <Script code="empty_hand:=&apos;chlorine&apos;"/>
+      <Script code="empty_hand:=&apos;empty&apos;"/>
     </Sequence>
   </BehaviorTree>
 
@@ -225,7 +227,8 @@
                  aruco_id="{aruco_id}"
                  slot_to_slot="{slot_to_slot}"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                 aruco_to_slot="{aruco_to_slot}"/>
+                 aruco_to_slot="{aruco_to_slot}"
+                 empty_hand=""/>
       </Sequence>
     </Repeat>
   </BehaviorTree>
@@ -331,7 +334,7 @@
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approach_offset="{approach_offset}"
-               object_id="{aruco_id}"/>
+               object_id="{empty_hand}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -757,6 +760,7 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+      <input_port name="empty_hand"/>
     </SubTree>
   </TreeNodesModel>
 

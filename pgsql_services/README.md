@@ -143,7 +143,7 @@ Could not access database
 #### Example CLI
 
 ```
-ros2 service call /remove_chemical_placement pgsql_interfaces/srv/RemoveChemicalPlacement "{name: 'natrium_chloride, slot_id: 4}"
+ros2 service call /remove_chemical_placement pgsql_interfaces/srv/RemoveChemicalPlacement "{name: 'natrium_chloride', slot_id: 4}"
 ---
 pgsql_interfaces.srv.RemoveChemicalPlacement_Response(success=True, message='Operation completed successfully')
 ```

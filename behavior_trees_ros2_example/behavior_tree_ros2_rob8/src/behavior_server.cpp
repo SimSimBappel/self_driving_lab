@@ -78,7 +78,12 @@ class BehaviorServer : public rclcpp::Node
                                 std::placeholders::_1, std::placeholders::_2));
     
 
-        
+  RosNodeParams params_wait_for_user;
+  params_wait_for_user.nh = this->node_;
+  params_wait_for_user.server_timeout = std::chrono::milliseconds(2000);
+  params_wait_for_user.wait_for_server_timeout = std::chrono::milliseconds(1000);
+  params_wait_for_user.default_port_value = "wait_for_user";
+  factory.registerNodeType<WaitForUserAction>("WaitForUserAction",params_wait_for_user);
 
         factory.registerNodeType<PrintValue>("PrintValue");
       RosNodeParams params_aruco_lookup_transform;
@@ -123,8 +128,8 @@ class BehaviorServer : public rclcpp::Node
         RosNodeParams params_database_remove_chemical_placement;
         // params_database_place_vessel.nh = shared_from_this();
         params_database_remove_chemical_placement.nh = this->node_;
-        params_database_remove_chemical_placement.server_timeout = std::chrono::milliseconds(2000);
-        params_database_remove_chemical_placement.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_database_remove_chemical_placement.server_timeout = std::chrono::milliseconds(5000);
+        params_database_remove_chemical_placement.wait_for_server_timeout = std::chrono::milliseconds(3000);
         params_database_remove_chemical_placement.default_port_value = "remove_chemical_placement";
         factory.registerNodeType<RemoveChemicalPlacementNode>("RemoveChemicalPlacementNode",params_database_remove_chemical_placement);
 
@@ -359,7 +364,7 @@ class BehaviorServer : public rclcpp::Node
 
         response->result = true;
         publisher_ptr_ = std::make_unique<BT::Groot2Publisher>(tree_, 5555);
-        const auto timer_period = 100ms;
+        const auto timer_period = 10ms;
             timer_ = this->create_wall_timer(
                 timer_period,
                 std::bind(&BehaviorServer::update_behavior_tree, this));
