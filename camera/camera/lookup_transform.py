@@ -5,10 +5,8 @@ from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 from behavior_tree_ros2_actions.srv import LookupTransform
-from geometry_msgs.msg import TransformStamped, PoseStamped
+from geometry_msgs.msg import PoseStamped
 
-
-from rclpy.qos import DurabilityPolicy, ReliabilityPolicy, QoSProfile, HistoryPolicy
 class FrameListener(Node):
 
     def __init__(self):
@@ -17,15 +15,11 @@ class FrameListener(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=True)
 
-
     def lookup_transform(self, request, response):
-        from_frame_rel = request.source 
-        to_frame_rel = request.target
-
         try:
             t = self.tf_buffer.lookup_transform(
-                to_frame_rel,
-                from_frame_rel,
+                request.target,
+                request.source,
                 rclpy.time.Time())
             
             # Create response
@@ -33,43 +27,36 @@ class FrameListener(Node):
             response.transform = PoseStamped()
             response.transform.header.stamp = self.get_clock().now().to_msg()
             response.transform.header.frame_id = "panda_link0"
-            response.transform.pose.position.x = t.transform.translation.x
-            response.transform.pose.position.y = t.transform.translation.y
-            response.transform.pose.position.z = t.transform.translation.z
-            response.transform.pose.orientation.x = t.transform.rotation.x
-            response.transform.pose.orientation.y = t.transform.rotation.y
-            response.transform.pose.orientation.z = t.transform.rotation.z
-            response.transform.pose.orientation.w = t.transform.rotation.w
-
-
-
-            # frames = self.tf_buffer.all_frames_as_string()
-            # self.get_logger().info('Current frames in tf2 tree:')
-            # for frame in frames.split('\n'):
-            #     self.get_logger().info(f'- {frame.strip()}')
+            response.transform.pose.position = t.transform.translation
+            response.transform.pose.orientation = t.transform.rotation
 
         except TransformException as ex:
-            self.get_logger().info(
-                f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
+            self.get_logger().info(f'Could not transform {request.target} to {request.source}: {ex}')
             response.result = False
             response.transform = PoseStamped()
 
-              # Output all frames in the tf2 tree
-            frames = self.tf_buffer.all_frames_as_string()
-            self.get_logger().info('Current frames in tf2 tree:')
-            for frame in frames.split('\n'):
-                self.get_logger().info(f'- {frame.strip()}')
+            self.print_frames()
         
         return response
+    
+    def print_frames(self):
+        # Output all frames in the tf2 tree
+        frames = self.tf_buffer.all_frames_as_string()
+        self.get_logger().info('Current frames in tf2 tree:')
+        for frame in frames.split('\n'):
+            self.get_logger().info(f'- {frame.strip()}')
 
 
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = FrameListener()
     try:
         rclpy.spin(node)
-        print("dead?")
     except KeyboardInterrupt:
         pass
-
+    print('Lookup_transform Shutting down...')
     rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

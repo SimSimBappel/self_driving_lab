@@ -14,9 +14,9 @@ class UserActionServer(Node):
     async def execute_callback(self, goal_handle):
         self.get_logger().info('waiting...')
 
-        input("Press something to continue...")
+        input("Press Enter to continue...")
 
-        self.get_logger().info('done waiting...')
+        self.get_logger().info('Proceeding...')
         goal_handle.succeed()
         
         return WaitForUser.Result(done=True)
