@@ -365,5 +365,9 @@
             <input_port name="approach_offset"/>
             <input_port name="aruco_to_slot"/>
         </SubTree>
+        <SubTree ID="visual_pour" editable="true">
+            <input_port name="chemical_name"/>
+            <input_port name="vessel_name"/>
+        </SubTree>
     </TreeNodesModel>
 </root>

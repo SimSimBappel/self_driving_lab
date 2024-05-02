@@ -56,38 +56,9 @@
                empty_hand="{empty_hand}"/>
       <Sleep msec="2000"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <GetChemicalNode message="{result_messages}"
-                       workstation_name="{workstation}"
-                       name_="test1"
-                       aruco_id="{aruco_id}"
-                       empty="{empty}"
-                       success="{success}"
-                       lookout_pose="{lookout_pose_msg}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       type_="pick"
-                       slot_id="{slot_id}"
-                       service_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
-      <SubTree ID="gripping"
-               width="0.02"
-               speed="0.03"
-               force="3"
-               epsilon="0.02"/>
-      <ClearOctomapNode service_name="__default__placeholder__"/>
-      <Repeat num_cycles="10">
-        <SubTree ID="aruco_pose_test"
-                 aruco_id="{aruco_id}"
-                 lookout_pose="{lookout_pose_msg}"
-                 aruco_to_slot="{aruco_to_slot}"
-                 slot_to_slot="{slot_to_slot}"
-                 _autoremap="false"/>
-      </Repeat>
+      <SubTree ID="visual_pour"
+               chemical_name="natrium_chloride"
+               vessel_name="beaker_250ml"/>
     </Sequence>
   </BehaviorTree>
 
@@ -246,6 +217,47 @@
     <Sequence>
       <ScriptCondition code="sub_in_value==42 &amp;&amp; sub_in_name==&apos;john&apos;"/>
       <Script code="sub_out_result:=69; sub_out_state:=&apos;ACTIVE&apos;"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="aruco_id_test">
+    <Sequence>
+      <SubTree ID="init"
+               empty_hand="{empty_hand}"/>
+      <Sleep msec="2000"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
+      <GetChemicalNode message="{result_messages}"
+                       workstation_name="{workstation}"
+                       name_="test1"
+                       aruco_id="{aruco_id}"
+                       empty="{empty}"
+                       success="{success}"
+                       lookout_pose="{lookout_pose_msg}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       type_="pick"
+                       slot_id="{slot_id}"
+                       service_name="__default__placeholder__"/>
+      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                            speed="0.2"
+                            accel="0.2"
+                            keep_orientation="false"
+                            lin="false"
+                            action_name="__default__placeholder__"/>
+      <SubTree ID="gripping"
+               width="0.02"
+               speed="0.03"
+               force="3"
+               epsilon="0.02"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
+      <Repeat num_cycles="10">
+        <SubTree ID="aruco_pose_test"
+                 aruco_id="{aruco_id}"
+                 lookout_pose="{lookout_pose_msg}"
+                 aruco_to_slot="{aruco_to_slot}"
+                 slot_to_slot="{slot_to_slot}"
+                 _autoremap="false"/>
+      </Repeat>
     </Sequence>
   </BehaviorTree>
 
@@ -547,6 +559,11 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+    </SubTree>
+    <SubTree ID="visual_pour"
+             editable="true">
+      <input_port name="chemical_name"/>
+      <input_port name="vessel_name"/>
     </SubTree>
   </TreeNodesModel>
 

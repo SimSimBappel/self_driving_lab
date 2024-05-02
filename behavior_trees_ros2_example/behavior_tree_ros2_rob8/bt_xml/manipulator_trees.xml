@@ -399,7 +399,7 @@
                           pose_bottle="{bottle_pose}"
                           bottle_name="{chemical_name}"
                           result="{result}"
-                          pose_container="{pose_above_container}"
+                          pose_container="{pose_besides_container}"
                           service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
@@ -412,18 +412,17 @@
                             keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
+      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;2.0&apos;"/>
+      <ArmMoveJointsRelativeAction joints="{relative_joint}"
+                                   speed="0.1"
+                                   accel="0.1"
+                                   action_name="__default__placeholder__"/>
       <ArmMoveTrajectoryPourAction container_name="{vessel_name}"
                                    bottle_name="{chemical_name}"
                                    tilt_angle="1.9"
                                    min_path_fraction="0.9"
                                    pour_duration="4.0"
                                    action_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{pose_above_container}"
-                            speed="0.15"
-                            accel="0.15"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
 
@@ -443,6 +442,17 @@
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
+    </Action>
+    <Action ID="ArmMoveJointsRelativeAction">
+      <input_port name="joints"
+                  type="std::vector&lt;double, std::allocator&lt;double&gt; &gt;"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="accel"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
     </Action>
     <Action ID="ArmMovePlizLinPoseMsgAction">
       <input_port name="pose"
@@ -495,7 +505,7 @@
     </Action>
     <Action ID="ArucoAction">
       <input_port name="id"
-                  type="signed char"/>
+                  type="unsigned char"/>
       <input_port name="aruco_to_slot_transform"
                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
       <input_port name="slot_to_slot_transform"

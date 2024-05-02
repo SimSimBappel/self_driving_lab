@@ -1629,7 +1629,7 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             // Set the target pose
             bottle_pose.position.x += 0.0;
             bottle_pose.position.y += 0.0;
-            bottle_pose.position.z += 0.0;
+            bottle_pose.position.z += 0.04;
 
             // Get the orientation of the bottle
             tf2::Quaternion quat(
