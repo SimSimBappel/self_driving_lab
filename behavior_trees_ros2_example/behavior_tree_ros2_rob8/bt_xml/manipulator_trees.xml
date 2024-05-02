@@ -123,6 +123,7 @@
                           action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
+      <Sleep msec="100"/>
       <ArmMovePoseMsgAction pose="{approach_pose}"
                             speed="0.2"
                             accel="0.2"
@@ -131,8 +132,8 @@
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.01"
-                                   accel="0.01"
+                                   speed="0.008"
+                                   accel="0.008"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <Sleep msec="200"/>
@@ -141,14 +142,14 @@
                  width="0.02"
                  speed="0.03"
                  force="3"
-                 epsilon="0.01"/>
+                 epsilon="0.02"/>
         <Sequence>
           <Sleep msec="1000"/>
           <SubTree ID="gripping"
                    width="0.02"
                    speed="0.03"
                    force="3"
-                   epsilon="0.01"/>
+                   epsilon="0.02"/>
         </Sequence>
       </Fallback>
       <AttachObjectNode object_id="{object_id}"
@@ -156,8 +157,8 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
-                                   speed="0.01"
-                                   accel="0.01"
+                                   speed="0.008"
+                                   accel="0.008"
                                    action_name="__default__placeholder__"/>
     </Sequence>
   </BehaviorTree>
@@ -363,6 +364,7 @@
                             keep_orientation="false"
                             lin="false"
                             action_name="__default__placeholder__"/>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <ArucoAction id="{aruco_id1}"
                    aruco_to_slot_transform="{aruco_to_slot1}"
                    slot_to_slot_transform="{slot_to_slot1}"
@@ -403,26 +405,29 @@
                           service_name="__default__placeholder__"/>
       <SubTree ID="grasp_pour_msg"
                target_pose_msg="{bottle_pose}"
-               retract_offset="0.0;0.0;-0.1;0.0;0.0;0.0"
+               retract_offset="0.0;0.0;-0.15;0.0;0.0;0.0"
                approach_offset="0.1;0.0;0.0;0.0;0.0;0.0"
                object_id="{chemical_name}"/>
-      <ArmMovePoseMsgAction pose="{pose_above_container}"
+      <ArmMovePoseMsgAction pose="{pose_besides_container}"
                             speed="0.15"
                             accel="0.15"
                             keep_orientation="false"
-                            lin="false"
+                            lin="true"
                             action_name="__default__placeholder__"/>
-      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;2.0&apos;"/>
+      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;-2.1&apos;"/>
       <ArmMoveJointsRelativeAction joints="{relative_joint}"
                                    speed="0.1"
                                    accel="0.1"
                                    action_name="__default__placeholder__"/>
-      <ArmMoveTrajectoryPourAction container_name="{vessel_name}"
-                                   bottle_name="{chemical_name}"
-                                   tilt_angle="1.9"
-                                   min_path_fraction="0.9"
-                                   pour_duration="4.0"
+      <Script code="relative_joint:= &apos;0.0;0.0;0.0;0.0;0.0;0.0;2.1&apos;"/>
+      <ArmMoveJointsRelativeAction joints="{relative_joint}"
+                                   speed="0.1"
+                                   accel="0.1"
                                    action_name="__default__placeholder__"/>
+      <SubTree ID="place_pose_msg"
+               target_pose_msg="{bottle_pose}"
+               approach_offset="0.0;0.0;-0.15;0.0;0.0;0.0"
+               object_id="{chemical_name}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -476,21 +481,6 @@
                   type="bool"/>
       <input_port name="lin"
                   type="bool"/>
-      <input_port name="action_name"
-                  default="__default__placeholder__"
-                  type="std::string">Action server name</input_port>
-    </Action>
-    <Action ID="ArmMoveTrajectoryPourAction">
-      <input_port name="container_name"
-                  type="signed char"/>
-      <input_port name="bottle_name"
-                  type="signed char"/>
-      <input_port name="tilt_angle"
-                  type="float"/>
-      <input_port name="min_path_fraction"
-                  type="float"/>
-      <input_port name="pour_duration"
-                  type="float"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>

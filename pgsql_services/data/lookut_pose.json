@@ -32,3 +32,5 @@ header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1712049889, nan
 transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, 
 
 message='Chemical found')
+
+aruco_marker,slot_1,0.0,-0.09513,-0.03009,-0.2534044072834003,-0.25340440728340025,-0.6601410503592003,0.6601410503592007
