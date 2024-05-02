@@ -14,7 +14,6 @@ import yaml
 
 
 def generate_launch_description():
-    # use_sim_time = LaunchConfiguration('use_sim_time', default="false")
 
     aruco_params_file = os.path.join(
         get_package_share_directory('camera'),
@@ -118,7 +117,6 @@ def generate_launch_description():
             "pointcloud.enable": "true",
             "enable_color": "true",
             "rgb_camera.profile": "1920,1080,6",
-            # "align_depth.enable": "true", #jeg dræber din mor hvis du kommenterer denne ind
             "clip_distance": "1.0",
         }.items(),
         condition=UnlessCondition(LaunchConfiguration('use_sim_time'))

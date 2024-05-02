@@ -5,33 +5,26 @@ import rclpy
 import tf2_ros
 import numpy as np
 import rclpy.duration
-import glob
-import tf_transformations as tf
 from rclpy.node import Node
 from cv_bridge import CvBridge
+import tf_transformations as tf
 from rclpy.qos import qos_profile_sensor_data
 from aruco_interfaces.msg import ArucoMarkers
 from sensor_msgs.msg import CameraInfo, Image
 from aruco_pose_estimation.utils import ARUCO_DICT
-from geometry_msgs.msg import PoseStamped, PoseArray, TransformStamped, Pose
 from behavior_tree_ros2_actions.action import FindArucoTag
 from rcl_interfaces.msg import ParameterDescriptor, ParameterType
 from aruco_pose_estimation.pose_estimation import pose_estimation
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
-import statistics
-
+from geometry_msgs.msg import PoseStamped, PoseArray, TransformStamped
 
 class CameraSubscriber(Node):
     def __init__(self, image_topic, info_topic, debug=False):
         super().__init__('camera_subscriber')
         self.image_sub = self.create_subscription(
                 Image, image_topic, self.image_callback, 1
-            )
+        )
         self.image_sub
-        self.depth_sub = self.create_subscription(
-                Image, '/camera/depth/image_raw', self.depth_callback, 1
-            )
-        self.depth_sub
         self.info_sub = self.create_subscription(
             CameraInfo, info_topic, self.info_callback, qos_profile_sensor_data
         )
@@ -52,10 +45,7 @@ class CameraSubscriber(Node):
         self.intrinsic_mat = None
         self.distortion = None
         self.runonce = False
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        package_dir = os.path.dirname(script_dir)
-        calibration_file_path = os.path.join(package_dir, 'resource', 'calibration_data.npz')
-        # self.calib_cam(calibration_file_path)
+
         
     def info_callback(self, info_msg):
         self.info_msg = info_msg
@@ -89,23 +79,6 @@ class CameraSubscriber(Node):
         except Exception as e:
             self.logger.warn(str(e))
             return
-        
-    def depth_callback(self, data: Image):
-        if not self.streaming:
-            return
-
-        if self.info_msg is None:
-            if self.runonce:
-                self.logger.warn("No camera info has been received!")
-            return
-        
-        try:
-            # Convert ROS Image message to OpenCV image
-            self.depth_raw = self.bridge.imgmsg_to_cv2(data, desired_encoding="16UC1")
-            self.datastamp = data.header.stamp
-        except Exception as e:
-            self.logger.warn(str(e))
-            return
 
     def get_latest_image(self):
         return self.img_raw
@@ -115,60 +88,7 @@ class CameraSubscriber(Node):
 
     def stop_streaming(self):
         if not self.debug:
-            self.streaming = False
-
-    # def calib_cam(self, calibration_file_path): 
-    #     if os.path.exists(calibration_file_path):
-    #         # Load calibration data from file
-    #         with np.load(calibration_file_path) as data:
-    #             mtx, dist = [data[i] for i in ('mtx', 'dist')]
-    #         self.logger.info("Camera calibration data loaded from file.")
-    #         return mtx, dist
-
-    #     # If calibration file doesn't exist, perform calibration
-    #     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    #     objp = np.zeros((6*9,3), np.float32)
-    #     objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
-    #     objpoints = [] # 3d point in real world space
-    #     imgpoints = [] # 2d points in image plane.
-
-    #     package_dir = os.path.abspath(__file__)
-    #     for i in range(2): 
-    #         package_dir = os.path.dirname(os.path.dirname(package_dir))
-
-    #     # image_path = os.path.join(package_dir, 'src', 'self_driving_lab', 'camera', 'resource', 'calib_images', 'checkerboard')
-    #     image_path = '/home/intelnuc/sdl_ws/src/self_driving_lab/camera/resource/calib_images/checkerboard/'
-    #     images = glob.glob(os.path.join(image_path, '*.jpg'))
-    #     if os.path.exists(image_path):
-    #         self.logger.info("Calibration images found")
-    #     # images = glob.glob(os.path.join('/home/intelnuc/sdl_ws/src/self_driving_lab/camera/resource/calib_images/checkerboard/', '*.jpg'))
-
-    #     for fname in images:
-    #         img = cv2.imread(fname)
-    #         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    #         ret, corners = cv2.findChessboardCorners(gray, (9,6),None)
-    #         if ret == True:
-    #             objpoints.append(objp)
-    #             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-    #             imgpoints.append(corners2)
-
-    #     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
-
-    #     self.logger.debug("matrix: " + str(mtx))
-    #     self.logger.debug("distortion: " + str(dist))
-    #     self.logger.info("Camera calibrated")
-
-    #     # Save calibration data to file
-    #     # np.savez(calibration_file_path, mtx=mtx, dist=dist)
-    #     self.logger.info("Camera calibration data saved to file.")
-
-    #     self.intrinsic_mat = mtx
-    #     self.distortion = dist
-    #     self.info_msg = True
-        # return mtx, dist  # Return camera matrix and distortion coefficients
-
-
-    
+            self.streaming = False    
 
 
 class ArucoMarkerDetector(Node):
@@ -179,7 +99,7 @@ class ArucoMarkerDetector(Node):
         self.initialize_parameters()
         self.camera_subscriber = CameraSubscriber(self.image_topic, self.info_topic, self.debug)
 
-        self.timeout = 5 # Secounds
+        self.timeout = 5 
         self.found_object = False
 
         self.pose_pub = self.create_publisher(PoseStamped, '/aruco/single_pose', 10)
@@ -220,15 +140,6 @@ class ArucoMarkerDetector(Node):
             goal_callback=self.goal_callback,
             cancel_callback=self.cancel_callback
             )
-        
-        
-    def send_request(self, source, target, time):
-        self.req.source = source
-        self.req.target = target
-        self.req.time = time
-        self.future = self.client.call_async(self.req)
-        rclpy.spin_until_future_complete(self, self.future)
-        return self.future.result()
     
 
     def execute_callback(self, goal_handle):
@@ -238,7 +149,6 @@ class ArucoMarkerDetector(Node):
         self.camera_subscriber.start_streaming()
         count = 0
         result = None 
-        grab_pose_msg = None
         poses = []
 
         while not goal_handle.is_cancel_requested and not self.found_object and time.time() - start_time < self.timeout:
@@ -263,11 +173,6 @@ class ArucoMarkerDetector(Node):
                                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
                                                                 distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
 
-                # _, __, markers = pose_estimation(rgb_frame=self.camera_subscriber.get_latest_image(), depth_frame=self.camera_subscriber.depth_raw,
-                #                                                 aruco_detector=self.aruco_detector,
-                #                                                 marker_size=self.marker_size, matrix_coefficients=self.camera_subscriber.intrinsic_mat,
-                #                                                 distortion_coefficients=self.camera_subscriber.distortion, pose_array=pose_array, markers=markers)
-
                 if markers.marker_ids is not None:
                     if markers.marker_ids.count(goal_handle.request.id) == 1:
                         index = markers.marker_ids.index(goal_handle.request.id)
@@ -280,7 +185,6 @@ class ArucoMarkerDetector(Node):
                                 sum(pos[0] for pos in poses) / len(poses),
                                 sum(pos[1] for pos in poses) / len(poses),
                                 sum(pos[2] for pos in poses) / len(poses),
-
                                 sum(pos[3] for pos in poses) / len(poses),
                                 sum(pos[4] for pos in poses) / len(poses),
                                 sum(pos[5] for pos in poses) / len(poses),
@@ -327,7 +231,6 @@ class ArucoMarkerDetector(Node):
             
                 self.reset()
                 time.sleep(0.05)
-                # print("zzz")
 
         self.camera_subscriber.stop_streaming()
         if time.time() - start_time > self.timeout:
@@ -336,7 +239,6 @@ class ArucoMarkerDetector(Node):
         result = FindArucoTag.Result()
         
         if self.found_object:
-            # result.grab_pose_msg = grab_pose_msg
             goal_handle.succeed()
             self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
             
@@ -381,26 +283,7 @@ class ArucoMarkerDetector(Node):
                     aruco.transform.rotation.w = markers.poses[index].orientation.w
                     aruco = self.tf_turn_around_axis(aruco, x=np.pi)
 
-                    grab_trans_msg = TransformStamped()
-                    grab_trans_msg.header.stamp = aruco.header.stamp
-                    grab_trans_msg.header.frame_id = aruco.child_frame_id
-                    grab_trans_msg.child_frame_id = "grab_pose"
-                    grab_trans_msg.transform.translation.x = 0.0
-                    grab_trans_msg.transform.translation.y = -0.12011
-                    grab_trans_msg.transform.translation.z = -0.06631
-                    grab_trans_msg.transform.rotation.x = -0.2568574083418005
-                    grab_trans_msg.transform.rotation.y = -0.25685740834180043
-                    grab_trans_msg.transform.rotation.z = -0.6588051849977608
-                    grab_trans_msg.transform.rotation.w = 0.6588051849977606
-                    self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
-
-                # self.logger.info("Markers detected")
-                # for i, pose in enumerate(pose_array.poses):
-                #     pose_array.poses[i] = self.turn_around_x_axis(pose_array.poses[i])
-
-                # # Publish the results with the poses and markes positions    
-                # self.poses_pub.publish(pose_array)
-                # self.markers_pub.publish(markers)
+                    self.tf_broadcaster.sendTransform([aruco])
             else:
                 self.logger.info("No markers detected")
 
@@ -430,34 +313,11 @@ class ArucoMarkerDetector(Node):
         
         return tf_msg 
 
-
-    def turn_around_x_axis(self, pose_msg: PoseStamped, angle=np.pi) -> PoseStamped:
-        euler_angles = tf.euler_from_quaternion([
-            pose_msg.orientation.x,
-            pose_msg.orientation.y,
-            pose_msg.orientation.z,
-            pose_msg.orientation.w
-        ])
-        # Edit the Euler angles as needed
-        edited_euler_angles = (euler_angles[0] + angle, euler_angles[1], euler_angles[2])
-
-        # Convert the Euler angles back to quaternion
-        quat = tf.quaternion_from_euler(*edited_euler_angles)
-
-        pose_msg.orientation.x = quat[0]
-        pose_msg.orientation.y = quat[1]
-        pose_msg.orientation.z = quat[2]
-        pose_msg.orientation.w = quat[3]
-        
-        return pose_msg 
-    
-
     def destroy(self):
         """Shutdown all components of node"""
         self.camera_subscriber.destroy_node()
         self.action_server.destroy()
         super().destroy_node()
-    
 
     def goal_callback(self, goal_request):
         """Accept or reject a client request to begin an action."""
@@ -476,12 +336,6 @@ class ArucoMarkerDetector(Node):
     def reset(self):
         """Delete image after using"""
         self.camera_subscriber.img_raw = None 
-
-    def spinme(self):
-        while rclpy.ok():
-            rclpy.spin(self)
-           
-
 
     def initialize_parameters(self):
         # Declare and read parameters from aruco_params.yaml
@@ -600,25 +454,15 @@ class ArucoMarkerDetector(Node):
         )
         self.logger.info(f"Marker type: {self.dictionary_id_name}")
 
-        self.use_depth_input = (
-            self.get_parameter("use_depth_input").get_parameter_value().bool_value
-        )
-        # self.logger.info(f"Use depth input: {self.use_depth_input}")
-
         self.image_topic = (
             self.get_parameter("image_topic").get_parameter_value().string_value
         )
-        # self.logger.info(f"Input image topic: {self.image_topic}")
-
-        self.depth_image_topic = (
-            self.get_parameter("depth_image_topic").get_parameter_value().string_value
-        )
-        # self.logger.info(f"Input depth image topic: {self.depth_image_topic}")
+        self.logger.info(f"Input image topic: {self.image_topic}")
 
         self.info_topic = (
             self.get_parameter("camera_info_topic").get_parameter_value().string_value
         )
-        # self.logger.info(f"Image camera info topic: {self.info_topic}")
+        self.logger.info(f"Image camera info topic: {self.info_topic}")
 
         self.camera_frame = (
             self.get_parameter("camera_frame").get_parameter_value().string_value
