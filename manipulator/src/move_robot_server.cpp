@@ -1678,7 +1678,9 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                 visual_tools->publishAxisLabeled(container_pose_, "container_pose");
                 visual_tools->trigger();
 
-                container_pose_.position.z += 0.35;
+                container_pose_.position.x += 0.0;
+                container_pose_.position.y += 0.10;
+                container_pose_.position.z += 0.2;
 
                 tf2::Quaternion quat2(
                     container_pose_.orientation.x,
