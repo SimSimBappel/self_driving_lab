@@ -263,7 +263,15 @@ void MoveRobotServer::add_object_callback(
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
-        grab_pose.position.z -= request->size_y/2 - 0.011; //size of testtube/2-(height of gripper/2)-(offset)
+
+        //! This enforces straigt orientation of objects
+        grab_pose.orientation.x = 0.0;
+        grab_pose.orientation.y = 0.0;
+        grab_pose.orientation.z = 0.0;
+        grab_pose.orientation.w = 1.0;
+
+
+        grab_pose.position.z -= request->size_y/2 - 0.02;//0.011; //size of testtube/2-(height of gripper/2)-(offset)
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
@@ -1652,9 +1660,9 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             
 
             // Set the target pose
-            bottle_pose.position.x += 0.0;
-            bottle_pose.position.y += 0.0;
-            bottle_pose.position.z += 0.02;
+            bottle_pose.position.x -= 0.005;
+            bottle_pose.position.y += 0.010;
+            bottle_pose.position.z += 0.0;
             // Get the orientation of the bottle
             tf2::Quaternion quat(
                 bottle_pose.orientation.x,
@@ -1670,7 +1678,7 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             quat_z_rotation.setRPY(0, 0, M_PI);
 
             // Combine the rotations
-            quat = quat * quat_y_rotation * quat_z_rotation;
+            quat = quat * quat_y_rotation; //* quat_z_rotation;
 
             // Update the orientation of the bottle
             bottle_pose.orientation.x = quat.x();
@@ -1714,7 +1722,7 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                 );
 
                 // Combine the rotations
-                quat2 = quat2 * quat_y_rotation * quat_z_rotation;
+                quat2 = quat2 * quat_y_rotation;// * quat_z_rotation;
 
                 // Update the orientation of the bottle
                 container_pose_.orientation.x = quat.x();
