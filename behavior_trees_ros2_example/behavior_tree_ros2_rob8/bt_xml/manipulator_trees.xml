@@ -21,14 +21,13 @@
                            service_name="__default__placeholder__"/>
           <SubTree ID="visual_place"
                    lookout_pose_msg="{lookout_pose}"
-                   keep_orientation="true"
+                   keep_orientation="false"
                    aruco_id="{aruco_id}"
                    slot_to_slot="{slot_to_slot_transform}"
                    approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                    aruco_to_slot="{aruco_to_slot_transform}"
                    empty_hand="{empty_hand}"/>
-          <SetBlackboard value="&apos;empty&apos;"
-                         output_key="empty_hand"/>
+          <Script code="empty_hand:=&apos;empty&apos;"/>
         </Sequence>
       </Precondition>
       <Sequence>
@@ -45,14 +44,13 @@
                            service_name="__default__placeholder__"/>
         <SubTree ID="visual_place"
                  lookout_pose_msg="{lookout_pose}"
-                 keep_orientation="true"
+                 keep_orientation="false"
                  aruco_id="{aruco_id}"
                  slot_to_slot="{slot_to_slot_transform}"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                  aruco_to_slot="{aruco_to_slot_transform}"
                  empty_hand="{empty_hand}"/>
-        <SetBlackboard value="&apos;empty&apos;"
-                       output_key="empty_hand"/>
+        <Script code="empty_hand:=&apos;empty&apos;"/>
       </Sequence>
     </Fallback>
   </BehaviorTree>
@@ -96,7 +94,15 @@
                    force="3"
                    epsilon="0.03"/>
         </Sequence>
-        <Script code="object_is_not_there:=1"/>
+        <Sequence>
+          <Script code="object_is_not_there:=1"/>
+          <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                       speed="0.05"
+                                       accel="0.05"
+                                       action_name="__default__placeholder__"/>
+          <RemoveObjectNode object_id=""
+                            service_name="__default__placeholder__"/>
+        </Sequence>
       </Fallback>
       <AttachObjectNode object_id="{object_id}"
                         service_name="__default__placeholder__"/>
@@ -220,7 +226,9 @@
                  slot_to_slot="{slot_to_slot}"
                  keep_orientation="false"
                  approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                 object_not_there="{object_not_there}"/>
+                 object_not_there="{object_not_there}"
+                 reagent=""
+                 empty_hand=""/>
         <SubTree ID="visual_place"
                  lookout_pose_msg="{lookout_pose_msg}"
                  keep_orientation="true"
@@ -751,6 +759,8 @@
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <output_port name="object_not_there"
                    default="0"/>
+      <inout_port name="reagent"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
     <SubTree ID="visual_place"
              editable="true">

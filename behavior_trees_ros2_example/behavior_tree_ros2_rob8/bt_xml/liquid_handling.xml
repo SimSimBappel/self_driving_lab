@@ -119,8 +119,8 @@
                                      service_name="__default__placeholder__"/>
         <Sleep msec="200"/>
         <PrintValue message="7"/>
-        <SetBlackboard value="{reagent}"
-                       output_key="empty_hand"/>
+        <Script code="empty_hand=reagent"/>
+        <PrintValue message="{empty_hand}"/>
       </Sequence>
     </Precondition>
   </BehaviorTree>

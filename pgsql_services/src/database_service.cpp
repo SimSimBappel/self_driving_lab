@@ -458,10 +458,18 @@ private:
                     slot_id_map[R[i][0].as<int>()] = i + 1;
                 }
 
+                std::string empty;
+
+                if (request->emptied) {
+                    empty = "true";
+                } else {
+                    empty = "false";
+                }
+                
                 // Pick the first free slot and insert a new row in 'chemical_placements' with the (original) chemical_id and slot_id
                 R = W.exec("SELECT slot_id FROM tray_slot WHERE tray_id = " + std::to_string(request->tray_id) + " AND slot_id NOT IN (SELECT slot_id FROM chemical_placements) LIMIT 1");
                 int slot_id = R[0][0].as<int>();
-                W.exec("INSERT INTO chemical_placements (chemical_id, slot_id) VALUES (" + std::to_string(chemical_id) + ", " + std::to_string(slot_id) + ")");
+                W.exec("INSERT INTO chemical_placements (chemical_id, slot_id, empty) VALUES (" + std::to_string(chemical_id) + ", " + std::to_string(slot_id) + ", " + empty + ")");
 
                 // Find the aruco_id of the tray_id in 'tray'
                 R = W.exec("SELECT aruco_id, type, workstation_id FROM tray WHERE tray_id = " + std::to_string(request->tray_id) + " AND type = 'chemical'");
@@ -470,6 +478,8 @@ private:
                     response->message = "Tray type is not chemical";
                     return;
                 }
+
+                
                 int aruco_id = R[0][0].as<int>();
                 std::string tray_type = R[0][1].as<std::string>();
                 int workstation_id = R[0][2].as<int>();
@@ -521,10 +531,12 @@ private:
             } else {
                 std::cout << "Can't open database" << std::endl;
                 response->success = false;
+                response->message = "Operation completed not good";
             }
         } catch (const std::exception &e) {
             std::cerr << e.what() << std::endl;
             response->success = false;
+            response->message = std::string("Caught exception: ") + e.what();
         }
     }
 
