@@ -141,7 +141,12 @@
                       if="empty_hand==&apos;empty&apos;">
           <SubTree ID="visual_pour"
                    chemical_name="{reagent}"
-                   vessel_name="beaker_250ml"/>
+                   vessel_name="beaker_250ml"
+                   aruco_id1="{aruco_id}"
+                   aruco_to_slot_transform="{aruco_to_slot}"
+                   slot_to_slot_transform="{slot_to_slot}"
+                   lookout_pose="{lookout_pose}"
+                   slot_id="{slot_id}"/>
         </Precondition>
         <Sequence>
           <PrintValue message="will empty gripper"/>
@@ -154,9 +159,24 @@
           <PrintValue message="will empty gripper"/>
           <SubTree ID="visual_pour"
                    chemical_name="{reagent}"
-                   vessel_name="beaker_250ml"/>
+                   vessel_name="beaker_250ml"
+                   aruco_id1="{aruco_id}"
+                   aruco_to_slot_transform="{aruco_to_slot}"
+                   slot_to_slot_transform="{slot_to_slot}"
+                   lookout_pose="{lookout_pose}"
+                   slot_id="{slot_id}"/>
         </Sequence>
       </Fallback>
+      <SubTree ID="visual_grasp"
+               aruco_id="{aruco_id}"
+               lookout_pose_msg="{lookout_pose}"
+               aruco_to_slot="{aruco_to_slot}"
+               slot_to_slot="{slot_to_slot}"
+               keep_orientation="false"
+               approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+               object_not_there="{object_not_there}"
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
       <SubTree ID="empty_gripper"
                storage_tray="5"
                side_grasp_tray="5"
@@ -262,6 +282,11 @@
              editable="true">
       <input_port name="chemical_name"/>
       <input_port name="vessel_name"/>
+      <output_port name="aruco_id1"/>
+      <output_port name="aruco_to_slot_transform"/>
+      <output_port name="slot_to_slot_transform"/>
+      <output_port name="lookout_pose"/>
+      <output_port name="slot_id"/>
     </SubTree>
   </TreeNodesModel>
 

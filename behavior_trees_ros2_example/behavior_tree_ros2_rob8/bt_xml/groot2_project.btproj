@@ -371,6 +371,11 @@
         <SubTree ID="visual_pour" editable="true">
             <input_port name="chemical_name"/>
             <input_port name="vessel_name"/>
+            <output_port name="aruco_id1"/>
+            <output_port name="aruco_to_slot_transform"/>
+            <output_port name="slot_to_slot_transform"/>
+            <output_port name="lookout_pose"/>
+            <output_port name="slot_id"/>
         </SubTree>
     </TreeNodesModel>
 </root>
