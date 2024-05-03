@@ -58,7 +58,12 @@
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="visual_pour"
                chemical_name="natrium_chloride"
-               vessel_name="beaker_250ml"/>
+               vessel_name="beaker_250ml"
+               aruco_id1="{aruco_id1}"
+               aruco_to_slot_transform="{aruco_to_slot_transform}"
+               slot_to_slot_transform="{aruco_slot_to_slot_transform}"
+               lookout_pose="{lookout_pose}"
+               slot_id="{slot_id}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -85,7 +90,12 @@
                        service_name="__default__placeholder__"/>
       <SubTree ID="visual_pour"
                chemical_name="natrium_chloride"
-               vessel_name="beaker_250ml"/>
+               vessel_name="beaker_250ml"
+               aruco_id1=""
+               aruco_to_slot_transform=""
+               slot_to_slot_transform=""
+               lookout_pose=""
+               slot_id=""/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
                lookout_pose_msg="{lookout_pose_msg}"
@@ -94,8 +104,8 @@
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                object_not_there="{object_not_there}"
-               empty_hand="{empty_hand}"
-               reagent="{reagent}"/>
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
       <SubTree ID="visual_place"
                lookout_pose_msg="{lookout_pose_msg}"
                keep_orientation="true"
@@ -136,8 +146,8 @@
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
                object_not_there="{object_not_there}"
-               empty_hand="{empty_hand}"
-               reagent="{reagent}"/>
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
@@ -550,6 +560,8 @@
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <output_port name="object_not_there"
                    default="0"/>
+      <inout_port name="reagent"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
     <SubTree ID="visual_place"
              editable="true">
@@ -565,6 +577,11 @@
              editable="true">
       <input_port name="chemical_name"/>
       <input_port name="vessel_name"/>
+      <output_port name="aruco_id1"/>
+      <output_port name="aruco_to_slot_transform"/>
+      <output_port name="slot_to_slot_transform"/>
+      <output_port name="lookout_pose"/>
+      <output_port name="slot_id"/>
     </SubTree>
   </TreeNodesModel>
 

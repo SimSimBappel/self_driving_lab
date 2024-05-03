@@ -140,6 +140,7 @@
                             lin="false"
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
                                    speed="0.008"
                                    accel="0.008"
@@ -165,6 +166,7 @@
                         service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
+      <Sleep msec="200"/>
       <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
                                    speed="0.008"
                                    accel="0.008"
@@ -240,42 +242,6 @@
                  empty_hand=""/>
       </Sequence>
     </Repeat>
-  </BehaviorTree>
-
-  <BehaviorTree ID="place_pose_msg">
-    <Sequence>
-      <Sleep msec="200"/>
-      <ArmPoseMsgOffsetCalculation offset="{approach_offset}"
-                                   pose="{target_pose_msg}"
-                                   pose_w_offset="{approach_pose}"/>
-      <Sleep msec="200"/>
-      <ArmMovePoseMsgAction pose="{approach_pose}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
-      <DetachObjectNode object_id="{object_id}"
-                        service_name="__default__placeholder__"/>
-      <RemoveObjectNode object_id="{object_id}"
-                        service_name="__default__placeholder__"/>
-      <ClearOctomapNode service_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.05"
-                                   accel="0.05"
-                                   action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <FrankaMoveGripperAction width="0.04"
-                               speed="0.03"
-                               action_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <ClearOctomapNode service_name="__default__placeholder__"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
-    </Sequence>
   </BehaviorTree>
 
   <BehaviorTree ID="visual_calibration">
@@ -526,13 +492,6 @@
                   type="std::string">Service name</input_port>
     </Action>
     <Action ID="ClearOctomapNode">
-      <input_port name="service_name"
-                  default="__default__placeholder__"
-                  type="std::string">Service name</input_port>
-    </Action>
-    <Action ID="DetachObjectNode">
-      <input_port name="object_id"
-                  type="signed char"/>
       <input_port name="service_name"
                   default="__default__placeholder__"
                   type="std::string">Service name</input_port>
