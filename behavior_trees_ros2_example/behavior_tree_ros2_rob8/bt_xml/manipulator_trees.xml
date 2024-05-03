@@ -100,8 +100,9 @@
                                        speed="0.05"
                                        accel="0.05"
                                        action_name="__default__placeholder__"/>
-          <RemoveObjectNode object_id=""
+          <RemoveObjectNode object_id="{object_id}"
                             service_name="__default__placeholder__"/>
+          <AlwaysFailure/>
         </Sequence>
       </Fallback>
       <AttachObjectNode object_id="{object_id}"
