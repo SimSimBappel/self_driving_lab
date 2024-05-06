@@ -66,7 +66,7 @@
                    reagent="{reagent}"
                    empty_hand="{empty_hand}"/>
           <Precondition else="FAILURE"
-                        if="object_is_not_there==1">
+                        if="object_not_there==1">
             <Sequence>
               <RemoveChemicalPlacementNode message="{message}"
                                            success="{success}"
@@ -139,14 +139,19 @@
       <Fallback>
         <Precondition else="FAILURE"
                       if="empty_hand==&apos;empty&apos;">
-          <SubTree ID="visual_pour"
-                   chemical_name="{reagent}"
-                   vessel_name="beaker_250ml"
-                   aruco_id1="{aruco_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
-                   lookout_pose="{lookout_pose}"
-                   slot_id="{slot_id}"/>
+          <Sequence>
+            <FrankaMoveGripperAction width="0.04"
+                                     speed="0.03"
+                                     action_name="__default__placeholder__"/>
+            <SubTree ID="visual_pour"
+                     chemical_name="{reagent}"
+                     vessel_name="beaker_250ml"
+                     aruco_id1="{aruco_id}"
+                     aruco_to_slot_transform="{aruco_to_slot}"
+                     slot_to_slot_transform="{slot_to_slot}"
+                     lookout_pose="{lookout_pose}"
+                     slot_id="{slot_id}"/>
+          </Sequence>
         </Precondition>
         <Sequence>
           <PrintValue message="will empty gripper"/>
@@ -157,6 +162,9 @@
                    storage_vessel_tray="10"
                    empty_hand="{empty_hand}"/>
           <PrintValue message="will empty gripper"/>
+          <FrankaMoveGripperAction width="0.04"
+                                   speed="0.03"
+                                   action_name="__default__placeholder__"/>
           <SubTree ID="visual_pour"
                    chemical_name="{reagent}"
                    vessel_name="beaker_250ml"
@@ -167,6 +175,7 @@
                    slot_id="{slot_id}"/>
         </Sequence>
       </Fallback>
+      <PrintValue message="visgrasp"/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
                lookout_pose_msg="{lookout_pose}"
@@ -188,6 +197,15 @@
 
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
+    <Action ID="FrankaMoveGripperAction">
+      <input_port name="width"
+                  type="double"/>
+      <input_port name="speed"
+                  type="double"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
     <Action ID="GetChemicalNode">
       <output_port name="message"
                    type="std::string"/>

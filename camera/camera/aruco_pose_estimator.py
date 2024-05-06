@@ -196,7 +196,7 @@ class ArucoMarkerDetector(Node):
                             zime = self.get_clock().now()
                             aruco.header.stamp = zime.to_msg()
                             aruco.header.frame_id = self.camera_frame
-                            aruco.child_frame_id = "aruco_marker_" + str(goal_handle.request.id)
+                            aruco.child_frame_id = "aruco_marker_"# + str(goal_handle.request.id)
                             aruco.transform.translation.x = avg_position[0]
                             aruco.transform.translation.y = avg_position[1]
                             aruco.transform.translation.z = avg_position[2]

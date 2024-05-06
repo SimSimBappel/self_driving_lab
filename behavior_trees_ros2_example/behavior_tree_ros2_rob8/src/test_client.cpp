@@ -387,7 +387,8 @@ int main(int argc, char **argv)
             << "--------------------------------\n";
 
   // // factory.registerBehaviorTreeFromFile(tree_xml_file_);
-  auto tree = factory.createTree("MainTree");
+  // auto tree = factory.createTree("MainTree");
+  auto tree = factory.createTree("pick_and_place_test");
 
   // // std::cout << BT::writeTreeToXML(tree);
   // std::cout << "----------- XML file  ----------\n"
