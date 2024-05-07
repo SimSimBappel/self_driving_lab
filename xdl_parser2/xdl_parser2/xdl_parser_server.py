@@ -7,13 +7,24 @@ import tkinter as tk
 from tkinter import filedialog
 import rclpy
 import os
-
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
+import time
 # sussy = '/home/lilholt/github/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test.xml'
 #<SubTree ID="Add"/>
 sussy = '/home/intelnuc/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test.xml'
+
 class xdl_parser(Node):
     def __init__(self):
         super().__init__('xdl_parser')
+
+        self.done = False
+
+        # client_cb_group = ReentrantCallbackGroup()
+
+        # self.srv = ActionServer(self,Xdl, "convert_xdl",self.xdl_parser_callback,callback_group=client_cb_group)
+        # self.BT_client = ActionClient(self,Xdl, 'xdl_action',callback_group=client_cb_group) 
+
         self.srv = ActionServer(self,Xdl, "convert_xdl",self.xdl_parser_callback)
         self.BT_client = ActionClient(self,Xdl, 'xdl_action') 
         self.get_logger().info("XDL Parser service has been started")
@@ -39,9 +50,15 @@ class xdl_parser(Node):
 
         # path = filedialog.askopenfilename() 
         path = "/home/intelnuc/sdl_ws/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/xdl_xml/blueprint.xml"
-        with open(path,"r") as file:
-            xml_string = file.read()
-            file.close()
+        path2 = '/home/lass6230/github/rob8_ws/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/xdl_xml/blueprint.xml'
+        try:
+            with open(path,"r") as file:
+                xml_string = file.read()
+                file.close()
+        except:
+            with open(path2,"r") as file:
+                xml_string = file.read()
+                file.close()
 
         return xml_string
 
@@ -72,30 +89,34 @@ class xdl_parser(Node):
             self.BT_client.wait_for_server()
             request = Xdl.Goal()
             request.xdl = behavior_tree
-            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE11111111")
+            # print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE11111111")
             self._send_goal_future = self.BT_client.send_goal_async(request)
-            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE222222222")
-            rclpy.spin_until_future_complete(self, self._send_goal_future)
-            print("goal actcepted: ",self._send_goal_future.result().accepted)
+            self._send_goal_future.add_done_callback(self.goal_response_callback)
+            # print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE222222222")
+            # rclpy.spin_until_future_complete(self, self._send_goal_future)
+            # print("goal actcepted: ",self._send_goal_future.result().accepted)
             
-            self._get_result_future = self._send_goal_future.result().get_result_async()
-            rclpy.spin_until_future_complete(self, self._get_result_future)
-            print("success ",self._get_result_future.result().result.result)
-            # self._send_goal_future.add_done_callback(self.goal_response_callback)
-            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE33333333333333")
-
+            # self._get_result_future = self._send_goal_future.result().get_result_async()
+            # rclpy.spin_until_future_complete(self, self._get_result_future)
+            # print("success ",self._get_result_future.result().result.result)
+            while(not self.done):
+                time.sleep(0.1)
+            # print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE33333333333333")
+            self.done = False
             goal_handle.succeed()
+            
             result = Xdl.Result()
             result.result = True
+            
             
 
         return result
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
-        # if not goal_handle.accepted:
-        #     self.get_logger().info('Goal rejected :(')
-        #     return
+        if not goal_handle.accepted:
+            self.get_logger().info('Goal rejected :(')
+            return
 
         self.get_logger().info('Goal accepted :)')
 
@@ -104,8 +125,9 @@ class xdl_parser(Node):
 
     def get_result_callback(self, future):
         result = future.result()
-        # self.get_logger().info('Result: {0}'.format(result.result.))
-        
+        self.get_logger().info('Result: {0}'.format(result.result.result))
+        self.done = True
+
 
         
 
@@ -216,9 +238,10 @@ def main(args=None):
     rclpy.init()
     parser = xdl_parser()
 
-
+    executor = MultiThreadedExecutor()
+    executor.add_node(parser)
     try:
-        rclpy.spin(parser)
+        executor.spin()
     except KeyboardInterrupt:
         pass
 

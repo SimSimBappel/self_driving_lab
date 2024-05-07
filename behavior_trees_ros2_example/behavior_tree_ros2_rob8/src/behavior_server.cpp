@@ -470,9 +470,15 @@ rclcpp_action::GoalResponse action_server_handle_goal(
                 RCLCPP_INFO(this->get_logger(), "Goal abort");
                 running = false;
                 break;
-                rclcpp::shutdown(); // remove this when using the service
+                // rclcpp::shutdown(); // remove this when using the service
             }
         }
+                // std::cout << "create main tree success\n";
+                // sleep(2);
+                // result->result = true;
+                // goal_handle->succeed(result);
+
+
       }
       
 
