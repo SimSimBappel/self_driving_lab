@@ -1,0 +1,6 @@
+string xdl
+---
+bool result
+---
+#feedback
+int32 cycle

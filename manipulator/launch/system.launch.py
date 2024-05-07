@@ -384,7 +384,7 @@ def generate_launch_description():
         #  launch_moveit,
          launch_pose_estimation,
         #  behavior_server,
-         xdl_parser
+        #  xdl_parser
          ]
         + load_controllers
     )

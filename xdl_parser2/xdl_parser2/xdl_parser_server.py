@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from xdl_parser_interface.srv import XdlConversion
-from behavior_tree_ros2_actions.srv import Xdl
+from behavior_tree_ros2_actions.action import Xdl
+from rclpy.action import ActionServer, ActionClient
 from rclpy.node import Node
 import tkinter as tk
 from tkinter import filedialog
@@ -13,8 +14,8 @@ sussy = '/home/intelnuc/sdl_ws/src/self_driving_lab/xdl_parser2/xdl_parser2/test
 class xdl_parser(Node):
     def __init__(self):
         super().__init__('xdl_parser')
-        self.srv = self.create_service(Xdl, "convert_xdl",self.xdl_parser_callback)
-        self.BT_client = self.create_client(Xdl, 'xdl_service') 
+        self.srv = ActionServer(self,Xdl, "convert_xdl",self.xdl_parser_callback)
+        self.BT_client = ActionClient(self,Xdl, 'xdl_action') 
         self.get_logger().info("XDL Parser service has been started")
         self.avaiable_tasks_dict = {
             'Add':'<SubTree ID="Add" '
@@ -47,31 +48,66 @@ class xdl_parser(Node):
 
 
 
-    def xdl_parser_callback(self,request,response):
+    def xdl_parser_callback(self,goal_handle):
 
-        if request.xdl == "" or request.xdl == 'None':
+        if goal_handle.request.xdl == "" or goal_handle.request.xdl == 'None':
             xdl = self.load_xdl()
         else:
-            xdl = request.xdl
+            xdl = goal_handle.request.xdl
+
 
 
         parameters, reagents, procedure, procedureTags = self.parse_xml(xdl)
 
 
         behavior_tree, result = self.generate_behavior_tree(procedureTags,procedure)
+        
+        
+        
         if not result:
-            response.result = False
+            result = Xdl.Result()
+            result.result = False
 
         else:
-            response.result = True
-            self.BT_client.wait_for_service()
-            request = Xdl.Request()
+            self.BT_client.wait_for_server()
+            request = Xdl.Goal()
             request.xdl = behavior_tree
-            future = self.BT_client.call_async(request)
-            rclpy.spin_until_future_complete(self, future)
+            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE11111111")
+            self._send_goal_future = self.BT_client.send_goal_async(request)
+            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE222222222")
+            rclpy.spin_until_future_complete(self, self._send_goal_future)
+            print("goal actcepted: ",self._send_goal_future.result().accepted)
+            
+            self._get_result_future = self._send_goal_future.result().get_result_async()
+            rclpy.spin_until_future_complete(self, self._get_result_future)
+            print("success ",self._get_result_future.result().result.result)
+            # self._send_goal_future.add_done_callback(self.goal_response_callback)
+            print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE33333333333333")
 
-        return response
+            goal_handle.succeed()
+            result = Xdl.Result()
+            result.result = True
+            
 
+        return result
+
+    def goal_response_callback(self, future):
+        goal_handle = future.result()
+        # if not goal_handle.accepted:
+        #     self.get_logger().info('Goal rejected :(')
+        #     return
+
+        self.get_logger().info('Goal accepted :)')
+
+        self._get_result_future = goal_handle.get_result_async()
+        self._get_result_future.add_done_callback(self.get_result_callback)
+
+    def get_result_callback(self, future):
+        result = future.result()
+        # self.get_logger().info('Result: {0}'.format(result.result.))
+        
+
+        
 
 
     def reverse(self,s): 

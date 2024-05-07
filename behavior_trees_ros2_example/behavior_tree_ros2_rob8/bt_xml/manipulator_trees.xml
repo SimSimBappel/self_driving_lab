@@ -84,14 +84,14 @@
         <SubTree ID="gripping"
                  width="0.02"
                  speed="0.03"
-                 force="3"
+                 force="2"
                  epsilon="0.03"/>
         <Sequence>
           <Sleep msec="1000"/>
           <SubTree ID="gripping"
                    width="0.02"
                    speed="0.03"
-                   force="3"
+                   force="2"
                    epsilon="0.03"/>
         </Sequence>
         <Sequence>
@@ -141,24 +141,34 @@
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.008"
-                                   accel="0.008"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                     speed="0.008"
+                                     accel="0.008"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                     speed="0.004"
+                                     accel="0.004"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                     speed="0.002"
+                                     accel="0.002"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
       <Sleep msec="200"/>
       <Sleep msec="200"/>
       <Fallback>
         <SubTree ID="gripping"
                  width="0.02"
                  speed="0.03"
-                 force="3"
+                 force="2"
                  epsilon="0.02"/>
         <Sequence>
           <Sleep msec="1000"/>
           <SubTree ID="gripping"
                    width="0.02"
                    speed="0.03"
-                   force="3"
+                   force="2"
                    epsilon="0.02"/>
         </Sequence>
       </Fallback>
@@ -167,10 +177,20 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
-                                   speed="0.008"
-                                   accel="0.008"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
+                                     speed="0.008"
+                                     accel="0.008"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
+                                     speed="0.004"
+                                     accel="0.004"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{retract_pose}"
+                                     speed="0.002"
+                                     accel="0.002"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
     </Sequence>
   </BehaviorTree>
 
@@ -209,6 +229,9 @@
                                speed="0.02"
                                action_name="__default__placeholder__"/>
       <FrankaHomeGripperAction action_name="__default__placeholder__"/>
+      <FrankaMoveGripperAction width="0.078"
+                               speed="0.03"
+                               action_name="__default__placeholder__"/>
       <Script code="empty_hand:=&apos;empty&apos;"/>
     </Sequence>
   </BehaviorTree>
@@ -276,12 +299,15 @@
                         service_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+      <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.01;0.0;0.0;0.0"
+                                   pose="{target_pose_msg}"
+                                   pose_w_offset="{target_pose_msg1}"/>
+      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
                                    speed="0.05"
                                    accel="0.05"
                                    action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
-      <FrankaMoveGripperAction width="0.04"
+      <FrankaMoveGripperAction width="0.078"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
@@ -307,21 +333,39 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
-                   Transform="{object_pose_msg}"
-                   action_name="__default__placeholder__"/>
       <PrintValue message="1"/>
-      <RetryUntilSuccessful num_attempts="5">
-        <LookupTransformNode result="{bool_result}"
-                             transform="{object_pose_msg2}"
-                             source="grab_pose"
-                             target="panda_link0"
-                             service_name="__default__placeholder__"/>
-      </RetryUntilSuccessful>
+      <Fallback>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="double_check"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="double_check"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+      </Fallback>
       <PrintValue message="2"/>
-      <ArmPoseMsgOffsetCalculation offset="0.1;0.0;-0.2;0.0;0.0;0.0"
+      <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
       <ArmMovePoseMsgAction pose="{second_lookout}"
@@ -330,18 +374,36 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
-                   Transform="{object_pose_msg}"
-                   action_name="__default__placeholder__"/>
-      <RetryUntilSuccessful num_attempts="5">
-        <LookupTransformNode result="{bool_result}"
-                             transform="{object_pose_msg2}"
-                             source="grab_pose"
-                             target="panda_link0"
-                             service_name="__default__placeholder__"/>
-      </RetryUntilSuccessful>
+      <Fallback>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="grab_pose"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="grab_pose"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+      </Fallback>
       <AddObjectNode pose="{object_pose_msg2}"
                      object_id="{reagent}"
                      shape="cylinder"
@@ -365,17 +427,37 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
-                   Transform="{object_pose_msg}"
-                   action_name="__default__placeholder__"/>
-      <LookupTransformNode result="{bool_result}"
-                           transform="{object_pose_msg2}"
-                           source="grab_pose"
-                           target="panda_link0"
-                           service_name="__default__placeholder__"/>
-      <ArmPoseMsgOffsetCalculation offset="0.1;0.0;-0.2;0.0;0.0;0.0"
+      <Fallback>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="double_check"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="double_check"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+      </Fallback>
+      <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.0;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
       <ArmMovePoseMsgAction pose="{second_lookout}"
@@ -384,18 +466,36 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id}"
-                   aruco_to_slot_transform="{aruco_to_slot}"
-                   slot_to_slot_transform="{slot_to_slot}"
-                   Transform="{object_pose_msg}"
-                   action_name="__default__placeholder__"/>
-      <RetryUntilSuccessful num_attempts="5">
-        <LookupTransformNode result="{bool_result}"
-                             transform="{object_pose_msg2}"
-                             source="grab_pose"
-                             target="panda_link0"
-                             service_name="__default__placeholder__"/>
-      </RetryUntilSuccessful>
+      <Fallback>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="grab_pose"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+        <Sequence>
+          <ArucoAction id="{aruco_id}"
+                       aruco_to_slot_transform="{aruco_to_slot}"
+                       slot_to_slot_transform="{slot_to_slot}"
+                       Transform="{object_pose_msg}"
+                       action_name="__default__placeholder__"/>
+          <RetryUntilSuccessful num_attempts="5">
+            <LookupTransformNode result="{bool_result}"
+                                 transform="{object_pose_msg2}"
+                                 source="grab_pose"
+                                 target="panda_link0"
+                                 service_name="__default__placeholder__"/>
+          </RetryUntilSuccessful>
+        </Sequence>
+      </Fallback>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
@@ -434,26 +534,70 @@
                             lin="false"
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id1}"
-                   aruco_to_slot_transform="{aruco_to_slot1}"
-                   slot_to_slot_transform="{slot_to_slot1}"
-                   Transform="{aruco_pose1}"
-                   action_name="__default__placeholder__"/>
-      <LookupTransformNode result="{bool_result1}"
-                           transform="{object_pose_msg1}"
-                           source="grab_pose"
-                           target="panda_link0"
-                           service_name="__default__placeholder__"/>
-      <ArucoAction id="{aruco_id2}"
-                   aruco_to_slot_transform="{aruco_to_slot2}"
-                   slot_to_slot_transform="{slot_to_slot2}"
-                   Transform="{aruco_pose2}"
-                   action_name="__default__placeholder__"/>
-      <LookupTransformNode result="{bool_result2}"
-                           transform="{object_pose_msg2}"
-                           source="grab_pose"
-                           target="panda_link0"
-                           service_name="__default__placeholder__"/>
+      <RetryUntilSuccessful num_attempts="3">
+        <Sequence>
+          <ArucoAction id="{aruco_id1}"
+                       aruco_to_slot_transform="{aruco_to_slot1}"
+                       slot_to_slot_transform="{slot_to_slot1}"
+                       Transform="{aruco_pose1}"
+                       action_name="__default__placeholder__"/>
+          <LookupTransformNode result="{bool_result1}"
+                               transform="{object_pose_msg1}"
+                               source="double_check"
+                               target="panda_link0"
+                               service_name="__default__placeholder__"/>
+          <ArucoAction id="{aruco_id2}"
+                       aruco_to_slot_transform="{aruco_to_slot2}"
+                       slot_to_slot_transform="{slot_to_slot2}"
+                       Transform="{aruco_pose2}"
+                       action_name="__default__placeholder__"/>
+          <LookupTransformNode result="{bool_result2}"
+                               transform="{object_pose_msg2}"
+                               source="double_check"
+                               target="panda_link0"
+                               service_name="__default__placeholder__"/>
+        </Sequence>
+      </RetryUntilSuccessful>
+      <RetryUntilSuccessful num_attempts="3">
+        <Sequence>
+          <ArmMovePoseMsgAction pose="{object_pose_msg1}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="false"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+          <ArucoAction id="{aruco_id1}"
+                       aruco_to_slot_transform="{aruco_to_slot1}"
+                       slot_to_slot_transform="{slot_to_slot1}"
+                       Transform="{aruco_pose1}"
+                       action_name="__default__placeholder__"/>
+          <LookupTransformNode result="{bool_result1}"
+                               transform="{object_pose_msg1}"
+                               source="grab_pose"
+                               target="panda_link0"
+                               service_name="__default__placeholder__"/>
+        </Sequence>
+      </RetryUntilSuccessful>
+      <RetryUntilSuccessful num_attempts="3">
+        <Sequence>
+          <ArmMovePoseMsgAction pose="{object_pose_msg2}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="false"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+          <ArucoAction id="{aruco_id2}"
+                       aruco_to_slot_transform="{aruco_to_slot2}"
+                       slot_to_slot_transform="{slot_to_slot2}"
+                       Transform="{aruco_pose2}"
+                       action_name="__default__placeholder__"/>
+          <LookupTransformNode result="{bool_result2}"
+                               transform="{object_pose_msg2}"
+                               source="grab_pose"
+                               target="panda_link0"
+                               service_name="__default__placeholder__"/>
+        </Sequence>
+      </RetryUntilSuccessful>
       <AddObjectNode pose="{object_pose_msg1}"
                      object_id="{chemical_name}"
                      shape="cylinder"
