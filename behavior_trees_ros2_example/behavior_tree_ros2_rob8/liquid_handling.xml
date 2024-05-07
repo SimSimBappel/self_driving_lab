@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="Add">
+    <Sequence>
+      <PrintValue message="{reagent}"/>
+      <PrintValue message="{vessel}"/>
+      <PrintValue message="{amount}"/>
+      <SubTree ID="get_reagent"
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
+      <PrintValue message="asd"/>
+      <PrintValue message="{empty_hand}"/>
+      <SubTree ID="pour_reagent"
+               empty_hand="{empty_hand}"
+               reagent="{reagent}"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="Separate">
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="Transfer">
+    <Sequence>
+      <AlwaysSuccess/>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="get_reagent">
+    <Precondition else="FAILURE"
+                  if="empty_hand==&apos;empty&apos;">
+      <Sequence>
+        <GetChemicalNode message="{result_messages}"
+                         workstation_name="{workstation}"
+                         name_="{reagent}"
+                         aruco_id="{aruco_id}"
+                         empty="{empty}"
+                         success="{success}"
+                         lookout_pose="{lookout_pose_msg}"
+                         aruco_to_slot_transform="{aruco_to_slot}"
+                         slot_to_slot_transform="{slot_to_slot}"
+                         type_="pick"
+                         slot_id="{slot_id}"
+                         service_name="__default__placeholder__"/>
+        <PrintValue message="got_chemical"/>
+        <Fallback>
+          <AlwaysSuccess/>
+          <SubTree ID="move_base"
+                   storage_tray="5"
+                   side_grasp_tray="7"
+                   emptied="{empty}"
+                   storage_vessel_tray="10"
+                   empty_hand="{empty_hand}"/>
+        </Fallback>
+        <Fallback>
+          <SubTree ID="visual_grasp"
+                   aruco_id="{aruco_id}"
+                   lookout_pose_msg="{lookout_pose_msg}"
+                   aruco_to_slot="{aruco_to_slot}"
+                   slot_to_slot="{slot_to_slot}"
+                   keep_orientation="false"
+                   approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                   object_not_there="{object_not_there}"
+                   reagent="{reagent}"
+                   empty_hand="{empty_hand}"/>
+          <Precondition else="FAILURE"
+                        if="object_is_not_there==1">
+            <Sequence>
+              <RemoveChemicalPlacementNode message="{message}"
+                                           success="{success}"
+                                           name_="{reagent}"
+                                           slot_id="{slot_id}"
+                                           service_name="__default__placeholder__"/>
+              <GetChemicalNode message="{result_messages}"
+                               workstation_name="{workstation}"
+                               name_="{reagent}"
+                               aruco_id="{aruco_id}"
+                               empty="{empty}"
+                               success="{success}"
+                               lookout_pose="{lookout_pose_msg}"
+                               aruco_to_slot_transform="{aruco_to_slot}"
+                               slot_to_slot_transform="{slot_to_slot}"
+                               type_="pick"
+                               slot_id="{slot_id}"
+                               service_name="__default__placeholder__"/>
+              <Fallback>
+                <AlwaysSuccess/>
+                <SubTree ID="move_base"
+                         storage_tray="5"
+                         side_grasp_tray="7"
+                         emptied="{empty}"
+                         storage_vessel_tray="10"
+                         empty_hand="{empty_hand}"/>
+              </Fallback>
+              <SubTree ID="visual_grasp"
+                       aruco_id="{aruco_id}"
+                       lookout_pose_msg="{lookout_pose_msg}"
+                       aruco_to_slot="{aruco_to_slot}"
+                       slot_to_slot="{slot_to_slot}"
+                       keep_orientation="false"
+                       approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
+                       object_not_there="{object_not_there}"
+                       reagent="{reagent}"
+                       empty_hand="{empty_hand}"/>
+            </Sequence>
+          </Precondition>
+        </Fallback>
+        <PrintValue message="5"/>
+        <PrintValue message="6"/>
+        <Sleep msec="200"/>
+        <PrintValue message="{empty_hand}"/>
+        <PrintValue message="{reagent}"/>
+        <RemoveChemicalPlacementNode message="{m}"
+                                     success="{s}"
+                                     name_="{reagent}"
+                                     slot_id="{slot_id}"
+                                     service_name="__default__placeholder__"/>
+        <Sleep msec="200"/>
+        <PrintValue message="7"/>
+        <Script code="empty_hand=reagent"/>
+        <PrintValue message="{empty_hand}"/>
+      </Sequence>
+    </Precondition>
+  </BehaviorTree>
+
+  <BehaviorTree ID="pour_reagent">
+    <Sequence>
+      <Fallback>
+        <AlwaysSuccess/>
+        <SubTree ID="move_base"
+                 storage_tray="5"
+                 side_grasp_tray="7"
+                 emptied="false"
+                 storage_vessel_tray="10"
+                 empty_hand="{empty_hand}"/>
+      </Fallback>
+      <Fallback>
+        <Precondition else="FAILURE"
+                      if="empty_hand==&apos;empty&apos;">
+          <SubTree ID="visual_pour"
+                   chemical_name="{reagent}"
+                   vessel_name="beaker_250ml"/>
+        </Precondition>
+        <Sequence>
+          <PrintValue message="will empty gripper"/>
+          <SubTree ID="empty_gripper"
+                   storage_tray="5"
+                   side_grasp_tray="7"
+                   emptied="false"
+                   storage_vessel_tray="10"
+                   empty_hand="{empty_hand}"/>
+          <PrintValue message="will empty gripper"/>
+          <SubTree ID="visual_pour"
+                   chemical_name="{reagent}"
+                   vessel_name="beaker_250ml"/>
+        </Sequence>
+      </Fallback>
+      <SubTree ID="empty_gripper"
+               storage_tray="5"
+               side_grasp_tray="5"
+               emptied="false"
+               storage_vessel_tray="10"
+               empty_hand="{empty_hand}"/>
+    </Sequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="GetChemicalNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="workstation_name"
+                   type="std::string"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <output_port name="aruco_id"
+                   type="signed char"/>
+      <output_port name="empty"
+                   type="bool"/>
+      <output_port name="success"
+                   type="bool"/>
+      <output_port name="lookout_pose"
+                   type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="aruco_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <output_port name="slot_to_slot_transform"
+                   type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
+      <input_port name="type_"
+                  type="std::string"/>
+      <output_port name="slot_id"
+                   type="signed char"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
+    <Action ID="PrintValue">
+      <input_port name="message"
+                  type="std::string"/>
+    </Action>
+    <Action ID="RemoveChemicalPlacementNode">
+      <output_port name="message"
+                   type="std::string"/>
+      <output_port name="success"
+                   type="bool"/>
+      <input_port name="name_"
+                  type="std::string"/>
+      <input_port name="slot_id"
+                  type="signed char"/>
+      <input_port name="service_name"
+                  default="__default__placeholder__"
+                  type="std::string">Service name</input_port>
+    </Action>
+    <SubTree ID="empty_gripper"
+             editable="true">
+      <input_port name="storage_tray"
+                  default="5"/>
+      <input_port name="side_grasp_tray"
+                  default="7"/>
+      <input_port name="emptied"/>
+      <input_port name="storage_vessel_tray"
+                  default="10"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="get_reagent"
+             editable="true">
+      <input_port name="reagent"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="move_base"
+             editable="true">
+      <input_port name="storage_tray"
+                  default="5"/>
+      <input_port name="side_grasp_tray"
+                  default="7"/>
+      <input_port name="emptied"/>
+      <input_port name="storage_vessel_tray"
+                  default="10"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="pour_reagent"
+             editable="true">
+      <inout_port name="empty_hand"/>
+      <input_port name="reagent"/>
+    </SubTree>
+    <SubTree ID="visual_grasp"
+             editable="true">
+      <input_port name="aruco_id"/>
+      <input_port name="lookout_pose_msg"/>
+      <input_port name="aruco_to_slot"/>
+      <input_port name="slot_to_slot"/>
+      <input_port name="keep_orientation"/>
+      <input_port name="approach_offset"
+                  default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
+      <output_port name="object_not_there"
+                   default="0"/>
+      <inout_port name="reagent"/>
+      <inout_port name="empty_hand"/>
+    </SubTree>
+    <SubTree ID="visual_pour"
+             editable="true">
+      <input_port name="chemical_name"/>
+      <input_port name="vessel_name"/>
+    </SubTree>
+  </TreeNodesModel>
+
+</root>

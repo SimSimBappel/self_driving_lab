@@ -31,7 +31,7 @@ class FibonacciActionServer(Node):
         self._action_server = ActionServer(
             self,
             MirMission,
-            'mir_mission_service',
+            'mir_mission_action',
             self.execute_callback)
 
     def execute_callback(self, goal_handle):
@@ -54,15 +54,15 @@ class FibonacciActionServer(Node):
 
 
         self.mir.post_to_mission_queue(self.mir_url,guid)
+
         
-        while self.mir.get_mission_done_or_not(goal_handle.request.mission_id):
+        while not self.mir.get_mission_latest_mission_status(self.mir_url):
             time.sleep(0.5)
+        goal_handle.succeed()
         result = MirMission.Result()
         result.done = True
         return result
-
-
-
+        
 
 def main(args=None):
     rclpy.init(args=args)

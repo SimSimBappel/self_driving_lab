@@ -345,7 +345,7 @@
             <input_port name="object_id"/>
         </SubTree>
         <SubTree ID="pour_reagent" editable="true">
-            <output_port name="empty_hand"/>
+            <inout_port name="empty_hand"/>
             <input_port name="reagent"/>
         </SubTree>
         <SubTree ID="visual_grasp" editable="true">
@@ -356,6 +356,8 @@
             <input_port name="keep_orientation"/>
             <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
             <output_port name="object_not_there" default="0"/>
+            <inout_port name="reagent"/>
+            <inout_port name="empty_hand"/>
         </SubTree>
         <SubTree ID="visual_place" editable="true">
             <input_port name="lookout_pose_msg"/>
@@ -364,10 +366,16 @@
             <input_port name="slot_to_slot"/>
             <input_port name="approach_offset"/>
             <input_port name="aruco_to_slot"/>
+            <input_port name="empty_hand"/>
         </SubTree>
         <SubTree ID="visual_pour" editable="true">
             <input_port name="chemical_name"/>
             <input_port name="vessel_name"/>
+            <output_port name="aruco_id1"/>
+            <output_port name="aruco_to_slot_transform"/>
+            <output_port name="slot_to_slot_transform"/>
+            <output_port name="lookout_pose"/>
+            <output_port name="slot_id"/>
         </SubTree>
     </TreeNodesModel>
 </root>

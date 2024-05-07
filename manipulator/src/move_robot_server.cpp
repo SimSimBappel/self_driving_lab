@@ -263,7 +263,15 @@ void MoveRobotServer::add_object_callback(
         // grab_pose.orientation.w = 1.0;
         // grab_pose.position.z = 0.2;
         grab_pose = request->pose.pose;
-        grab_pose.position.z -= request->size_y/2 - 0.011; //size of testtube/2-(height of gripper/2)-(offset)
+
+        //! This enforces straigt orientation of objects
+        grab_pose.orientation.x = 0.0;
+        grab_pose.orientation.y = 0.0;
+        grab_pose.orientation.z = 0.0;
+        grab_pose.orientation.w = 1.0;
+
+
+        grab_pose.position.z -= request->size_y/2 - 0.02;//0.011; //size of testtube/2-(height of gripper/2)-(offset)
 
         // First, we add the object to the world (without using a vector).
         object_to_attach.primitives.push_back(primitive);
@@ -295,6 +303,9 @@ void MoveRobotServer::remove_object_callback(
         int attempts = 0;
         bool object_removed = false;
 
+        visual_tools->deleteAllMarkers();
+      
+
         while (!object_removed) {
             auto object_result = planning_scene_interface.getObjects(object_ids);
             planning_scene_interface.removeCollisionObjects(object_ids);
@@ -309,6 +320,7 @@ void MoveRobotServer::remove_object_callback(
             }
             attempts++;
         }
+        // TODO: add rm container.
 
         // planning_scene_interface.removeCollisionObjects(object_ids);
         // RCLCPP_INFO(this->get_logger(), "remove_object_callback ended");
@@ -1069,46 +1081,63 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         move_group_->setPlanningTime(20.0);
       }
       else if(goal->lin){
-        move_group_->setPlanningTime(20.0);
-        // LINE CONSTRAINTS
-        moveit_msgs::msg::PositionConstraint line_constraint;
-        line_constraint.header.frame_id = move_group_->getPoseReferenceFrame();
-        line_constraint.link_name = move_group_->getEndEffectorLink();
-        shape_msgs::msg::SolidPrimitive line;
-        line.type = shape_msgs::msg::SolidPrimitive::BOX;
-        line.dimensions = { 0.0005, 0.0005, 1.0 };
-        line_constraint.constraint_region.primitives.emplace_back(line);
-
-        geometry_msgs::msg::Pose line_pose;
-        line_pose.position.x = goal->pose.pose.position.x;
-        line_pose.position.y = goal->pose.pose.position.y;
-        line_pose.position.z = goal->pose.pose.position.z;
-        line_pose.orientation.x = goal->pose.pose.orientation.x;
-        line_pose.orientation.y = goal->pose.pose.orientation.x;
-        line_pose.orientation.z = goal->pose.pose.orientation.x;
-        line_pose.orientation.w = goal->pose.pose.orientation.x;
-        line_constraint.constraint_region.primitive_poses.emplace_back(line_pose);
-        line_constraint.weight = 1.0;
-
-
-        // ORIENTATION CONSTRAINTS
+        move_group_->setPlannerId("geometric::RRTstar");
         moveit_msgs::msg::OrientationConstraint orientation_constraint;
         orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
         orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
 
         orientation_constraint.orientation = goal->pose.pose.orientation;
-        orientation_constraint.absolute_x_axis_tolerance = 0.2;
-        orientation_constraint.absolute_y_axis_tolerance = 0.2;
-        // orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        orientation_constraint.absolute_x_axis_tolerance = 1.57;
+        orientation_constraint.absolute_y_axis_tolerance = 0.4;
+        orientation_constraint.absolute_z_axis_tolerance = 0.4;
         orientation_constraint.weight = 1.0;
 
+        moveit_msgs::msg::Constraints orientation_constraints;
+        orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
 
-        moveit_msgs::msg::Constraints line_constraints;
-        line_constraints.position_constraints.emplace_back(line_constraint);
-        line_constraints.orientation_constraints.emplace_back(orientation_constraint);
+        move_group_->setPathConstraints(orientation_constraints);
 
-        line_constraints.name = "use_equality_constraints";
-        move_group_->setPathConstraints(line_constraints);
+        move_group_->setPlanningTime(20.0);
+        // move_group_->setPlanningTime(20.0);
+        // // LINE CONSTRAINTS
+        // moveit_msgs::msg::PositionConstraint line_constraint;
+        // line_constraint.header.frame_id = move_group_->getPoseReferenceFrame();
+        // line_constraint.link_name = move_group_->getEndEffectorLink();
+        // shape_msgs::msg::SolidPrimitive line;
+        // line.type = shape_msgs::msg::SolidPrimitive::BOX;
+        // line.dimensions = { 0.0005, 0.0005, 1.0 };
+        // line_constraint.constraint_region.primitives.emplace_back(line);
+
+        // geometry_msgs::msg::Pose line_pose;
+        // line_pose.position.x = goal->pose.pose.position.x;
+        // line_pose.position.y = goal->pose.pose.position.y;
+        // line_pose.position.z = goal->pose.pose.position.z;
+        // line_pose.orientation.x = goal->pose.pose.orientation.x;
+        // line_pose.orientation.y = goal->pose.pose.orientation.x;
+        // line_pose.orientation.z = goal->pose.pose.orientation.x;
+        // line_pose.orientation.w = goal->pose.pose.orientation.x;
+        // line_constraint.constraint_region.primitive_poses.emplace_back(line_pose);
+        // line_constraint.weight = 1.0;
+
+
+        // // ORIENTATION CONSTRAINTS
+        // moveit_msgs::msg::OrientationConstraint orientation_constraint;
+        // orientation_constraint.header.frame_id = move_group_ ->getPoseReferenceFrame();
+        // orientation_constraint.link_name = move_group_ ->getEndEffectorLink();
+
+        // orientation_constraint.orientation = goal->pose.pose.orientation;
+        // orientation_constraint.absolute_x_axis_tolerance = 0.2;
+        // orientation_constraint.absolute_y_axis_tolerance = 0.2;
+        // // orientation_constraint.absolute_z_axis_tolerance = 0.2;
+        // orientation_constraint.weight = 1.0;
+
+
+        // moveit_msgs::msg::Constraints line_constraints;
+        // line_constraints.position_constraints.emplace_back(line_constraint);
+        // line_constraints.orientation_constraints.emplace_back(orientation_constraint);
+
+        // line_constraints.name = "use_equality_constraints";
+        // move_group_->setPathConstraints(line_constraints);
       }
       else{
         // moveit_msgs::msg::OrientationConstraint orientation_constraint;
@@ -1464,6 +1493,9 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_joints_relative_handle_goa
 
   void MoveRobotServer::arm_move_joints_relative_execute(const std::shared_ptr<GoalHandleArmMoveJointsRelative> goal_handle){
       auto result = std::make_shared<ArmMoveJointsRelative::Result>();
+
+      move_group_->clearPathConstraints();
+
       std_msgs::msg::Float64MultiArray joints_;
       const auto goal = goal_handle->get_goal();
       auto joint_pose = goal->joints;
@@ -1625,12 +1657,12 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             geometry_msgs::msg::Pose bottle_pose = object_poses[bottle_name];
             visual_tools->publishAxisLabeled(bottle_pose, bottle_name);
             visual_tools->trigger();
+            
 
             // Set the target pose
-            bottle_pose.position.x += 0.0;
-            bottle_pose.position.y += 0.0;
-            bottle_pose.position.z += 0.04;
-
+            bottle_pose.position.x -= 0.005;
+            bottle_pose.position.y += 0.010;
+            bottle_pose.position.z += 0.0;
             // Get the orientation of the bottle
             tf2::Quaternion quat(
                 bottle_pose.orientation.x,
@@ -1646,7 +1678,7 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             quat_z_rotation.setRPY(0, 0, M_PI);
 
             // Combine the rotations
-            quat = quat * quat_y_rotation;// * quat_z_rotation;
+            quat = quat * quat_y_rotation; //* quat_z_rotation;
 
             // Update the orientation of the bottle
             bottle_pose.orientation.x = quat.x();
@@ -1678,9 +1710,9 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                 visual_tools->publishAxisLabeled(container_pose_, "container_pose");
                 visual_tools->trigger();
 
-                container_pose_.position.x += 0.0;
-                container_pose_.position.y += 0.10;
-                container_pose_.position.z += 0.2;
+                container_pose_.position.x -= 0.03;
+                container_pose_.position.y -= 0.08;
+                container_pose_.position.z += 0.11;
 
                 tf2::Quaternion quat2(
                     container_pose_.orientation.x,

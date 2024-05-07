@@ -58,7 +58,12 @@
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="visual_pour"
                chemical_name="natrium_chloride"
-               vessel_name="beaker_250ml"/>
+               vessel_name="beaker_250ml"
+               aruco_id1="{aruco_id1}"
+               aruco_to_slot_transform="{aruco_to_slot_transform}"
+               slot_to_slot_transform="{aruco_slot_to_slot_transform}"
+               lookout_pose="{lookout_pose}"
+               slot_id="{slot_id}"/>
     </Sequence>
   </BehaviorTree>
 
@@ -85,7 +90,12 @@
                        service_name="__default__placeholder__"/>
       <SubTree ID="visual_pour"
                chemical_name="natrium_chloride"
-               vessel_name="beaker_250ml"/>
+               vessel_name="beaker_250ml"
+               aruco_id1=""
+               aruco_to_slot_transform=""
+               slot_to_slot_transform=""
+               lookout_pose=""
+               slot_id=""/>
       <SubTree ID="visual_grasp"
                aruco_id="{aruco_id}"
                lookout_pose_msg="{lookout_pose_msg}"
@@ -93,9 +103,9 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-               object_not_there="0"
-               empty_hand="{empty_hand}"
-               reagent="{reagent}"/>
+               object_not_there="{object_not_there}"
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
       <SubTree ID="visual_place"
                lookout_pose_msg="{lookout_pose_msg}"
                keep_orientation="true"
@@ -135,15 +145,15 @@
                slot_to_slot="{slot_to_slot}"
                keep_orientation="false"
                approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-               object_not_there="0"
-               empty_hand="{empty_hand}"
-               reagent="{reagent}"/>
+               object_not_there="{object_not_there}"
+               reagent="{reagent}"
+               empty_hand="{empty_hand}"/>
       <FrankaMoveGripperAction width="0.04"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
-      <DetachObjectNode object_id="{aruco_id}"
+      <DetachObjectNode object_id="{reagent}"
                         service_name="__default__placeholder__"/>
-      <RemoveObjectNode object_id="{aruco_id}"
+      <RemoveObjectNode object_id="{reagent}"
                         service_name="__default__placeholder__"/>
       <Fallback>
         <AlwaysSuccess/>
@@ -550,6 +560,8 @@
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
       <output_port name="object_not_there"
                    default="0"/>
+      <inout_port name="reagent"/>
+      <inout_port name="empty_hand"/>
     </SubTree>
     <SubTree ID="visual_place"
              editable="true">
@@ -559,11 +571,17 @@
       <input_port name="slot_to_slot"/>
       <input_port name="approach_offset"/>
       <input_port name="aruco_to_slot"/>
+      <input_port name="empty_hand"/>
     </SubTree>
     <SubTree ID="visual_pour"
              editable="true">
       <input_port name="chemical_name"/>
       <input_port name="vessel_name"/>
+      <output_port name="aruco_id1"/>
+      <output_port name="aruco_to_slot_transform"/>
+      <output_port name="slot_to_slot_transform"/>
+      <output_port name="lookout_pose"/>
+      <output_port name="slot_id"/>
     </SubTree>
   </TreeNodesModel>
 

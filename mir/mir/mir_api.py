@@ -319,11 +319,10 @@ class MiR():
         return False
 
     # Check if a mission is done or not
-    def get_mission_done_or_not(self, id):
-        exe_mission = self.get_mission_queue()
+    def get_mission_done_or_not(self,mir_ip, id):
+        exe_mission = self.get_mission_queue(mir_ip)
         
         for item in exe_mission:
-            print(item)
             if (item['id'] == id):
                 print(item['state'])
             if (item['id'] == id) and (item['state'] == 'Done'):
