@@ -218,18 +218,18 @@ class ArucoMarkerDetector(Node):
                             grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
                             grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w
 
-                            grab_trans_msg = TransformStamped()
-                            grab_trans_msg.header.stamp = aruco.header.stamp
-                            grab_trans_msg.header.frame_id = aruco.child_frame_id
-                            grab_trans_msg.child_frame_id = "double_check"
-                            grab_trans_msg.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x
-                            grab_trans_msg.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y
-                            grab_trans_msg.transform.translation.z = -0.25 #goal_handle.request.aruco_to_slot_transform.transform.translation.z
-                            grab_trans_msg.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x
-                            grab_trans_msg.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y
-                            grab_trans_msg.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
-                            grab_trans_msg.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w
-                            self.tf_broadcaster.sendTransform([aruco, grab_trans_msg])
+                            double_check = TransformStamped()
+                            double_check.header.stamp = aruco.header.stamp
+                            double_check.header.frame_id = aruco.child_frame_id
+                            double_check.child_frame_id = "double_check"
+                            double_check.transform.translation.x = goal_handle.request.aruco_to_slot_transform.transform.translation.x
+                            double_check.transform.translation.y = goal_handle.request.aruco_to_slot_transform.transform.translation.y
+                            double_check.transform.translation.z = -0.25 #goal_handle.request.aruco_to_slot_transform.transform.translation.z
+                            double_check.transform.rotation.x = goal_handle.request.aruco_to_slot_transform.transform.rotation.x
+                            double_check.transform.rotation.y = goal_handle.request.aruco_to_slot_transform.transform.rotation.y
+                            double_check.transform.rotation.z = goal_handle.request.aruco_to_slot_transform.transform.rotation.z
+                            double_check.transform.rotation.w = goal_handle.request.aruco_to_slot_transform.transform.rotation.w
+                            self.tf_broadcaster.sendTransform([aruco, grab_trans_msg, double_check])
 
                             self.found_object = True
                             self.logger.info("Found ID: " + str(goal_handle.request.id))
