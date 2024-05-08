@@ -137,30 +137,40 @@
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <Sleep msec="100"/>
-      <ArmMovePoseMsgAction pose="{approach_pose}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
-      <ClearOctomapNode service_name="__default__placeholder__"/>
-      <Sleep msec="200"/>
-      <Fallback>
-        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                     speed="0.008"
-                                     accel="0.008"
-                                     action_name="__default__placeholder__"/>
-        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                     speed="0.004"
-                                     accel="0.004"
-                                     action_name="__default__placeholder__"/>
-        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                     speed="0.002"
-                                     accel="0.002"
-                                     action_name="__default__placeholder__"/>
-      </Fallback>
-      <Sleep msec="200"/>
-      <Sleep msec="200"/>
+      <RetryUntilSuccessful num_attempts="2">
+        <Fallback>
+          <Sequence>
+            <ArmMovePoseMsgAction pose="{approach_pose}"
+                                  speed="0.2"
+                                  accel="0.2"
+                                  keep_orientation="false"
+                                  lin="false"
+                                  action_name="__default__placeholder__"/>
+            <ClearOctomapNode service_name="__default__placeholder__"/>
+            <Sleep msec="200"/>
+            <Fallback>
+              <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                           speed="0.008"
+                                           accel="0.008"
+                                           action_name="__default__placeholder__"/>
+              <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                           speed="0.004"
+                                           accel="0.004"
+                                           action_name="__default__placeholder__"/>
+              <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                           speed="0.002"
+                                           accel="0.002"
+                                           action_name="__default__placeholder__"/>
+            </Fallback>
+            <Sleep msec="200"/>
+            <Sleep msec="200"/>
+          </Sequence>
+          <Sequence>
+            <HomeArmAction action_name="__default__placeholder__"/>
+            <AlwaysFailure/>
+          </Sequence>
+        </Fallback>
+      </RetryUntilSuccessful>
       <Fallback>
         <SubTree ID="gripping"
                  width="0.02"
@@ -291,12 +301,14 @@
                                    pose="{target_pose_msg}"
                                    pose_w_offset="{approach_pose}"/>
       <Sleep msec="200"/>
-      <ArmMovePoseMsgAction pose="{approach_pose}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <RetryUntilSuccessful num_attempts="3">
+        <ArmMovePoseMsgAction pose="{approach_pose}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="false"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+      </RetryUntilSuccessful>
       <DetachObjectNode object_id="{object_id}"
                         service_name="__default__placeholder__"/>
       <RemoveObjectNode object_id="{object_id}"

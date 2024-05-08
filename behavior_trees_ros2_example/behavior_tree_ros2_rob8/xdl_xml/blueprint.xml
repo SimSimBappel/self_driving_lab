@@ -15,9 +15,9 @@
      </Reagents>
 
      <Procedure>
-         <!-- <Add reagent='natrium_chloride' vessel='reactor' amount='2'/> -->
+         <Add reagent='natrium_chloride' vessel='reactor' amount='2'/>
          <Add reagent='chlorine' vessel='reactor' amount='2'/>
-         <!-- <Add reagent='sulfuric_acid' vessel='reactor' amount='1' time='5 min'/> -->
+         <Add reagent='sulfuric_acid' vessel='reactor' amount='1' time='5 min'/>
          <!-- Parameter values used for temp and time -->
      </Procedure>
  </Blueprint>
