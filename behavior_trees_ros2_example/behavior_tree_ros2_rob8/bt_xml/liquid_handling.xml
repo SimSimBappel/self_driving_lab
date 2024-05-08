@@ -101,7 +101,7 @@
                        slot_to_slot="{slot_to_slot}"
                        keep_orientation="false"
                        approach_offset="0.0;0.0;-0.2;0.0;0.0;0.0"
-                       object_not_there="{object_not_there}"
+                       object_not_there="{object_not_there2}"
                        reagent="{reagent}"
                        empty_hand="{empty_hand}"/>
             </Sequence>
@@ -307,8 +307,8 @@
       <input_port name="keep_orientation"/>
       <input_port name="approach_offset"
                   default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-      <output_port name="object_not_there"
-                   default="0"/>
+      <inout_port name="object_not_there"
+                  default="0"/>
       <inout_port name="reagent"/>
       <inout_port name="empty_hand"/>
     </SubTree>

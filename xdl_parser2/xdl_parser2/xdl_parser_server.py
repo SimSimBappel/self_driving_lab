@@ -19,7 +19,7 @@ class xdl_parser(Node):
         super().__init__('xdl_parser')
 
         self.done = False
-
+        self.success = False
         # client_cb_group = ReentrantCallbackGroup()
 
         # self.srv = ActionServer(self,Xdl, "convert_xdl",self.xdl_parser_callback,callback_group=client_cb_group)
@@ -103,7 +103,10 @@ class xdl_parser(Node):
                 time.sleep(0.1)
             # print("DOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNEEEEEEEEEEEEEEE33333333333333")
             self.done = False
-            goal_handle.succeed()
+            if self.success:
+                goal_handle.succeed()
+            else:
+                goal_handle.abort()
             
             result = Xdl.Result()
             result.result = True
@@ -127,6 +130,7 @@ class xdl_parser(Node):
         result = future.result()
         self.get_logger().info('Result: {0}'.format(result.result.result))
         self.done = True
+        self.success = result.result.result
 
 
         
