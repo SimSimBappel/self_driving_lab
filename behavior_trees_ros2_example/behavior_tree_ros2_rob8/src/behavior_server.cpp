@@ -457,7 +457,7 @@ rclcpp_action::GoalResponse action_server_handle_goal(
       factory.registerBehaviorTreeFromText(goal->xdl);
         
       std::cout << "register main tree success\n";
-      tree_ = factory.createTree("MainTree");
+      tree_ = factory.createTree("Main");
       std::cout << "create main tree success\n";
       bool running = true;
       while(running){

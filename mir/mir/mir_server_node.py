@@ -40,8 +40,6 @@ class FibonacciActionServer(Node):
         if status['battery_percentage'] < self.battery_threshold:
             self.get_logger().info('MIR IS LOW ON BATTERY :|')
             self.get_logger().info('CHARGE MIR ROBOT :|')
-            result.done = False
-            return result
         else:
             #self.mir.delete_mission_queue(self.mir_url)
             pass

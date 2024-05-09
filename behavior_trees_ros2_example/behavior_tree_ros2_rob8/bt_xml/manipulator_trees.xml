@@ -78,10 +78,16 @@
                             lin="false"
                             action_name="__default__placeholder__"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
-                                   speed="0.05"
-                                   accel="0.05"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                     speed="0.05"
+                                     accel="0.05"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg}"
+                                     speed="0.02"
+                                     accel="0.02"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
       <Sleep msec="200"/>
       <Sleep msec="200"/>
       <Fallback>
@@ -113,10 +119,16 @@
                         service_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
-                                   speed="0.05"
-                                   accel="0.05"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                     speed="0.05"
+                                     accel="0.05"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{approch_pose}"
+                                     speed="0.02"
+                                     accel="0.02"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
     </Sequence>
   </BehaviorTree>
 
@@ -318,20 +330,32 @@
       <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.01;0.0;0.0;0.0"
                                    pose="{target_pose_msg}"
                                    pose_w_offset="{target_pose_msg1}"/>
-      <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
-                                   speed="0.05"
-                                   accel="0.05"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
+                                     speed="0.05"
+                                     accel="0.05"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
+                                     speed="0.02"
+                                     accel="0.02"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
       <Sleep msec="200"/>
       <FrankaMoveGripperAction width="0.078"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
-                                   speed="0.1"
-                                   accel="0.1"
-                                   action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
+                                     speed="0.1"
+                                     accel="0.1"
+                                     action_name="__default__placeholder__"/>
+        <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
+                                     speed="0.02"
+                                     accel="0.02"
+                                     action_name="__default__placeholder__"/>
+      </Fallback>
     </Sequence>
   </BehaviorTree>
 
@@ -437,12 +461,20 @@
 
   <BehaviorTree ID="visual_place">
     <Sequence>
-      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="{keep_orientation}"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="{keep_orientation}"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+        <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="{keep_orientation}"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+      </Fallback>
       <Fallback>
         <Sequence>
           <ArucoAction id="{aruco_id}"
@@ -476,12 +508,25 @@
       <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.0;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
-      <ArmMovePoseMsgAction pose="{second_lookout}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="{keep_orientation}"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePoseMsgAction pose="{second_lookout}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="{keep_orientation}"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+        <Sequence>
+          <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.05;0.0;0.0;0.0"
+                                       pose="{object_pose_msg2}"
+                                       pose_w_offset="{second_lookout2}"/>
+          <ArmMovePoseMsgAction pose="{second_lookout2}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+      </Fallback>
       <Fallback>
         <Sequence>
           <ArucoAction id="{aruco_id}"
@@ -574,6 +619,7 @@
                                service_name="__default__placeholder__"/>
         </Sequence>
       </RetryUntilSuccessful>
+      <ClearOctomapNode service_name="__default__placeholder__"/>
       <RetryUntilSuccessful num_attempts="3">
         <Sequence>
           <ArmMovePoseMsgAction pose="{object_pose_msg1}"
