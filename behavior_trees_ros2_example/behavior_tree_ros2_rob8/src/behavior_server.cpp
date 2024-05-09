@@ -330,6 +330,20 @@ class BehaviorServer : public rclcpp::Node
         params_arm_move_trajectory_pour_msg.server_timeout = std::chrono::milliseconds(3000);
         params_arm_move_trajectory_pour_msg.wait_for_server_timeout = std::chrono::milliseconds(2000);
         factory.registerNodeType<ArmMoveTrajectoryPourAction>("ArmMoveTrajectoryPourAction",params_arm_move_trajectory_pour_msg);
+
+        RosNodeParams params_move_base;
+        params_move_base.nh = this->node_;
+        params_move_base.server_timeout = std::chrono::milliseconds(2000);
+        params_move_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_move_base.default_port_value = "mir_mission_action";
+        factory.registerNodeType<MirMissionAction>("MirMissionAction",params_move_base);
+
+        RosNodeParams params_check_base;
+        params_check_base.nh = this->node_;
+        params_check_base.server_timeout = std::chrono::milliseconds(2000);
+        params_check_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_check_base.default_port_value = "mir_check_position";
+        factory.registerNodeType<MirMissionAction>("MirCheckPosition",params_check_base);
         #ifdef USE_SLEEP_PLUGIN
         RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
         #else
@@ -443,7 +457,7 @@ rclcpp_action::GoalResponse action_server_handle_goal(
       factory.registerBehaviorTreeFromText(goal->xdl);
         
       std::cout << "register main tree success\n";
-      tree_ = factory.createTree("Main");
+      tree_ = factory.createTree("MainTree");
       std::cout << "create main tree success\n";
       bool running = true;
       while(running){

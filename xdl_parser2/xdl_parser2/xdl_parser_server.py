@@ -3,8 +3,8 @@ from xdl_parser_interface.srv import XdlConversion
 from behavior_tree_ros2_actions.action import Xdl
 from rclpy.action import ActionServer, ActionClient
 from rclpy.node import Node
-import tkinter as tk
-from tkinter import filedialog
+# import tkinter as tk
+# from tkinter import filedialog
 import rclpy
 import os
 from rclpy.executors import MultiThreadedExecutor
@@ -45,8 +45,8 @@ class xdl_parser(Node):
         path = os.path.dirname(script_path)
         path += '/test.xml'
 
-        root = tk.Tk()
-        root.withdraw()
+        # root = tk.Tk()
+        # root.withdraw()
 
         # path = filedialog.askopenfilename() 
         path = "/home/intelnuc/sdl_ws/src/self_driving_lab/behavior_trees_ros2_example/behavior_tree_ros2_rob8/xdl_xml/blueprint.xml"

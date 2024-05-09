@@ -357,6 +357,21 @@ int main(int argc, char **argv)
   params_clear_octomap.default_port_value = "clear_octomap";
   factory.registerNodeType<ClearOctomapNode>("ClearOctomapNode",params_clear_octomap);
 
+  RosNodeParams params_move_base;
+        params_move_base.nh = nh;
+        params_move_base.server_timeout = std::chrono::milliseconds(2000);
+        params_move_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_move_base.default_port_value = "mir_mission_action";
+        factory.registerNodeType<MirMissionAction>("MirMissionAction",params_move_base);
+  
+  RosNodeParams params_check_base;
+        params_move_base.nh = nh;
+        params_move_base.server_timeout = std::chrono::milliseconds(2000);
+        params_move_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_move_base.default_port_value = "mir_check_position";
+        factory.registerNodeType<MirMissionAction>("MirCheckPosition",params_check_base);
+
+
 #ifdef USE_SLEEP_PLUGIN
   RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
 #else
@@ -387,8 +402,8 @@ int main(int argc, char **argv)
             << "--------------------------------\n";
 
   // // factory.registerBehaviorTreeFromFile(tree_xml_file_);
-  // auto tree = factory.createTree("MainTree");
-  auto tree = factory.createTree("pick_and_place_test");
+  auto tree = factory.createTree("MainTree");
+  // auto tree = factory.createTree("pick_and_place_test");
 
   // // std::cout << BT::writeTreeToXML(tree);
   // std::cout << "----------- XML file  ----------\n"
@@ -398,7 +413,7 @@ int main(int argc, char **argv)
   BT::Groot2Publisher publisher(tree,5555);
 
   // auto tree = factory.createTreeFromText(xml_text);
-  tree.tickWhileRunning();
+  // tree.tickWhileRunning();
   // tree.tickOnce();
   // for(int i=0; i<5; i++){
   //   tree.tickWhileRunning();
