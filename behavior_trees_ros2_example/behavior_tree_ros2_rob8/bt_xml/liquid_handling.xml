@@ -44,6 +44,13 @@
                          type_="pick"
                          slot_id="{slot_id}"
                          service_name="__default__placeholder__"/>
+        <SubTree ID="move_base"
+                 storage_tray="5"
+                 side_grasp_tray="7"
+                 emptied="{empty}"
+                 storage_vessel_tray="10"
+                 empty_hand="{empty_hand}"
+                 workstation="{workstation}"/>
         <Fallback>
           <SubTree ID="visual_grasp"
                    aruco_id="{aruco_id}"
