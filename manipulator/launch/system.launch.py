@@ -371,7 +371,7 @@ def generate_launch_description():
          fake_sensor_commands_arg,
          load_gripper_arg,
          db_arg,
-         rviz_node,
+        #  rviz_node,
          robot_state_publisher,
          run_move_group_node,
          ros2_control_node,
