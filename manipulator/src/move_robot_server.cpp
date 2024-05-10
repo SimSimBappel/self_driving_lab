@@ -211,7 +211,7 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
 
     auto robot_model_ = move_group_->getRobotModel();
 
-    visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, base_link, "visual_markers", robot_model_);
+    // visual_tools = std::make_shared<moveit_visual_tools::MoveItVisualTools>(node_, base_link, "visual_markers", robot_model_);
 
     Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
 
