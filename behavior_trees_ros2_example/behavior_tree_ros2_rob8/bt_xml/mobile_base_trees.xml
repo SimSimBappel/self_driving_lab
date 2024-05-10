@@ -12,12 +12,10 @@
                  emptied="{emptied}"
                  storage_vessel_tray="10"
                  empty_hand="{empty_hand}"/>
-        <Sequence>
-          <HomeArmAction action_name="__default__placeholder__"/>
-          <MirMissionAction mission_id="{workstation}"
-                            result="{result}"
-                            action_name="__default__placeholder__"/>
-        </Sequence>
+        <HomeArmAction action_name="__default__placeholder__"/>
+        <MirMissionAction mission_id="{workstation}"
+                          result="{result}"
+                          action_name="__default__placeholder__"/>
       </Sequence>
     </Fallback>
   </BehaviorTree>

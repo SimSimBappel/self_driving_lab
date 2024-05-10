@@ -36,7 +36,7 @@
 
 
 
-static const double PLANNING_TIME_S = 5.0;
+static const double PLANNING_TIME_S = 25.0;
 static const double MAX_VELOCITY_SCALE = 0.8;
 static const double MAX_ACCELERATION_SCALE = 0.8;
 static const unsigned int PLANNING_ATTEMPTS = 10;
@@ -1079,7 +1079,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
         move_group_->setPathConstraints(orientation_constraints);
 
-        move_group_->setPlanningTime(20.0);
+        // move_group_->setPlanningTime(20.0);
       }
       else if(goal->lin){
         move_group_->setPlannerId("geometric::RRTstar");
@@ -1098,7 +1098,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
 
         move_group_->setPathConstraints(orientation_constraints);
 
-        move_group_->setPlanningTime(20.0);
+        // move_group_->setPlanningTime(20.0);
         // move_group_->setPlanningTime(20.0);
         // // LINE CONSTRAINTS
         // moveit_msgs::msg::PositionConstraint line_constraint;
@@ -1158,7 +1158,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_msg_handle_goal(
         moveit_msgs::msg::Constraints empty_constraints;
         move_group_->setPathConstraints(empty_constraints);
         move_group_->clearPathConstraints();
-        move_group_->setPlanningTime(10.0);
+        // move_group_->setPlanningTime(10.0);
 
       }
 
@@ -1337,7 +1337,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_pose_handle_goal(
         orientation_constraints.orientation_constraints.emplace_back(orientation_constraint);
 
         move_group_->setPathConstraints(orientation_constraints);
-        move_group_->setPlanningTime(20.0);
+        // move_group_->setPlanningTime(20.0);
       }
       else{
         // moveit_msgs::msg::OrientationConstraint orientation_constraint;

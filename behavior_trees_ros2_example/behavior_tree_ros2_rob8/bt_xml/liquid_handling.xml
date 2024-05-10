@@ -44,16 +44,6 @@
                          type_="pick"
                          slot_id="{slot_id}"
                          service_name="__default__placeholder__"/>
-        <PrintValue message="got_chemical"/>
-        <Fallback>
-          <SubTree ID="move_base"
-                   storage_tray="5"
-                   side_grasp_tray="7"
-                   emptied="{empty}"
-                   storage_vessel_tray="10"
-                   empty_hand="{empty_hand}"
-                   workstation="{workstation}"/>
-        </Fallback>
         <Fallback>
           <SubTree ID="visual_grasp"
                    aruco_id="{aruco_id}"
@@ -85,16 +75,13 @@
                                type_="pick"
                                slot_id="{slot_id}"
                                service_name="__default__placeholder__"/>
-              <Fallback>
-                <AlwaysSuccess/>
-                <SubTree ID="move_base"
-                         storage_tray="5"
-                         side_grasp_tray="7"
-                         emptied="{empty}"
-                         storage_vessel_tray="10"
-                         empty_hand="{empty_hand}"
-                         workstation=""/>
-              </Fallback>
+              <SubTree ID="move_base"
+                       storage_tray="5"
+                       side_grasp_tray="7"
+                       emptied="{empty}"
+                       storage_vessel_tray="10"
+                       empty_hand="{empty_hand}"
+                       workstation=""/>
               <SubTree ID="visual_grasp"
                        aruco_id="{aruco_id}"
                        lookout_pose_msg="{lookout_pose_msg}"
@@ -108,20 +95,14 @@
             </Sequence>
           </Precondition>
         </Fallback>
-        <PrintValue message="5"/>
-        <PrintValue message="6"/>
         <Sleep msec="200"/>
-        <PrintValue message="{empty_hand}"/>
-        <PrintValue message="{reagent}"/>
         <RemoveChemicalPlacementNode message="{m}"
                                      success="{s}"
                                      name_="{reagent}"
                                      slot_id="{slot_id}"
                                      service_name="__default__placeholder__"/>
         <Sleep msec="200"/>
-        <PrintValue message="7"/>
         <Script code="empty_hand=reagent"/>
-        <PrintValue message="{empty_hand}"/>
       </Sequence>
     </Precondition>
   </BehaviorTree>
