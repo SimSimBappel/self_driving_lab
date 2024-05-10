@@ -330,32 +330,24 @@
       <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.01;0.0;0.0;0.0"
                                    pose="{target_pose_msg}"
                                    pose_w_offset="{target_pose_msg1}"/>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="3">
         <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
                                      speed="0.05"
                                      accel="0.05"
                                      action_name="__default__placeholder__"/>
-        <ArmMovePlizLinPoseMsgAction pose="{target_pose_msg1}"
-                                     speed="0.02"
-                                     accel="0.02"
-                                     action_name="__default__placeholder__"/>
-      </Fallback>
+      </RetryUntilSuccessful>
       <Sleep msec="200"/>
       <FrankaMoveGripperAction width="0.078"
                                speed="0.03"
                                action_name="__default__placeholder__"/>
       <Sleep msec="200"/>
       <ClearOctomapNode service_name="__default__placeholder__"/>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="3">
         <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
                                      speed="0.1"
                                      accel="0.1"
                                      action_name="__default__placeholder__"/>
-        <ArmMovePlizLinPoseMsgAction pose="{approach_pose}"
-                                     speed="0.02"
-                                     accel="0.02"
-                                     action_name="__default__placeholder__"/>
-      </Fallback>
+      </RetryUntilSuccessful>
     </Sequence>
   </BehaviorTree>
 
@@ -430,21 +422,15 @@
 
   <BehaviorTree ID="visual_place">
     <Sequence>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="5">
         <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
                               speed="0.2"
                               accel="0.2"
                               keep_orientation="{keep_orientation}"
                               lin="false"
                               action_name="__default__placeholder__"/>
-        <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
-                              speed="0.2"
-                              accel="0.2"
-                              keep_orientation="{keep_orientation}"
-                              lin="false"
-                              action_name="__default__placeholder__"/>
-      </Fallback>
-      <Fallback>
+      </RetryUntilSuccessful>
+      <RetryUntilSuccessful num_attempts="5">
         <Sequence>
           <ArucoAction id="{aruco_id}"
                        aruco_to_slot_transform="{aruco_to_slot}"
@@ -459,21 +445,7 @@
                                  service_name="__default__placeholder__"/>
           </RetryUntilSuccessful>
         </Sequence>
-        <Sequence>
-          <ArucoAction id="{aruco_id}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       Transform="{object_pose_msg}"
-                       action_name="__default__placeholder__"/>
-          <RetryUntilSuccessful num_attempts="5">
-            <LookupTransformNode result="{bool_result}"
-                                 transform="{object_pose_msg2}"
-                                 source="double_check"
-                                 target="panda_link0"
-                                 service_name="__default__placeholder__"/>
-          </RetryUntilSuccessful>
-        </Sequence>
-      </Fallback>
+      </RetryUntilSuccessful>
       <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.0;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
@@ -485,7 +457,7 @@
                               lin="false"
                               action_name="__default__placeholder__"/>
         <Sequence>
-          <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.05;0.0;0.0;0.0"
+          <ArmPoseMsgOffsetCalculation offset="-0.03;0.0;-0.05;0.0;0.0;0.0"
                                        pose="{object_pose_msg2}"
                                        pose_w_offset="{second_lookout2}"/>
           <ArmMovePoseMsgAction pose="{second_lookout2}"
@@ -496,7 +468,7 @@
                                 action_name="__default__placeholder__"/>
         </Sequence>
       </Fallback>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="5">
         <Sequence>
           <ArucoAction id="{aruco_id}"
                        aruco_to_slot_transform="{aruco_to_slot}"
@@ -511,21 +483,7 @@
                                  service_name="__default__placeholder__"/>
           </RetryUntilSuccessful>
         </Sequence>
-        <Sequence>
-          <ArucoAction id="{aruco_id}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       Transform="{object_pose_msg}"
-                       action_name="__default__placeholder__"/>
-          <RetryUntilSuccessful num_attempts="5">
-            <LookupTransformNode result="{bool_result}"
-                                 transform="{object_pose_msg2}"
-                                 source="grab_pose"
-                                 target="panda_link0"
-                                 service_name="__default__placeholder__"/>
-          </RetryUntilSuccessful>
-        </Sequence>
-      </Fallback>
+      </RetryUntilSuccessful>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <SubTree ID="place_pose_msg"
                target_pose_msg="{object_pose_msg2}"
