@@ -373,8 +373,7 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <PrintValue message="1"/>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="2">
         <Sequence>
           <ArucoAction id="{aruco_id}"
                        aruco_to_slot_transform="{aruco_to_slot}"
@@ -389,22 +388,7 @@
                                  service_name="__default__placeholder__"/>
           </RetryUntilSuccessful>
         </Sequence>
-        <Sequence>
-          <ArucoAction id="{aruco_id}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       Transform="{object_pose_msg}"
-                       action_name="__default__placeholder__"/>
-          <RetryUntilSuccessful num_attempts="5">
-            <LookupTransformNode result="{bool_result}"
-                                 transform="{object_pose_msg2}"
-                                 source="double_check"
-                                 target="panda_link0"
-                                 service_name="__default__placeholder__"/>
-          </RetryUntilSuccessful>
-        </Sequence>
-      </Fallback>
-      <PrintValue message="2"/>
+      </RetryUntilSuccessful>
       <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
@@ -414,7 +398,7 @@
                             keep_orientation="{keep_orientation}"
                             lin="false"
                             action_name="__default__placeholder__"/>
-      <Fallback>
+      <RetryUntilSuccessful num_attempts="2">
         <Sequence>
           <ArucoAction id="{aruco_id}"
                        aruco_to_slot_transform="{aruco_to_slot}"
@@ -429,28 +413,13 @@
                                  service_name="__default__placeholder__"/>
           </RetryUntilSuccessful>
         </Sequence>
-        <Sequence>
-          <ArucoAction id="{aruco_id}"
-                       aruco_to_slot_transform="{aruco_to_slot}"
-                       slot_to_slot_transform="{slot_to_slot}"
-                       Transform="{object_pose_msg}"
-                       action_name="__default__placeholder__"/>
-          <RetryUntilSuccessful num_attempts="5">
-            <LookupTransformNode result="{bool_result}"
-                                 transform="{object_pose_msg2}"
-                                 source="grab_pose"
-                                 target="panda_link0"
-                                 service_name="__default__placeholder__"/>
-          </RetryUntilSuccessful>
-        </Sequence>
-      </Fallback>
+      </RetryUntilSuccessful>
       <AddObjectNode pose="{object_pose_msg2}"
                      object_id="{reagent}"
                      shape="cylinder"
                      size_x="0.02"
                      size_y="0.15.5"
                      service_name="__default__placeholder__"/>
-      <PrintValue message="3"/>
       <SubTree ID="grasp_pose_msg"
                target_pose_msg="{object_pose_msg2}"
                approch_offset="{approach_offset}"
