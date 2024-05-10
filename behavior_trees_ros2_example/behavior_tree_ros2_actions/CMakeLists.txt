@@ -45,6 +45,7 @@ set(action_files
     "action/ArmMoveTrajectoryPour.action"
     "action/MirMission.action"
     "action/WaitForUser.action"
+    "action/Xdl.action"
     # "action/MoveGroupSequence.action"
     # "action/Pickup.action"
     # "action/Place.action"

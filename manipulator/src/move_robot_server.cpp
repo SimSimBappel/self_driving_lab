@@ -567,6 +567,7 @@ rclcpp_action::GoalResponse MoveRobotServer::home_arm_handle_goal(
     move_group_->setNamedTarget("ready");
     move_group_->setPlanningPipelineId("ompl");
     move_group_->setStartStateToCurrentState();
+    move_group_->clearPathConstraints();
     move_group_->setMaxVelocityScalingFactor(0.1);
     move_group_->setMaxAccelerationScalingFactor(0.1);
     auto feedback = std::make_shared<Home::Feedback>();

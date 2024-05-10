@@ -18,12 +18,14 @@ find_package(behavior_tree_ros2_actions REQUIRED)
 find_package(franka_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(pgsql_interfaces REQUIRED)
+find_package(rclcpp REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 set(THIS_PACKAGE_DEPS 
     behaviortree_ros2
     std_msgs
+    rclcpp
     std_srvs
     geometry_msgs
     tf2_geometry_msgs

@@ -315,7 +315,8 @@ def generate_launch_description():
     )
     robot_arg = DeclareLaunchArgument(
         robot_ip_parameter_name,
-        default_value='192.168.2.30',
+        # default_value='192.168.2.30',
+        default_value='192.168.12.228',
         description='Hostname or IP address of the robot.')
 
     use_fake_hardware_arg = DeclareLaunchArgument(
@@ -364,6 +365,18 @@ def generate_launch_description():
         output='screen'
     )
 
+    mir_mission_server = Node(
+        package='mir',
+        executable='mir_server_node',
+        output='screen'
+    )
+
+    mir_check_position_server = Node(
+        package='mir',
+        executable='mir_position_node',
+        output='screen'
+    )
+
     return LaunchDescription(
         [robot_arg,
          use_sim_time_arg,
@@ -384,7 +397,9 @@ def generate_launch_description():
         #  launch_moveit,
          launch_pose_estimation,
         #  behavior_server,
-         xdl_parser
+        mir_check_position_server,
+         xdl_parser,
+            mir_mission_server,
          ]
         + load_controllers
     )

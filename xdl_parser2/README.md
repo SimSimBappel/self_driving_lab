@@ -16,4 +16,6 @@ CLI service call:
 ```sh
 ros2 service call /convert_xdl behavior_tree_ros2_actions/srv/Xdl "{xdl:""}"
 ```
-
+```sh
+ros2 action send_goal /convert_xdl behavior_tree_ros2_actions/action/Xdl "{xdl: ""}"
+```

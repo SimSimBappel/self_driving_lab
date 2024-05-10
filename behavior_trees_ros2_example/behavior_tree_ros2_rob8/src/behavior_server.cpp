@@ -3,6 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/executors.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
 
 #include "gripper_behaviors.cpp"
 #include "camera_behaviors.cpp"
@@ -27,6 +28,7 @@
 #include <random>
 
 #include "behavior_tree_ros2_actions/srv/xdl.hpp"
+#include "behavior_tree_ros2_actions/action/xdl.hpp"
 
 #ifndef USE_SLEEP_PLUGIN
 #include "sleep_action.hpp"
@@ -76,7 +78,13 @@ class BehaviorServer : public rclcpp::Node
     
       this->service_ = create_service<behavior_tree_ros2_actions::srv::Xdl>("xdl_service", std::bind(&BehaviorServer::Xdl_service, this,
                                 std::placeholders::_1, std::placeholders::_2));
-    
+
+      this->action_server = rclcpp_action::create_server<behavior_tree_ros2_actions::action::Xdl>(
+      this,
+      "xdl_action",
+      std::bind(&BehaviorServer::action_server_handle_goal, this, std::placeholders::_1, std::placeholders::_2),
+      std::bind(&BehaviorServer::action_server_handle_cancel, this, std::placeholders::_1),
+      std::bind(&BehaviorServer::action_server_handle_accepted, this, std::placeholders::_1));
 
   RosNodeParams params_wait_for_user;
   params_wait_for_user.nh = this->node_;
@@ -175,8 +183,8 @@ class BehaviorServer : public rclcpp::Node
         RosNodeParams params_gripper_franka_move;
         // params_gripper_franka_move.nh = shared_from_this();
         params_gripper_franka_move.nh = this->node_;
-        params_gripper_franka_move.server_timeout = std::chrono::milliseconds(2000);
-        params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_gripper_franka_move.server_timeout = std::chrono::milliseconds(8000);
+        params_gripper_franka_move.wait_for_server_timeout = std::chrono::milliseconds(4000);
         params_gripper_franka_move.default_port_value = "panda_gripper/move";
         factory.registerNodeType<FrankaMoveGripperAction>("FrankaMoveGripperAction",params_gripper_franka_move);
         ////////////////////////////////////////////////////////////////////////////////////////
@@ -322,6 +330,20 @@ class BehaviorServer : public rclcpp::Node
         params_arm_move_trajectory_pour_msg.server_timeout = std::chrono::milliseconds(3000);
         params_arm_move_trajectory_pour_msg.wait_for_server_timeout = std::chrono::milliseconds(2000);
         factory.registerNodeType<ArmMoveTrajectoryPourAction>("ArmMoveTrajectoryPourAction",params_arm_move_trajectory_pour_msg);
+
+        RosNodeParams params_move_base;
+        params_move_base.nh = this->node_;
+        params_move_base.server_timeout = std::chrono::milliseconds(2000);
+        params_move_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_move_base.default_port_value = "mir_mission_action";
+        factory.registerNodeType<MirMissionAction>("MirMissionAction",params_move_base);
+
+        RosNodeParams params_check_base;
+        params_check_base.nh = this->node_;
+        params_check_base.server_timeout = std::chrono::milliseconds(2000);
+        params_check_base.wait_for_server_timeout = std::chrono::milliseconds(1000);
+        params_check_base.default_port_value = "mir_check_position";
+        factory.registerNodeType<MirMissionAction>("MirCheckPosition",params_check_base);
         #ifdef USE_SLEEP_PLUGIN
         RegisterRosNode(factory, "../lib/libsleep_action_plugin.so", params);
         #else
@@ -368,12 +390,14 @@ class BehaviorServer : public rclcpp::Node
             timer_ = this->create_wall_timer(
                 timer_period,
                 std::bind(&BehaviorServer::update_behavior_tree, this));
+        std::cout << "lets goooo\n";
 
         // tree.tickWhileRunning();
         
 
 
     }
+
     void update_behavior_tree() {
             // Tick the behavior tree.
             BT::NodeStatus tree_status = tree_.tickOnce();
@@ -384,13 +408,96 @@ class BehaviorServer : public rclcpp::Node
             if (tree_status == BT::NodeStatus::SUCCESS) {
                 RCLCPP_INFO(this->get_logger(), "Finished with status SUCCESS");
                 timer_->cancel();
-                rclcpp::shutdown(); // remove this when using the service
+                // rclcpp::shutdown(); // remove this when using the service
             } else if (tree_status == BT::NodeStatus::FAILURE) {
                 RCLCPP_INFO(this->get_logger(), "Finished with status FAILURE");
                 timer_->cancel();
                 rclcpp::shutdown(); // remove this when using the service
             }
         }
+
+
+
+
+
+    
+rclcpp_action::GoalResponse action_server_handle_goal(
+    const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const behavior_tree_ros2_actions::action::Xdl::Goal> goal)
+  {
+    (void)goal; //ignore unused parameter warning
+    // RCLCPP_INFO(this->get_logger(), "Received goal requsdadest with sleep time %d",goal->pose);
+    // 
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse action_server_handle_cancel(
+    const std::shared_ptr<rclcpp_action::ServerGoalHandle<behavior_tree_ros2_actions::action::Xdl>> goal_handle)
+  {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    (void)goal_handle;
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void action_server_handle_accepted(const std::shared_ptr<rclcpp_action::ServerGoalHandle<behavior_tree_ros2_actions::action::Xdl>> goal_handle)
+  {
+    using namespace std::placeholders;
+    std::thread{std::bind(&BehaviorServer::action_server_execute, this, _1), goal_handle}.detach();
+
+  }
+
+  void action_server_execute(const std::shared_ptr<rclcpp_action::ServerGoalHandle<behavior_tree_ros2_actions::action::Xdl>> goal_handle){
+      auto result = std::make_shared<behavior_tree_ros2_actions::action::Xdl::Result>();
+
+
+
+
+
+      const auto goal = goal_handle->get_goal();
+      factory.registerBehaviorTreeFromText(goal->xdl);
+        
+      std::cout << "register main tree success\n";
+      tree_ = factory.createTree("Main");
+      std::cout << "create main tree success\n";
+      bool running = true;
+      while(running){
+        sleep(0.01);
+        BT::NodeStatus tree_status = tree_.tickOnce();
+            if (tree_status == BT::NodeStatus::RUNNING) {
+                // return;
+            }
+            // Cancel the timer if we hit a terminal state.
+            if (tree_status == BT::NodeStatus::SUCCESS) {
+                RCLCPP_INFO(this->get_logger(), "Finished with status SUCCESS");
+                // timer_->cancel();
+                // rclcpp::shutdown(); // remove this when using the service
+                result->result = true;
+                goal_handle->succeed(result);
+                RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+                running = false;
+                break;
+            } else if (tree_status == BT::NodeStatus::FAILURE) {
+                RCLCPP_INFO(this->get_logger(), "Finished with status FAILURE");
+                // timer_->cancel();
+                result->result = false;
+                goal_handle->abort(result);
+                RCLCPP_INFO(this->get_logger(), "Goal abort");
+                running = false;
+                break;
+                // rclcpp::shutdown(); // remove this when using the service
+            }
+        }
+                // std::cout << "create main tree success\n";
+                // sleep(2);
+                // result->result = true;
+                // goal_handle->succeed(result);
+
+
+      }
+      
+
+
+
 
     void test(){
         tree_ = factory.createTree("node_test_tree");
@@ -415,6 +522,7 @@ class BehaviorServer : public rclcpp::Node
                 std::bind(&BehaviorServer::update_behavior_tree, this));
     }
     rclcpp::Service<behavior_tree_ros2_actions::srv::Xdl>::SharedPtr service_;
+    rclcpp_action::Server<behavior_tree_ros2_actions::action::Xdl>::SharedPtr action_server;
     rclcpp::Node::SharedPtr node_;
     BT::Tree tree_;
     std::unique_ptr<BT::Groot2Publisher> publisher_ptr_;

@@ -107,7 +107,13 @@ class LookupTransformNode: public RosServiceNode<LookupTransform>
     setOutput("transform",response->transform);
     // setOutput("aruco_to_slot_transform",response->aruco_to_slot_transform);
     // setOutput("slot_to_slot_transform",response->slot_to_slot_transform);
-    return NodeStatus::SUCCESS;
+    if(response->result== true){
+      return NodeStatus::SUCCESS;
+    }
+    else{
+      return NodeStatus::FAILURE;
+    }
+    
   }
 
   // Callback invoked when there was an error at the level

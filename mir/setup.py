@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mir_server_node = mir.mir_server_node:main',
+            'mir_position_node = mir.mir_check_position_node:main',
         ],
     },
 )

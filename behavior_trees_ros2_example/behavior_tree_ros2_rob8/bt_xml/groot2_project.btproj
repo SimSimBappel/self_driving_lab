@@ -210,6 +210,16 @@
             <input_port name="target" type="std::string"/>
             <input_port name="service_name" default="__default__placeholder__" type="std::string">Service name</input_port>
         </Action>
+        <Action ID="MirCheckPosition">
+            <input_port name="mission_id" type="std::string"/>
+            <output_port name="result" type="bool"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
+        <Action ID="MirMissionAction">
+            <input_port name="mission_id" type="std::string"/>
+            <output_port name="result" type="bool"/>
+            <input_port name="action_name" default="__default__placeholder__" type="std::string">Action server name</input_port>
+        </Action>
         <Action ID="PlaceChemicalNode">
             <output_port name="message" type="std::string"/>
             <output_port name="workstation_name" type="std::string"/>
@@ -315,7 +325,7 @@
             <input_port name="target_pose_msg"/>
             <input_port name="approch_offset"/>
             <input_port name="object_id"/>
-            <output_port name="object_is_not_there" default="0"/>
+            <inout_port name="object_is_not_there" default="0"/>
         </SubTree>
         <SubTree ID="grasp_pour_msg" editable="true">
             <input_port name="target_pose_msg"/>
@@ -338,6 +348,7 @@
             <input_port name="emptied"/>
             <input_port name="storage_vessel_tray" default="10"/>
             <inout_port name="empty_hand"/>
+            <input_port name="workstation"/>
         </SubTree>
         <SubTree ID="place_pose_msg" editable="true">
             <input_port name="target_pose_msg"/>
@@ -355,7 +366,7 @@
             <input_port name="slot_to_slot"/>
             <input_port name="keep_orientation"/>
             <input_port name="approach_offset" default="0.0;0.0;-0.1;0.0;0.0;0.0"/>
-            <output_port name="object_not_there" default="0"/>
+            <inout_port name="object_not_there" default="0"/>
             <inout_port name="reagent"/>
             <inout_port name="empty_hand"/>
         </SubTree>
@@ -372,9 +383,9 @@
             <input_port name="chemical_name"/>
             <input_port name="vessel_name"/>
             <output_port name="aruco_id1"/>
-            <output_port name="aruco_to_slot_transform"/>
-            <output_port name="slot_to_slot_transform"/>
-            <output_port name="lookout_pose"/>
+            <output_port name="aruco_to_slot1"/>
+            <output_port name="slot_to_slot1"/>
+            <output_port name="lookout_pose_msg2"/>
             <output_port name="slot_id"/>
         </SubTree>
     </TreeNodesModel>

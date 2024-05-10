@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root BTCPP_format="4">
   <BehaviorTree ID="move_base">
-    <Sequence>
-      <SubTree ID="empty_gripper"
-               storage_tray="5"
-               side_grasp_tray="7"
-               emptied="{emptied}"
-               storage_vessel_tray="10"
-               empty_hand="{empty_hand}"/>
+    <Fallback>
+      <MirCheckPosition mission_id="{workstation}"
+                        result="{result}"
+                        action_name="__default__placeholder__"/>
       <Sequence>
-        <HomeArmAction action_name="__default__placeholder__"/>
-        <AlwaysSuccess/>
+        <SubTree ID="empty_gripper"
+                 storage_tray="5"
+                 side_grasp_tray="7"
+                 emptied="{emptied}"
+                 storage_vessel_tray="10"
+                 empty_hand="{empty_hand}"/>
+        <Sequence>
+          <HomeArmAction action_name="__default__placeholder__"/>
+          <MirMissionAction mission_id="{workstation}"
+                            result="{result}"
+                            action_name="__default__placeholder__"/>
+        </Sequence>
       </Sequence>
-    </Sequence>
+    </Fallback>
   </BehaviorTree>
 
   <BehaviorTree ID="move_base_to_goal">
@@ -24,6 +31,24 @@
   <!-- Description of Node Models (used by Groot) -->
   <TreeNodesModel>
     <Action ID="HomeArmAction">
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="MirCheckPosition">
+      <input_port name="mission_id"
+                  type="std::string"/>
+      <output_port name="result"
+                   type="bool"/>
+      <input_port name="action_name"
+                  default="__default__placeholder__"
+                  type="std::string">Action server name</input_port>
+    </Action>
+    <Action ID="MirMissionAction">
+      <input_port name="mission_id"
+                  type="std::string"/>
+      <output_port name="result"
+                   type="bool"/>
       <input_port name="action_name"
                   default="__default__placeholder__"
                   type="std::string">Action server name</input_port>
