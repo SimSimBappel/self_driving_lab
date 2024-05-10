@@ -216,9 +216,9 @@ MoveRobotServer::MoveRobotServer(const rclcpp::NodeOptions &options)
     Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
 
     text_pose.translation().z() = 1.0;
-    visual_tools->deleteAllMarkers();  // clear all old markers
-    visual_tools->publishText(text_pose, "Frank_________A", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-    visual_tools->trigger();
+   //visual_tools->deleteAllMarkers();  // clear all old markers
+   //visual_tools->publishText(text_pose, "Frank_________A", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+   //visual_tools->trigger();
 
 
 
@@ -303,7 +303,7 @@ void MoveRobotServer::remove_object_callback(
         int attempts = 0;
         bool object_removed = false;
 
-        visual_tools->deleteAllMarkers();
+       //visual_tools->deleteAllMarkers();
       
 
         while (!object_removed) {
@@ -1655,8 +1655,8 @@ void MoveRobotServer::get_pre_pour_pose_callback(
         if(object_poses.find(bottle_name) != object_poses.end()) {
             // Get the pose of the "bottle" object
             geometry_msgs::msg::Pose bottle_pose = object_poses[bottle_name];
-            visual_tools->publishAxisLabeled(bottle_pose, bottle_name);
-            visual_tools->trigger();
+            ////visual_tools->publishAxisLabeled(bottle_pose, bottle_name);
+            ////visual_tools->trigger();
             
 
             // Set the target pose
@@ -1686,8 +1686,8 @@ void MoveRobotServer::get_pre_pour_pose_callback(
             bottle_pose.orientation.z = quat.z();
             bottle_pose.orientation.w = quat.w();
 
-            visual_tools->publishAxisLabeled(bottle_pose, "grasp_target");
-            visual_tools->trigger();
+           //visual_tools->publishAxisLabeled(bottle_pose, "grasp_target");
+            //visual_tools->trigger();
 
             // move_group.setPoseTarget(bottle_pose);
 
@@ -1707,8 +1707,8 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                 geometry_msgs::msg::Pose container_pose_ = container_poses_[container_name];
 
 
-                visual_tools->publishAxisLabeled(container_pose_, "container_pose");
-                visual_tools->trigger();
+                //visual_tools->publishAxisLabeled(container_pose_, "container_pose");
+                //visual_tools->trigger();
 
                 container_pose_.position.x -= 0.03;
                 container_pose_.position.y -= 0.08;
@@ -1737,8 +1737,8 @@ void MoveRobotServer::get_pre_pour_pose_callback(
                 response->result = true;
                 response->pose_container = stamped_pose2;
 
-                visual_tools->publishAxisLabeled(container_pose_, "container_pose_above");
-                visual_tools->trigger();
+                //visual_tools->publishAxisLabeled(container_pose_, "container_pose_above");
+                //visual_tools->trigger();
 
 
           }
@@ -1915,8 +1915,8 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       container_frame_n = container_frame_n * Eigen::Translation3d(Eigen::Vector3d(0, 0, -container_object.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT] / 2 + 0.011));
       container_frame_n.linear().setIdentity();
 
-      visual_tools->publishAxisLabeled(container_frame_n, "CONTAINER_FRAME");
-      visual_tools->trigger();
+      //visual_tools->publishAxisLabeled(container_frame_n, "CONTAINER_FRAME");
+      //visual_tools->trigger();
 
       //! TESTING
 
@@ -2054,11 +2054,11 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       // }
 
 
-      visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
-      visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
-      for (std::size_t i = 0; i < waypoints.size(); ++i)
-      visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
-      visual_tools->trigger();
+      //visual_tools->publishText(text_pose, "Cartesian_Path", rviz_visual_tools::WHITE, rviz_visual_tools::XLARGE);
+      //visual_tools->publishPath(waypoints, rviz_visual_tools::LIME_GREEN, rviz_visual_tools::SMALL);
+      // for (std::size_t i = 0; i < waypoints.size(); ++i)
+      //visual_tools->publishAxisLabeled(waypoints[i], "pt" + std::to_string(i), rviz_visual_tools::SMALL);
+      //visual_tools->trigger();
 
 
       // Get the current robot model
@@ -2106,7 +2106,7 @@ rclcpp_action::GoalResponse MoveRobotServer::arm_move_trajectory_pour_handle_goa
       // move_group_->execute(reverse_trajectory_msg);
 
       result->done = true;
-      visual_tools->deleteAllMarkers();
+     //visual_tools->deleteAllMarkers();
       goal_handle->succeed(result);
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
     }
