@@ -359,12 +359,25 @@
 
   <BehaviorTree ID="visual_grasp">
     <Sequence>
-      <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="{keep_orientation}"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="{keep_orientation}"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+        <Sequence>
+          <ArmPoseMsgOffsetCalculation offset="-0.05;0.0;0.1;0.0;0.0;0.0"
+                                       pose="{lookout_pose_msg}"
+                                       pose_w_offset="{lookout_pose_msg2}"/>
+          <ArmMovePoseMsgAction pose="{lookout_pose_msg2}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+      </Fallback>
       <RetryUntilSuccessful num_attempts="2">
         <Sequence>
           <ArucoAction id="{aruco_id}"
@@ -381,15 +394,38 @@
           </RetryUntilSuccessful>
         </Sequence>
       </RetryUntilSuccessful>
-      <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.;0.0;0.0;0.0"
+      <ArmPoseMsgOffsetCalculation offset="0.0;0.0;0.0;0.0;0.0;0.0"
                                    pose="{object_pose_msg2}"
                                    pose_w_offset="{second_lookout}"/>
-      <ArmMovePoseMsgAction pose="{second_lookout}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="{keep_orientation}"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePoseMsgAction pose="{second_lookout}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="{keep_orientation}"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+        <Sequence>
+          <ArmPoseMsgOffsetCalculation offset="0.03;0.0;-0.05;0.0;0.0;0.0"
+                                       pose="{second_lookout}"
+                                       pose_w_offset="{second_lookout2}"/>
+          <ArmMovePoseMsgAction pose="{second_lookout2}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+        <Sequence>
+          <ClearOctomapNode service_name="__default__placeholder__"/>
+          <Sleep msec="300"/>
+          <ArmMovePoseMsgAction pose="{second_lookout}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+      </Fallback>
       <RetryUntilSuccessful num_attempts="2">
         <Sequence>
           <ArucoAction id="{aruco_id}"
@@ -422,14 +458,33 @@
 
   <BehaviorTree ID="visual_place">
     <Sequence>
-      <RetryUntilSuccessful num_attempts="5">
+      <Fallback>
         <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
                               speed="0.2"
                               accel="0.2"
                               keep_orientation="{keep_orientation}"
                               lin="false"
                               action_name="__default__placeholder__"/>
-      </RetryUntilSuccessful>
+        <Sequence>
+          <ArmPoseMsgOffsetCalculation offset="-0.05;0.0;0.1;0.0;0.0;0.0"
+                                       pose="{lookout_pose_msg}"
+                                       pose_w_offset="{lookout_pose_msg_fallback}"/>
+          <ArmMovePoseMsgAction pose="{lookout_pose_msg_fallback}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+        <RetryUntilSuccessful num_attempts="5">
+          <ArmMovePoseMsgAction pose="{lookout_pose_msg}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </RetryUntilSuccessful>
+      </Fallback>
       <RetryUntilSuccessful num_attempts="5">
         <Sequence>
           <ArucoAction id="{aruco_id}"
@@ -461,6 +516,16 @@
                                        pose="{object_pose_msg2}"
                                        pose_w_offset="{second_lookout2}"/>
           <ArmMovePoseMsgAction pose="{second_lookout2}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="{keep_orientation}"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+        <Sequence>
+          <ClearOctomapNode service_name="__default__placeholder__"/>
+          <Sleep msec="300"/>
+          <ArmMovePoseMsgAction pose="{second_lookout}"
                                 speed="0.2"
                                 accel="0.2"
                                 keep_orientation="{keep_orientation}"
@@ -515,12 +580,25 @@
                      aruco_to_slot_transform="{aruco_to_slot2}"
                      slot_to_slot_transform="{slot_to_slot2}"
                      service_name="__default__placeholder__"/>
-      <ArmMovePoseMsgAction pose="{lookout_pose_msg2}"
-                            speed="0.2"
-                            accel="0.2"
-                            keep_orientation="false"
-                            lin="false"
-                            action_name="__default__placeholder__"/>
+      <Fallback>
+        <ArmMovePoseMsgAction pose="{lookout_pose_msg2}"
+                              speed="0.2"
+                              accel="0.2"
+                              keep_orientation="false"
+                              lin="false"
+                              action_name="__default__placeholder__"/>
+        <Sequence>
+          <ArmPoseMsgOffsetCalculation offset="-0.05;0.0;0.1;0.0;0.0;0.0"
+                                       pose="{lookout_pose_msg2}"
+                                       pose_w_offset="{lookout_pose_msg3}"/>
+          <ArmMovePoseMsgAction pose="{lookout_pose_msg3}"
+                                speed="0.2"
+                                accel="0.2"
+                                keep_orientation="false"
+                                lin="false"
+                                action_name="__default__placeholder__"/>
+        </Sequence>
+      </Fallback>
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <RetryUntilSuccessful num_attempts="3">
         <Sequence>
@@ -549,12 +627,35 @@
       <ClearOctomapNode service_name="__default__placeholder__"/>
       <RetryUntilSuccessful num_attempts="3">
         <Sequence>
-          <ArmMovePoseMsgAction pose="{object_pose_msg1}"
-                                speed="0.2"
-                                accel="0.2"
-                                keep_orientation="false"
-                                lin="false"
-                                action_name="__default__placeholder__"/>
+          <Fallback>
+            <ArmMovePoseMsgAction pose="{object_pose_msg1}"
+                                  speed="0.2"
+                                  accel="0.2"
+                                  keep_orientation="false"
+                                  lin="false"
+                                  action_name="__default__placeholder__"/>
+            <Sequence>
+              <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.05;0.0;0.0;0.0"
+                                           pose="{object_pose_msg1}"
+                                           pose_w_offset="{object_pose_msg1_fallback}"/>
+              <ArmMovePoseMsgAction pose="{object_pose_msg1_fallback}"
+                                    speed="0.2"
+                                    accel="0.2"
+                                    keep_orientation="false"
+                                    lin="false"
+                                    action_name="__default__placeholder__"/>
+            </Sequence>
+            <Sequence>
+              <ClearOctomapNode service_name="__default__placeholder__"/>
+              <Sleep msec="300"/>
+              <ArmMovePoseMsgAction pose="{object_pose_msg1}"
+                                    speed="0.2"
+                                    accel="0.2"
+                                    keep_orientation="false"
+                                    lin="false"
+                                    action_name="__default__placeholder__"/>
+            </Sequence>
+          </Fallback>
           <ArucoAction id="{aruco_id1}"
                        aruco_to_slot_transform="{aruco_to_slot1}"
                        slot_to_slot_transform="{slot_to_slot1}"
@@ -569,12 +670,35 @@
       </RetryUntilSuccessful>
       <RetryUntilSuccessful num_attempts="3">
         <Sequence>
-          <ArmMovePoseMsgAction pose="{object_pose_msg2}"
-                                speed="0.2"
-                                accel="0.2"
-                                keep_orientation="false"
-                                lin="false"
-                                action_name="__default__placeholder__"/>
+          <Fallback>
+            <ArmMovePoseMsgAction pose="{object_pose_msg2}"
+                                  speed="0.2"
+                                  accel="0.2"
+                                  keep_orientation="false"
+                                  lin="false"
+                                  action_name="__default__placeholder__"/>
+            <Sequence>
+              <ArmPoseMsgOffsetCalculation offset="0.0;0.0;-0.05;0.0;0.0;0.0"
+                                           pose="{object_pose_msg2}"
+                                           pose_w_offset="{object_pose_msg2_fallback}"/>
+              <ArmMovePoseMsgAction pose="{object_pose_msg2_fallback}"
+                                    speed="0.2"
+                                    accel="0.2"
+                                    keep_orientation="false"
+                                    lin="false"
+                                    action_name="__default__placeholder__"/>
+            </Sequence>
+            <Sequence>
+              <ClearOctomapNode service_name="__default__placeholder__"/>
+              <Sleep msec="300"/>
+              <ArmMovePoseMsgAction pose="{object_pose_msg2}"
+                                    speed="0.2"
+                                    accel="0.2"
+                                    keep_orientation="false"
+                                    lin="false"
+                                    action_name="__default__placeholder__"/>
+            </Sequence>
+          </Fallback>
           <ArucoAction id="{aruco_id2}"
                        aruco_to_slot_transform="{aruco_to_slot2}"
                        slot_to_slot_transform="{slot_to_slot2}"
