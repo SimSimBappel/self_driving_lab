@@ -13,9 +13,11 @@
                  storage_vessel_tray="10"
                  empty_hand="{empty_hand}"/>
         <HomeArmAction action_name="__default__placeholder__"/>
-        <MirMissionAction mission_id="{workstation}"
-                          result="{result}"
-                          action_name="__default__placeholder__"/>
+        <RetryUntilSuccessful num_attempts="2">
+          <MirMissionAction mission_id="{workstation}"
+                            result="{result}"
+                            action_name="__default__placeholder__"/>
+        </RetryUntilSuccessful>
       </Sequence>
     </Fallback>
   </BehaviorTree>
