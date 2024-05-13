@@ -161,6 +161,7 @@
             <output_port name="aruco_id" type="signed char"/>
             <output_port name="empty" type="bool"/>
             <output_port name="success" type="bool"/>
+            <input_port name="tray_id" default="0" type="signed char"/>
             <output_port name="lookout_pose" type="geometry_msgs::msg::PoseStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <output_port name="aruco_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
             <output_port name="slot_to_slot_transform" type="geometry_msgs::msg::TransformStamped_&lt;std::allocator&lt;void&gt; &gt;"/>
