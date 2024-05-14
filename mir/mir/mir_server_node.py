@@ -13,7 +13,7 @@ class FibonacciActionServer(Node):
     def __init__(self):
         super().__init__('mir_server_node')
         self.mir = mir_api.MiR()
-        self.mir_url = "http://192.168.100.140/api/v2.0.0/"
+        self.mir_url = "http://192.168.12.20/api/v2.0.0/"
         self.battery_threshold = 30
 
         status = self.mir.get_system_info(self.mir_url)
@@ -55,6 +55,7 @@ class FibonacciActionServer(Node):
 
         
         while not self.mir.get_mission_latest_mission_status(self.mir_url):
+            print("mission not done, still alive")
             time.sleep(0.5)
         goal_handle.succeed()
         result = MirMission.Result()

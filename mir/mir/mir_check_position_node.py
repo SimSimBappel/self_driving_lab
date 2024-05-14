@@ -14,7 +14,7 @@ class MirPositionNode(Node):
     def __init__(self):
         super().__init__('mir_position_node')
         self.mir = mir_api.MiR()
-        self.mir_url = "http://192.168.100.140/api/v2.0.0/"
+        self.mir_url = "http://192.168.12.20/api/v2.0.0/"
         self.battery_threshold = 30
 
         status = self.mir.get_system_info(self.mir_url)

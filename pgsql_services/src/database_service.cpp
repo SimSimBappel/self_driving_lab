@@ -199,10 +199,13 @@ private:
             }
 
 
-
             for (auto row : result) {
                 int chemical_id = row["chemical_id"].as<int>();
-                std::string placement_query = "SELECT * FROM chemical_placements WHERE chemical_id = " + W.quote(chemical_id) + ";";
+                std::string placement_query = "SELECT cp.* FROM chemical_placements cp JOIN tray_slot ts ON cp.slot_id = ts.slot_id WHERE cp.chemical_id = " + W.quote(chemical_id);
+                if (request->tray != 0) { // Assuming 0 is not a valid tray ID
+                    placement_query += " AND ts.tray_id = " + W.quote(static_cast<int>(request->tray));
+                }
+                placement_query += ";";
                 pqxx::result placement_result = W.exec(placement_query);
 
                 if (placement_result.empty()) {
@@ -448,7 +451,7 @@ private:
                 if (free_slots == 0) {
                     response->success = false;
                     response->message = "No free slots";
-                    return;
+                    return; 
                 }
 
                 // Map the slot_ids in the range 1, 2, 3 ... sizeof(tray_id) to the tray_id

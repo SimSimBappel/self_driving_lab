@@ -458,6 +458,7 @@ rclcpp_action::GoalResponse action_server_handle_goal(
         
       std::cout << "register main tree success\n";
       tree_ = factory.createTree("Main");
+      // tree_ = factory.createTree("pick_and_place_test");
       std::cout << "create main tree success\n";
       bool running = true;
       while(running){
