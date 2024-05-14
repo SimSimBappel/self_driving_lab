@@ -175,3 +175,9 @@ ros2 service call /remove_vessel_placement pgsql_interfaces/srv/RemoveVesselPlac
 pgsql_interfaces.srv.RemoveVesselPlacement_Response(success=True, message='Operation completed successfully')
 ```
 
+
+
+
+
+
+ros2 service call /place_chemical pgsql_interfaces/srv/PlaceChemical "{name: 'natrium_chloride', tray_id: 12, emptied: false}"

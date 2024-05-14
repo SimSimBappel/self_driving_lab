@@ -316,7 +316,7 @@ def generate_launch_description():
     robot_arg = DeclareLaunchArgument(
         robot_ip_parameter_name,
         # default_value='192.168.2.30',
-        default_value='192.168.12.228',
+        default_value='192.168.2.228',
         description='Hostname or IP address of the robot.')
 
     use_fake_hardware_arg = DeclareLaunchArgument(
