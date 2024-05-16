@@ -8,18 +8,6 @@ sudo apt-get install -y libpqxx-dev libpqxx-6.4
 ## Testing services
 Please see docstrings in source code or .srv and .msg files for detailed compositions of services. 
 
-## Todo
-[x] - Internal relateSlots(), to relate increasing slot_ids to a local set. i.e. T1: 1, 2, 3 ; T2: 1 (4), 2 (5), 3 (6)
-[ ] - Add static transforms to respective .csv files in ../data directory (aruco->slot1) and (slot1 -> rest)
-[x] - Place vessel/chemical (upsert fnc) -> findslots() internal function
-[ ] - Edge cases, what about when we grip the item? (remove)
-[ ] - What is the best returned chem / vessel ? Maybe return a list sorted. 
-[ ] - Various adding to system flows, like: workstation -> arucotag -> tray/machine -> (tray_slots) -> vessel/chemical -> placement_tables
-[ ] - lookupAruco -> if needed
-[ ] - Tidy up recurring code
-[ ] - fix csv.h strcpy fnc -> null cases, if we feel like it. 
-
-
 ### Get Vessel
 ```
 request: 
@@ -44,8 +32,6 @@ Vessel not found
 
 #### Example CLI
 ```
-
-ros2 service call /get_pre_pour_pose_service behavior_tree_ros2_actions/srv/GetPrePourPose "{object_id: 20}"
 ros2 service call /get_vessel pgsql_interfaces/srv/GetVessel "{name: 'beaker'}"
 ---
 pgsql_interfaces.srv.GetVessel_Response(name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=506852090), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=1, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=505478335), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.7000000000000001, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711448538, nanosec=505489042), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), success=True, message='Vessel found')
@@ -59,7 +45,8 @@ string name
 response:
 string workstation_name
 geometry_msgs/PoseStamped lookout_pose               
-int8 aruco_id                                                       
+int8 aruco_id
+int8 tray_id (optional)                                                   
 geometry_msgs/TransformStamped aruco_to_slot_transform              
 geometry_msgs/TransformStamped slot_to_slot_transform   
 bool empty      
@@ -77,6 +64,7 @@ Chemical not found
 #### Example CLI
 ```
 ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'sulfuric_acid'}"
+ros2 service call /get_chemical pgsql_interfaces/srv/GetChemical "{name: 'sulfuric_acid', tray_id: '10'}"
 ---
 pgsql_interfaces.srv.GetChemical_Response(workstation_name='robot_table', lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=645658287), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=1.0, y=2.0, z=3.0), orientation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), aruco_id=2, aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644511923), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.5, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1711451806, nanosec=644531086), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, message='Chemical found')
 
@@ -107,17 +95,6 @@ No free slots
 Tray type is not vessel
 
 Could not access database
-
-
-pgsql_interfaces.srv.GetChemical_Response(workstation_name='workstation2', 
-
-lookout_pose=geometry_msgs.msg.PoseStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=387100400), frame_id='panda_link0'), pose=geometry_msgs.msg.Pose(position=geometry_msgs.msg.Point(x=0.30844, y=0.41801, z=0.14444), orientation=geometry_msgs.msg.Quaternion(x=0.71522, y=0.69876, z=-0.0099642, w=0.00915))), 
-
-aruco_id=14, 
-aruco_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=386682328), frame_id='panda_link0'), child_frame_id='slot_1', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=-0.12011000000000001, z=-0.06631), rotation=geometry_msgs.msg.Quaternion(x=-0.25685740834180054, y=-0.2568574083418005, z=-0.6588051849977608, w=0.6588051849977605))), 
-
-slot_to_slot_transform=geometry_msgs.msg.TransformStamped(header=std_msgs.msg.Header(stamp=builtin_interfaces.msg.Time(sec=1713771314, nanosec=386723959), frame_id='panda_link0'), child_frame_id='', transform=geometry_msgs.msg.Transform(translation=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=0.0), rotation=geometry_msgs.msg.Quaternion(x=0.0, y=0.0, z=0.0, w=1.0))), empty=False, success=True, message='Chemical found')
-
 
 #### Example CLI
 
