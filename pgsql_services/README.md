@@ -37,7 +37,9 @@ string message
 
 #### Response Messages
 Vessel found
+
 Vessel has no placements
+
 Vessel not found
 
 #### Example CLI
@@ -67,7 +69,9 @@ string message
 
 #### Response Messages
 Chemical found
+
 Chemical has no placements
+
 Chemical not found
 
 #### Example CLI
@@ -97,8 +101,11 @@ string message
 
 #### Response Messages
 Operation completed successfully
+
 No free slots
+
 Tray type is not vessel
+
 Could not access database
 
 
@@ -135,8 +142,11 @@ string message
 
 #### Response Messages
 Operation completed successfully
+
 No chemical found in the specified slot"
+
 Chemical not found 
+
 Could not access database
 
 
@@ -162,8 +172,11 @@ string message
 
 #### Response Messages
 Operation completed successfully
+
 No vessel found in the specified slot"
+
 Vessel not found 
+
 Could not access database
 
 
@@ -174,10 +187,3 @@ ros2 service call /remove_vessel_placement pgsql_interfaces/srv/RemoveVesselPlac
 ---
 pgsql_interfaces.srv.RemoveVesselPlacement_Response(success=True, message='Operation completed successfully')
 ```
-
-
-
-
-
-
-ros2 service call /place_chemical pgsql_interfaces/srv/PlaceChemical "{name: 'natrium_chloride', tray_id: 12, emptied: false}"
